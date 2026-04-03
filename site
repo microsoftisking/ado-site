@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADO API — Free AI Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d14;
+      --surface:   #13131f;
+      --surface2:  #1a1a2e;
+      --border:    #2a2a45;
+      --accent:    #b48ef7;
+      --accent2:   #f78eb4;
+      --accent3:   #8ef7e0;
+      --text:      #e8e8f5;
+      --muted:     #7070a0;
+      --success:   #7efcb0;
+      --error:     #fc7e7e;
+      --glow:      rgba(180, 142, 247, 0.25);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ===================== STARFIELD ===================== */
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===================== LAYOUT ===================== */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      gap: 2rem;
+    }
+
+    /* ===================== HEADER ===================== */
+    header {
+      text-align: center;
+      padding-top: 1rem;
+    }
+
+    .logo {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 18px rgba(180,142,247,0.5));
+    }
+
+    .tagline {
+      margin-top: 0.4rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+    }
+
+    .kawaii-deco {
+      margin-top: 0.6rem;
+      font-size: 1.4rem;
+      letter-spacing: 0.3em;
+    }
+
+    /* ===================== CARDS ===================== */
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(180,142,247,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, var(--glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+      line-height: 1.6;
+    }
+
+    /* ===================== BUTTONS ===================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.6rem;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #0d0d14;
+      box-shadow: 0 2px 20px rgba(180,142,247,0.35);
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 4px 30px rgba(180,142,247,0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+    .btn-copy:hover { border-color: var(--accent3); color: var(--accent3); }
+
+    /* ===================== KEY DISPLAY BOX ===================== */
+    .key-box {
+      display: none;
+      margin-top: 1.2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+    }
+
+    .key-box.visible { display: block; }
+
+    .key-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .key-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .key-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent3);
+      word-break: break-all;
+      flex: 1;
+      user-select: all;
+    }
+
+    .key-warning {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--accent2);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      line-height: 1.5;
+    }
+
+    /* ===================== INPUT ===================== */
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0.9rem;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(180,142,247,0.15);
+    }
+
+    input[type="text"]::placeholder { color: var(--muted); }
+
+    /* ===================== USAGE DISPLAY ===================== */
+    .usage-result {
+      display: none;
+      margin-top: 1.2rem;
+    }
+    .usage-result.visible { display: block; }
+
+    .usage-bar-bg {
+      height: 10px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 0.9rem 0 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .usage-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent3), var(--accent));
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .usage-bar-fill.danger {
+      background: linear-gradient(90deg, var(--accent2), var(--error));
+    }
+
+    .usage-nums {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .usage-nums span { color: var(--text); font-weight: 700; }
+
+    /* ===================== ALERT ===================== */
+    .alert {
+      display: none;
+      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      line-height: 1.5;
+    }
+    .alert.visible { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .alert-error { background: rgba(252,126,126,0.12); border: 1px solid rgba(252,126,126,0.3); color: var(--error); }
+    .alert-success { background: rgba(126,252,176,0.1); border: 1px solid rgba(126,252,176,0.3); color: var(--success); }
+
+    /* ===================== HOW TO USE ===================== */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .steps li {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82em;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.1em 0.4em;
+      border-radius: 5px;
+      color: var(--accent3);
+      word-break: break-all;
+    }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    footer span { color: var(--accent2); }
+
+    /* ===================== SPINNER ===================== */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+
+    /* ===================== PULSE DECO ===================== */
+    @keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+    .pulse { animation: pulse 2.5s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<!-- Animated starfield background -->
+<canvas id="stars"></canvas>
+
+<div class="page">
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="logo">ADO</div>
+    <div class="kawaii-deco pulse">✦ &nbsp; ✦ &nbsp; ✦</div>
+    <p class="tagline">Free community AI access · 50 requests/day · No signup needed</p>
+  </header>
+
+  <!-- ===== GENERATE KEY CARD ===== -->
+  <div class="card">
+    <div class="card-title">✨ Generate Your ADO Key</div>
+    <p class="card-desc">
+      Click below to instantly create your unique, permanent API key.
+      It's free. No account, no email, no drama.
+    </p>
+
+    <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
+      ✦ Generate My Key
+    </button>
+
+    <div id="genError" class="alert alert-error"></div>
+
+    <div class="key-box" id="keyBox">
+      <div class="key-label">Your ADO Key</div>
+      <div class="key-row">
+        <div class="key-value" id="keyDisplay"></div>
+        <button class="btn btn-copy" onclick="copyKey()">Copy</button>
+      </div>
+      <div class="key-warning">
+        ⚠️ Save this key somewhere safe. We cannot recover it for you.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHECK USAGE CARD ===== -->
+  <div class="card">
+    <div class="card-title">📊 Check Your Usage</div>
+    <p class="card-desc">
+      Paste your ADO key below to see how many of your 50 daily requests you've used.
+      Quota resets at midnight UTC every day.
+    </p>
+
+    <input
+      type="text"
+      id="usageKeyInput"
+      placeholder="ADO-XXXXXX-XXXXXX-XXXXXX-XXXXXX"
+      spellcheck="false"
+    />
+
+    <button class="btn btn-secondary" onclick="handleCheckUsage()">
+      Check Usage
+    </button>
+
+    <div id="usageError" class="alert alert-error"></div>
+
+    <div class="usage-result" id="usageResult">
+      <div class="usage-bar-bg">
+        <div class="usage-bar-fill" id="usageBarFill" style="width: 0%"></div>
+      </div>
+      <div class="usage-nums">
+        <div>Used: <span id="usageUsed">0</span></div>
+        <div>Remaining: <span id="usageRemaining">50</span></div>
+        <div>Limit: <span>50</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HOW TO USE CARD ===== -->
+  <div class="card">
+    <div class="card-title">🛠️ How to Use ADO</div>
+    <p class="card-desc">Set up in 60 seconds on SillyTavern, JanitorAI, or any OpenAI-compatible app.</p>
+    <ol class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div>Generate your ADO key above and copy it.</div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>
+          In your app, find the <strong>API settings</strong> or <strong>Custom API</strong> section.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>
+          Set the <strong>API Base URL</strong> to:<br />
+          <code id="workerUrlDisplay">https://YOUR-WORKER.workers.dev</code>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div>
+          Set your <strong>API Key</strong> to your ADO key (starts with <code>ADO-</code>).
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div>Save and start chatting. You get <strong>50 free requests per day</strong>.</div>
+      </li>
+    </ol>
+  </div>
+
+  <footer>
+    Made with <span>♡</span> for the community · ADO is free forever
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — Change this to your actual Cloudflare Worker URL
+// after you deploy it in the steps below.
+// ============================================================
+const WORKER_URL = "https://apiado.burgerboixs.workers.dev/";
+
+// Update the display in the how-to-use card
+document.getElementById("workerUrlDisplay").textContent = WORKER_URL;
+
+// ============================================================
+// STARFIELD CANVAS
+// ============================================================
+(function () {
+  const canvas = document.getElementById("stars");
+  const ctx = canvas.getContext("2d");
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 6000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.4 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.004 + 0.001,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  function draw(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+      const alpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(ts * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,180,255,${alpha})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener("resize", () => { resize(); initStars(); });
+  resize();
+  initStars();
+  requestAnimationFrame(draw);
+})();
+
+// ============================================================
+// GENERATE KEY
+// ============================================================
+async function handleGenerate() {
+  const btn = document.getElementById("generateBtn");
+  const errBox = document.getElementById("genError");
+  const keyBox = document.getElementById("keyBox");
+
+  // Reset state
+  errBox.className = "alert alert-error";
+  errBox.textContent = "";
+  keyBox.className = "key-box";
+
+  // Show loading state
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Generating...`;
+
+  try {
+    const res = await fetch(`${WORKER_URL}/generate`, { method: "POST" });
+    const data = await res.json();
+
+    if (!res.ok || !data.key) {
+      throw new Error(data.error || "Something went wrong. Try again.");
+    }
+
+    // Show the key
+    document.getElementById("keyDisplay").textContent = data.key;
+    keyBox.className = "key-box visible";
+    btn.innerHTML = "✦ Generate Another Key";
+  } catch (err) {
+    errBox.textContent = "⚠️ " + err.message;
+    errBox.className = "alert alert-error visible";
+    btn.innerHTML = "✦ Generate My Key";
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// COPY KEY TO CLIPBOARD
+// ============================================================
+function copyKey() {
+  const key = document.getElementById("keyDisplay").textContent;
+  navigator.clipboard.writeText(key).then(() => {
+    const btn = document.querySelector(".btn-copy");
+    btn.textContent = "Copied!";
+    setTimeout(() => (btn.textContent = "Copy"), 2000);
+  });
+}
+
+// ============================================================
+// CHECK USAGE
+// ============================================================
+async function handleCheckUsage() {
+  const input = document.getElementById("usageKeyInput");
+  const errBox = document.getElementById("usageError");
+  const resultBox = document.getElementById("usageResult");
+  const key = input.value.trim();
+
+  // Reset
+  errBox.className = "alert alert-error";
+  resultBox.className = "usage-result";
+
+  if (!key) {
+    errBox.textContent = "⚠️ Please paste your ADO key first.";
+    errBox.className = "alert alert-error visible";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${WORKER_URL}/usage?key=${encodeURIComponent(key)}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Could not fetch usage.");
+    }
+
+    const pct = Math.min(100, (data.used / data.limit) * 100);
+
+    document.getElementById("usageUsed").textContent = data.used;
+    document.getElementById("usageRemaining").textContent = data.remaining;
+
+    const bar = document.getElementById("usageBarFill");
+    bar.style.width = pct + "%";
+    bar.className = "usage-bar-fill" + (pct >= 80 ? " danger" : "");
+
+    resultBox.className = "usage-result visible";
+  } catch (err) {
+    errBox.textContent = "⚠️ " + err.message;
+    errBox.className = "alert alert-error visible";
+  }
+}
+</script>
+</body>
+</html>
