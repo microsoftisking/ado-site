@@ -1,627 +1,763 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ADO API — Free AI Access</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link
-href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
-rel="stylesheet"
-/>
-<style>
-/* ===================== RESET & BASE ===================== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADO LIVE — Free AI Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
---bg: #0d0d14;
---surface: #13131f;
---surface2: #1a1a2e;
---border: #2a2a45;
---accent: #b48ef7;
---accent2: #f78eb4;
---accent3: #8ef7e0;
---text: #e8e8f5;
---muted: #7070a0;
---success: #7efcb0;
---error: #fc7e7e;
---glow: rgba(180, 142, 247, 0.25);
-}
+    :root {
+      --bg: #07070f;
+      --surface: #0f0f1c;
+      --surface2: #15152a;
+      --border: #252545;
+      --accent: #c084fc;
+      --accent2: #f472b6;
+      --accent3: #67e8f9;
+      --accent4: #fbbf24;
+      --text: #ede8ff;
+      --muted: #6060a0;
+      --success: #4ade80;
+      --error: #f87171;
+      --glow-p: rgba(192,132,252,0.3);
+      --glow-p2: rgba(244,114,182,0.2);
+    }
 
-html, body {
-height: 100%;
-background: var(--bg);
-color: var(--text);
-font-family: 'Nunito', sans-serif;
-overflow-x: hidden;
-}
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; overflow-x: hidden; }
 
-/* ===================== STARFIELD ===================== */
-#stars {
-position: fixed;
-inset: 0;
-pointer-events: none;
-z-index: 0;
-}
+    /* ── CANVAS ── */
+    #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-/* ===================== LAYOUT ===================== */
-.page {
-position: relative;
-z-index: 1;
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-padding: 2rem 1rem 4rem;
-gap: 2rem;
-}
+    /* ── STATUS TICKER ── */
+    #statusTicker {
+      position: relative; z-index: 10;
+      width: 100%; padding: 6px 0;
+      background: linear-gradient(90deg, #1a0033, #0d001a, #1a0033);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+    }
+    #statusTicker .ticker-inner {
+      display: flex; align-items: center; gap: 2rem;
+      animation: scrollTicker 30s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes scrollTicker { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+    .ticker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; flex-shrink: 0; }
+    .ticker-dot.offline { background: var(--error); box-shadow: 0 0 8px var(--error); }
+    #tickerText { color: var(--text); }
 
-/* ===================== HEADER ===================== */
-header {
-text-align: center;
-padding-top: 1rem;
-}
+    /* ── PAGE WRAPPER ── */
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; gap: 2rem; }
 
-.logo {
-font-size: 3.5rem;
-font-weight: 800;
-letter-spacing: 0.15em;
-background: linear-gradient(135deg, var(--accent), var(--accent2));
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-filter: drop-shadow(0 0 18px rgba(180,142,247,0.5));
-}
+    /* ── HEADER ── */
+    header { text-align: center; padding-top: 0.5rem; }
+    .logo-ado {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      letter-spacing: 0.25em;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 40%, var(--accent2) 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(192,132,252,0.6));
+      line-height: 1;
+    }
+    .logo-sub {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.5em;
+      color: var(--accent2);
+      margin-top: -4px;
+      opacity: 0.8;
+    }
+    .logo-tagline { margin-top: 0.5rem; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.04em; }
 
-.tagline {
-margin-top: 0.4rem;
-color: var(--muted);
-font-size: 0.95rem;
-letter-spacing: 0.05em;
-}
+    /* ── SCREENS ── */
+    .screen { width: 100%; max-width: 600px; display: none; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .screen.active { display: flex; }
 
-.kawaii-deco {
-margin-top: 0.6rem;
-font-size: 1.4rem;
-letter-spacing: 0.3em;
-}
+    /* ── LOGIN CARD ── */
+    .login-card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(192,132,252,0.08), 0 0 0 1px rgba(192,132,252,0.05);
+      position: relative; overflow: hidden;
+    }
+    .login-card::before {
+      content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(192,132,252,0.12), transparent 70%);
+      pointer-events: none;
+    }
+    .login-icon { font-size: 3rem; margin-bottom: 1rem; display: block; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .login-title { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem; }
+    .login-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.8rem; }
+    .login-rules {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 0.9rem 1rem; margin-bottom: 1.8rem; text-align: left; font-size: 0.82rem; color: var(--muted); line-height: 1.8;
+    }
+    .login-rules span { color: var(--accent3); }
 
-/* ===================== CARDS ===================== */
-.card {
-width: 100%;
-max-width: 560px;
-background: var(--surface);
-border: 1px solid var(--border);
-border-radius: 20px;
-padding: 2rem;
-box-shadow: 0 4px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(180,142,247,0.05);
-position: relative;
-overflow: hidden;
-}
+    .btn-google {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+      padding: 0.85rem 2rem; border-radius: 14px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text); font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: 1rem; cursor: pointer;
+      transition: all 0.2s; width: 100%;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .btn-google:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--glow-p); transform: translateY(-1px); }
+    .btn-google:active { transform: scale(0.98); }
+    .btn-google svg { width: 20px; height: 20px; }
 
-.card::before {
-content: '';
-position: absolute;
-top: -60px; right: -60px;
-width: 160px; height: 160px;
-background: radial-gradient(circle, var(--glow), transparent 70%);
-pointer-events: none;
-}
+    /* ── LOADING ── */
+    .loading-ring {
+      width: 48px; height: 48px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 2rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-.card-title {
-font-size: 1.15rem;
-font-weight: 800;
-color: var(--accent);
-margin-bottom: 0.4rem;
-display: flex;
-align-items: center;
-gap: 0.5rem;
-}
+    /* ── CONCERT TICKET DASHBOARD ── */
+    .ticket {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 60px rgba(192,132,252,0.12), 0 0 0 1px rgba(192,132,252,0.06);
+      position: relative;
+    }
 
-.card-desc {
-font-size: 0.88rem;
-color: var(--muted);
-margin-bottom: 1.4rem;
-line-height: 1.6;
-}
+    /* Ticket header band */
+    .ticket-header {
+      background: linear-gradient(135deg, #1a0040, #2d0060, #1a0040);
+      border-bottom: 1px solid rgba(192,132,252,0.3);
+      padding: 0.9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative;
+    }
+    .ticket-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(192,132,252,0.03) 3px, rgba(192,132,252,0.03) 4px);
+    }
+    .ticket-event { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.15em; color: var(--accent); }
+    .ticket-type { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; color: var(--accent2); text-transform: uppercase; }
 
-/* ===================== BUTTONS ===================== */
-.btn {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 0.5rem;
-padding: 0.75rem 1.6rem;
-border-radius: 12px;
-border: none;
-font-family: 'Nunito', sans-serif;
-font-weight: 700;
-font-size: 0.95rem;
-cursor: pointer;
-transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-}
+    /* User info section */
+    .ticket-user {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07);
+    }
+    .user-photo {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 16px var(--glow-p);
+      object-fit: cover; flex-shrink: 0;
+    }
+    .user-photo-placeholder {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--surface2); border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .user-name { font-weight: 800; font-size: 1rem; color: var(--text); }
+    .user-email { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .user-badge {
+      margin-left: auto; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.3);
+      border-radius: 99px; padding: 0.25rem 0.75rem;
+      font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
 
-.btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Key section */
+    .ticket-key { padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07); }
+    .field-label {
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.4rem; font-family: 'Space Mono', monospace;
+    }
+    .field-label em { color: var(--accent3); font-style: normal; }
+    .key-display {
+      font-family: 'Space Mono', monospace; font-size: 0.92rem; color: var(--accent3);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.7rem 1rem;
+      word-break: break-all; user-select: all;
+      margin-bottom: 0.75rem;
+    }
+    .copy-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .btn-copy-tag {
+      flex: 1; min-width: 120px;
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.55rem 0.9rem; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--muted); font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-copy-tag:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-copy-tag.copied { border-color: var(--success); color: var(--success); }
 
-.btn-primary {
-background: linear-gradient(135deg, var(--accent), var(--accent2));
-color: #0d0d14;
-box-shadow: 0 2px 20px rgba(180,142,247,0.35);
-}
-.btn-primary:hover:not(:disabled) {
-box-shadow: 0 4px 30px rgba(180,142,247,0.55);
-transform: translateY(-1px);
-}
+    /* Ticket usage / quota */
+    .ticket-usage { padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07); }
+    .usage-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; }
+    .usage-label-row .field-label { margin-bottom: 0; }
+    .usage-counter { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--text); }
+    .usage-counter span { color: var(--accent); }
 
-.btn-secondary {
-background: var(--surface2);
-color: var(--text);
-border: 1px solid var(--border);
-}
-.btn-secondary:hover:not(:disabled) {
-border-color: var(--accent);
-color: var(--accent);
-}
+    /* Ticket stubs (5 icons) */
+    .stubs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .stub {
+      flex: 1; height: 36px;
+      background: linear-gradient(135deg, rgba(192,132,252,0.2), rgba(244,114,182,0.15));
+      border: 1px solid rgba(192,132,252,0.35);
+      border-radius: 8px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all 0.3s;
+    }
+    .stub.used {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.08);
+      filter: grayscale(1) opacity(0.3);
+    }
+    .stub::after {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+      opacity: 0.5;
+    }
+    .stub.used::after { display: none; }
 
-.btn-copy {
-background: transparent;
-border: 1px solid var(--border);
-color: var(--muted);
-padding: 0.4rem 0.9rem;
-font-size: 0.8rem;
-border-radius: 8px;
-}
-.btn-copy:hover { border-color: var(--accent3); color: var(--accent3); }
+    /* Mascot */
+    .ticket-mascot {
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .mascot-art {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      transition: all 0.5s;
+      flex-shrink: 0;
+    }
+    .mascot-speech {
+      font-size: 0.8rem; line-height: 1.5;
+      color: var(--muted);
+      flex: 1;
+    }
+    .mascot-speech strong { font-size: 0.85rem; display: block; margin-bottom: 2px; }
 
-/* ===================== KEY DISPLAY BOX ===================== */
-.key-box {
-display: none;
-margin-top: 1.2rem;
-background: var(--surface2);
-border: 1px solid var(--border);
-border-radius: 12px;
-padding: 1rem 1.2rem;
-}
+    /* Ticket tearline */
+    .tearline {
+      height: 1px; position: relative; overflow: visible;
+      margin: 0;
+    }
+    .tearline::before {
+      content: '';
+      position: absolute; top: 50%; left: -12px; right: -12px;
+      height: 1px; border-top: 2px dashed rgba(255,255,255,0.08);
+      transform: translateY(-50%);
+    }
+    .tearline-circles {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 100%; display: flex; justify-content: space-between; pointer-events: none;
+    }
+    .tearline-circles::before,
+    .tearline-circles::after {
+      content: '';
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin: 0 -12px;
+      flex-shrink: 0;
+    }
 
-.key-box.visible { display: block; }
+    /* Bottom actions bar */
+    .ticket-footer { padding: 1.2rem 1.5rem; display: flex; gap: 0.6rem; align-items: center; }
+    .btn-signout {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; border-radius: 8px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; margin-left: auto;
+    }
+    .btn-signout:hover { border-color: var(--error); color: var(--error); }
 
-.key-label {
-font-size: 0.75rem;
-color: var(--muted);
-letter-spacing: 0.08em;
-text-transform: uppercase;
-margin-bottom: 0.5rem;
-}
+    .btn-refresh {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; border-radius: 8px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-refresh:hover { border-color: var(--accent3); color: var(--accent3); }
 
-.key-row {
-display: flex;
-align-items: center;
-gap: 0.6rem;
-flex-wrap: wrap;
-}
+    /* ── ENDPOINT CARD ── */
+    .endpoint-card {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.3rem 1.5rem;
+    }
+    .endpoint-card .field-label { margin-bottom: 0.6rem; }
+    .endpoint-url {
+      font-family: 'Space Mono', monospace; font-size: 0.82rem;
+      color: var(--accent4); word-break: break-all;
+    }
 
-.key-value {
-font-family: 'Space Mono', monospace;
-font-size: 0.95rem;
-color: var(--accent3);
-word-break: break-all;
-flex: 1;
-user-select: all;
-}
+    /* ── HOW TO USE ── */
+    .howto-card {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+    }
+    .howto-title { font-weight: 800; font-size: 1rem; color: var(--accent); margin-bottom: 1rem; }
+    .steps { display: flex; flex-direction: column; gap: 0.8rem; }
+    .step { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
+    .step-n { width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--accent); font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    code { font-family: 'Space Mono', monospace; font-size: 0.8em; background: var(--surface2); border: 1px solid var(--border); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent3); word-break: break-all; }
 
-.key-warning {
-margin-top: 0.75rem;
-font-size: 0.8rem;
-color: var(--accent2);
-display: flex;
-align-items: flex-start;
-gap: 0.4rem;
-line-height: 1.5;
-}
+    /* ── GACHA OVERLAY ── */
+    #gachaOverlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(5, 5, 20, 0.97);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 1.5rem;
+    }
+    #gachaOverlay.active { display: flex; }
 
-/* ===================== INPUT ===================== */
-input[type="text"] {
-width: 100%;
-padding: 0.75rem 1rem;
-background: var(--surface2);
-border: 1px solid var(--border);
-border-radius: 10px;
-color: var(--text);
-font-family: 'Space Mono', monospace;
-font-size: 0.85rem;
-outline: none;
-transition: border-color 0.2s;
-margin-bottom: 0.9rem;
-}
+    .gacha-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.3em;
+      color: var(--accent2);
+      animation: gachaGlow 1s ease-in-out infinite alternate;
+    }
+    @keyframes gachaGlow { from { text-shadow: 0 0 20px rgba(244,114,182,0.4); } to { text-shadow: 0 0 40px rgba(244,114,182,0.9), 0 0 80px rgba(192,132,252,0.4); } }
 
-input[type="text"]:focus {
-border-color: var(--accent);
-box-shadow: 0 0 0 3px rgba(180,142,247,0.15);
-}
+    .gacha-card {
+      width: 280px; background: linear-gradient(135deg, #1a0040, #2d0060);
+      border: 1px solid rgba(192,132,252,0.5); border-radius: 20px;
+      padding: 2rem 1.5rem; text-align: center;
+      box-shadow: 0 0 60px rgba(192,132,252,0.3), 0 0 120px rgba(244,114,182,0.1);
+      animation: gachaReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes gachaReveal {
+      0% { transform: scale(0.3) rotateY(180deg); opacity: 0; }
+      60% { transform: scale(1.1) rotateY(-10deg); }
+      100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+    }
+    .gacha-star { font-size: 2rem; margin-bottom: 0.5rem; animation: spin 3s linear infinite; display: inline-block; }
+    .gacha-label { font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent2); text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; }
+    .gacha-key { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--accent3); word-break: break-all; margin-bottom: 1rem; line-height: 1.6; }
+    .gacha-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .particle {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      animation: particleFly 2s ease-out forwards;
+    }
+    @keyframes particleFly {
+      0% { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
+    .btn-gacha-close {
+      padding: 0.7rem 2rem; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; color: #07070f; font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: 0.95rem; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .btn-gacha-close:hover { transform: scale(1.05); }
 
-input[type="text"]::placeholder { color: var(--muted); }
+    footer { color: var(--muted); font-size: 0.78rem; text-align: center; }
+    footer a { color: var(--accent); text-decoration: none; }
 
-/* ===================== USAGE DISPLAY ===================== */
-.usage-result {
-display: none;
-margin-top: 1.2rem;
-}
-.usage-result.visible { display: block; }
-
-.usage-bar-bg {
-height: 10px;
-background: var(--surface2);
-border-radius: 99px;
-overflow: hidden;
-margin: 0.9rem 0 0.5rem;
-border: 1px solid var(--border);
-}
-
-.usage-bar-fill {
-height: 100%;
-border-radius: 99px;
-background: linear-gradient(90deg, var(--accent3), var(--accent));
-transition: width 0.6s cubic-bezier(.4,0,.2,1);
-}
-
-.usage-bar-fill.danger {
-background: linear-gradient(90deg, var(--accent2), var(--error));
-}
-
-.usage-nums {
-display: flex;
-justify-content: space-between;
-font-size: 0.82rem;
-color: var(--muted);
-}
-
-.usage-nums span { color: var(--text); font-weight: 700; }
-
-/* ===================== ALERT ===================== */
-.alert {
-display: none;
-padding: 0.7rem 1rem;
-border-radius: 10px;
-font-size: 0.85rem;
-margin-top: 0.8rem;
-line-height: 1.5;
-}
-.alert.visible { display: flex; align-items: flex-start; gap: 0.5rem; }
-.alert-error { background: rgba(252,126,126,0.12); border: 1px solid rgba(252,126,126,0.3); color: var(--error); }
-.alert-success { background: rgba(126,252,176,0.1); border: 1px solid rgba(126,252,176,0.3); color: var(--success); }
-
-/* ===================== HOW TO USE ===================== */
-.steps {
-counter-reset: step;
-list-style: none;
-display: flex;
-flex-direction: column;
-gap: 0.9rem;
-margin-top: 0.5rem;
-}
-
-.steps li {
-display: flex;
-gap: 0.9rem;
-align-items: flex-start;
-font-size: 0.9rem;
-line-height: 1.6;
-color: var(--muted);
-}
-
-.step-num {
-flex-shrink: 0;
-width: 26px; height: 26px;
-border-radius: 50%;
-background: var(--surface2);
-border: 1px solid var(--border);
-color: var(--accent);
-font-size: 0.78rem;
-font-weight: 800;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-
-code {
-font-family: 'Space Mono', monospace;
-font-size: 0.82em;
-background: var(--surface2);
-border: 1px solid var(--border);
-padding: 0.1em 0.4em;
-border-radius: 5px;
-color: var(--accent3);
-word-break: break-all;
-}
-
-/* ===================== FOOTER ===================== */
-footer {
-color: var(--muted);
-font-size: 0.8rem;
-text-align: center;
-margin-top: 1rem;
-}
-
-footer span { color: var(--accent2); }
-
-/* ===================== SPINNER ===================== */
-@keyframes spin { to { transform: rotate(360deg); } }
-.spinner {
-width: 16px; height: 16px;
-border: 2px solid transparent;
-border-top-color: currentColor;
-border-radius: 50%;
-animation: spin 0.6s linear infinite;
-display: inline-block;
-}
-
-/* ===================== PULSE DECO ===================== */
-@keyframes pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
-.pulse { animation: pulse 2.5s ease-in-out infinite; }
-</style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .screen.active { animation: fadeIn 0.4s ease-out; }
+  </style>
 </head>
 <body>
 
-<!-- Animated starfield background -->
 <canvas id="stars"></canvas>
+
+<!-- Status Ticker -->
+<div id="statusTicker">
+  <div class="ticker-inner">
+    <span class="ticker-dot" id="tickerDot"></span>
+    <span id="tickerText">Connecting to ADO systems...</span>
+    &nbsp;&nbsp;✦&nbsp;&nbsp; ADO LIVE BETA — 5 REQUESTS/DAY &nbsp;&nbsp;✦&nbsp;&nbsp; FREE FOR THE COMMUNITY &nbsp;&nbsp;✦&nbsp;&nbsp; RESETS MIDNIGHT UTC &nbsp;&nbsp;✦&nbsp;&nbsp;
+  </div>
+</div>
 
 <div class="page">
 
-<!-- ===== HEADER ===== -->
-<header>
-<div class="logo">ADO</div>
-<div class="kawaii-deco pulse">✦ &nbsp; ✦ &nbsp; ✦</div>
-<p class="tagline">Free community AI access · 50 requests/day · No signup needed</p>
-</header>
+  <!-- HEADER -->
+  <header>
+    <div class="logo-ado">ADO</div>
+    <div class="logo-sub">Live · Beta Season</div>
+    <p class="logo-tagline">Your backstage pass to free AI · ログイン not optional ✦</p>
+  </header>
 
-<!-- ===== GENERATE KEY CARD ===== -->
-<div class="card">
-<div class="card-title">✨ Generate Your ADO Key</div>
-<p class="card-desc">
-Click below to instantly create your unique, permanent API key.
-It's free. No account, no email, no drama.
-</p>
+  <!-- LOADING SCREEN -->
+  <div class="screen active" id="screenLoading">
+    <div class="loading-ring"></div>
+  </div>
 
-<button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
-✦ Generate My Key
-</button>
+  <!-- LOGIN SCREEN -->
+  <div class="screen" id="screenLogin">
+    <div class="login-card">
+      <span class="login-icon">🎟️</span>
+      <h2 class="login-title">Claim Your Backstage Pass</h2>
+      <p class="login-desc">Sign in with Google to get your permanent ADO key.<br/>One pass per account. Free. Always.</p>
+      <div class="login-rules">
+        <span>✦</span> <strong>5 free AI requests / day</strong> (beta)<br/>
+        <span>✦</span> One key per Google account<br/>
+        <span>✦</span> Works with SillyTavern, JanitorAI, and any OpenAI-compatible app<br/>
+        <span>✦</span> Your pass <strong>never expires</strong> · quota resets midnight UTC
+      </div>
+      <button class="btn-google" id="btnSignIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google / グーグルでログイン
+      </button>
+    </div>
+  </div>
 
-<div id="genError" class="alert alert-error"></div>
+  <!-- DASHBOARD SCREEN -->
+  <div class="screen" id="screenDashboard">
 
-<div class="key-box" id="keyBox">
-<div class="key-label">Your ADO Key</div>
-<div class="key-row">
-<div class="key-value" id="keyDisplay"></div>
-<button class="btn btn-copy" onclick="copyKey()">Copy</button>
-</div>
-<div class="key-warning">
-⚠️ Save this key somewhere safe. We cannot recover it for you.
-</div>
-</div>
+    <!-- Concert Ticket Card -->
+    <div class="ticket">
+      <!-- Ticket Header Band -->
+      <div class="ticket-header">
+        <div>
+          <div class="ticket-event">ADO LIVE WORLD TOUR</div>
+          <div class="ticket-type">Backstage Pass · バックステージパス</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent2);letter-spacing:0.1em;">BETA</div>
+          <div style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);">SEASON 01</div>
+        </div>
+      </div>
+
+      <!-- User Info -->
+      <div class="ticket-user">
+        <img class="user-photo" id="userPhoto" src="" alt="" onerror="this.style.display='none';document.getElementById('userPhotoPlaceholder').style.display='flex'" />
+        <div id="userPhotoPlaceholder" class="user-photo-placeholder" style="display:none">🎤</div>
+        <div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-email" id="userEmail">—</div>
+        </div>
+        <div class="user-badge">VIP ACCESS</div>
+      </div>
+
+      <!-- Key Display -->
+      <div class="ticket-key">
+        <div class="field-label">Pass ID / <em>鍵</em></div>
+        <div class="key-display" id="keyDisplay">Generating your pass...</div>
+        <div class="copy-row">
+          <button class="btn-copy-tag" id="btnCopyKey">📋 Copy Key / 鍵をコピー</button>
+          <button class="btn-copy-tag" id="btnCopyJAI">🤖 JanitorAI Format</button>
+          <button class="btn-copy-tag" id="btnCopyST">🧠 SillyTavern Format</button>
+        </div>
+      </div>
+
+      <div class="tearline"><div class="tearline-circles"></div></div>
+
+      <!-- Usage / Tickets -->
+      <div class="ticket-usage">
+        <div class="usage-label-row">
+          <div class="field-label">Today's Tickets / <em>チケット</em></div>
+          <div class="usage-counter"><span id="usageRemaining">?</span> / 5 remaining</div>
+        </div>
+        <div class="stubs" id="stubsRow">
+          <div class="stub">🎟</div>
+          <div class="stub">🎟</div>
+          <div class="stub">🎟</div>
+          <div class="stub">🎟</div>
+          <div class="stub">🎟</div>
+        </div>
+      </div>
+
+      <!-- ASCII Mascot -->
+      <div class="ticket-mascot">
+        <div class="mascot-art" id="mascotArt">(✿◠‿◠)</div>
+        <div class="mascot-speech">
+          <strong id="mascotMood">Ready to perform!</strong>
+          <span id="mascotSub">All passes available · まだいっぱい！</span>
+        </div>
+      </div>
+
+      <!-- Footer Bar -->
+      <div class="ticket-footer">
+        <button class="btn-refresh" id="btnRefreshUsage">↻ Refresh Usage</button>
+        <button class="btn-signout" id="btnSignOut">Sign Out / ログアウト</button>
+      </div>
+    </div>
+
+    <!-- Endpoint Reference -->
+    <div class="endpoint-card">
+      <div class="field-label">API Endpoint / <em>エンドポイント</em></div>
+      <div class="endpoint-url" id="endpointDisplay">https://your-worker.workers.dev</div>
+    </div>
+
+    <!-- How To Use -->
+    <div class="howto-card">
+      <div class="howto-title">🛠 Setup Guide / セットアップ</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">1</div>
+          <div>Copy your <strong>Pass ID</strong> using the button above.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div>In <strong>SillyTavern</strong>: API → Chat Completion → OpenAI → paste the API URL and your key. Use the <em>SillyTavern Format</em> copy button above for pre-formatted text.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div>In <strong>JanitorAI</strong>: Settings → API → Custom. Paste the API URL as the base, and your key in the key field. Use the <em>JanitorAI Format</em> button.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div>You get <strong>5 requests/day</strong> during beta. Quota resets at <strong>midnight UTC</strong> automatically.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>ADO LIVE Beta · Free for the community · <a href="admin.html">Admin ⚙</a></footer>
+  </div>
+
+</div><!-- end .page -->
+
+<!-- Gacha Reveal Overlay -->
+<div id="gachaOverlay">
+  <div class="gacha-particles" id="gachaParticles"></div>
+  <div class="gacha-title">✦ NEW PASS ISSUED ✦</div>
+  <div class="gacha-card">
+    <div class="gacha-star">⭐</div>
+    <div class="gacha-label">Your Backstage Pass / バックステージパス</div>
+    <div class="gacha-key" id="gachaKeyDisplay"></div>
+  </div>
+  <button class="btn-gacha-close" id="btnGachaClose">Claim My Pass ✦</button>
 </div>
 
-<!-- ===== CHECK USAGE CARD ===== -->
-<div class="card">
-<div class="card-title">📊 Check Your Usage</div>
-<p class="card-desc">
-Paste your ADO key below to see how many of your 50 daily requests you've used.
-Quota resets at midnight UTC every day.
-</p>
-
-<input
-type="text"
-id="usageKeyInput"
-placeholder="ADO-XXXXXX-XXXXXX-XXXXXX-XXXXXX"
-spellcheck="false"
-/>
-
-<button class="btn btn-secondary" onclick="handleCheckUsage()">
-Check Usage
-</button>
-
-<div id="usageError" class="alert alert-error"></div>
-
-<div class="usage-result" id="usageResult">
-<div class="usage-bar-bg">
-<div class="usage-bar-fill" id="usageBarFill" style="width: 0%"></div>
-</div>
-<div class="usage-nums">
-<div>Used: <span id="usageUsed">0</span></div>
-<div>Remaining: <span id="usageRemaining">50</span></div>
-<div>Limit: <span>50</span></div>
-</div>
-</div>
-</div>
-
-<!-- ===== HOW TO USE CARD ===== -->
-<div class="card">
-<div class="card-title">🛠️ How to Use ADO</div>
-<p class="card-desc">Set up in 60 seconds on SillyTavern, JanitorAI, or any OpenAI-compatible app.</p>
-<ol class="steps">
-<li>
-<div class="step-num">1</div>
-<div>Generate your ADO key above and copy it.</div>
-</li>
-<li>
-<div class="step-num">2</div>
-<div>
-In your app, find the <strong>API settings</strong> or <strong>Custom API</strong> section.
-</div>
-</li>
-<li>
-<div class="step-num">3</div>
-<div>
-Set the <strong>API Base URL</strong> to:<br />
-<code id="workerUrlDisplay">https://YOUR-WORKER.workers.dev</code>
-</div>
-</li>
-<li>
-<div class="step-num">4</div>
-<div>
-Set your <strong>API Key</strong> to your ADO key (starts with <code>ADO-</code>).
-</div>
-</li>
-<li>
-<div class="step-num">5</div>
-<div>Save and start chatting. You get <strong>50 free requests per day</strong>.</div>
-</li>
-</ol>
-</div>
-
-<footer>
-Made with <span>♡</span> for the community · ADO is free forever
-</footer>
-</div>
-
+<!-- Starfield -->
 <script>
-// ============================================================
-// CONFIG — Change this to your actual Cloudflare Worker URL
-// after you deploy it in the steps below.
-// ============================================================
-const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
-
-// Update the display in the how-to-use card
-document.getElementById("workerUrlDisplay").textContent = WORKER_URL;
-
-// ============================================================
-// STARFIELD CANVAS
-// ============================================================
-(function () {
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-let stars = [];
-
-function resize() {
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-}
-
-function initStars() {
-stars = [];
-const count = Math.floor((canvas.width * canvas.height) / 6000);
-for (let i = 0; i < count; i++) {
-stars.push({
-x: Math.random() * canvas.width,
-y: Math.random() * canvas.height,
-r: Math.random() * 1.4 + 0.2,
-a: Math.random(),
-speed: Math.random() * 0.004 + 0.001,
-phase: Math.random() * Math.PI * 2,
-});
-}
-}
-
-function draw(ts) {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-for (const s of stars) {
-const alpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(ts * s.speed + s.phase));
-ctx.beginPath();
-ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-ctx.fillStyle = `rgba(200,180,255,${alpha})`;
-ctx.fill();
-}
-requestAnimationFrame(draw);
-}
-
-window.addEventListener("resize", () => { resize(); initStars(); });
-resize();
-initStars();
-requestAnimationFrame(draw);
+(function(){
+  const c = document.getElementById("stars"), ctx = c.getContext("2d");
+  let stars=[];
+  function resize(){ c.width=innerWidth; c.height=innerHeight; }
+  function init(){
+    stars=[];
+    const n=Math.floor(c.width*c.height/7000);
+    for(let i=0;i<n;i++) stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+0.2,sp:Math.random()*0.003+0.001,ph:Math.random()*Math.PI*2});
+  }
+  function draw(t){
+    ctx.clearRect(0,0,c.width,c.height);
+    for(const s of stars){
+      const a=0.25+0.75*(0.5+0.5*Math.sin(t*s.sp+s.ph));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(210,180,255,${a})`; ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener("resize",()=>{resize();init();});
+  resize(); init(); requestAnimationFrame(draw);
 })();
-
-// ============================================================
-// GENERATE KEY
-// ============================================================
-async function handleGenerate() {
-const btn = document.getElementById("generateBtn");
-const errBox = document.getElementById("genError");
-const keyBox = document.getElementById("keyBox");
-
-// Reset state
-errBox.className = "alert alert-error";
-errBox.textContent = "";
-keyBox.className = "key-box";
-
-// Show loading state
-btn.disabled = true;
-btn.innerHTML = `<span class="spinner"></span> Generating...`;
-
-try {
-const res = await fetch(`${WORKER_URL}/generate`, { method: "POST" });
-const data = await res.json();
-
-if (!res.ok || !data.key) {
-throw new Error(data.error || "Something went wrong. Try again.");
-}
-
-// Show the key
-document.getElementById("keyDisplay").textContent = data.key;
-keyBox.className = "key-box visible";
-btn.innerHTML = "✦ Generate Another Key";
-} catch (err) {
-errBox.textContent = "⚠️ " + err.message;
-errBox.className = "alert alert-error visible";
-btn.innerHTML = "✦ Generate My Key";
-} finally {
-btn.disabled = false;
-}
-}
-
-// ============================================================
-// COPY KEY TO CLIPBOARD
-// ============================================================
-function copyKey() {
-const key = document.getElementById("keyDisplay").textContent;
-navigator.clipboard.writeText(key).then(() => {
-const btn = document.querySelector(".btn-copy");
-btn.textContent = "Copied!";
-setTimeout(() => (btn.textContent = "Copy"), 2000);
-});
-}
-
-// ============================================================
-// CHECK USAGE
-// ============================================================
-async function handleCheckUsage() {
-const input = document.getElementById("usageKeyInput");
-const errBox = document.getElementById("usageError");
-const resultBox = document.getElementById("usageResult");
-const key = input.value.trim();
-
-// Reset
-errBox.className = "alert alert-error";
-resultBox.className = "usage-result";
-
-if (!key) {
-errBox.textContent = "⚠️ Please paste your ADO key first.";
-errBox.className = "alert alert-error visible";
-return;
-}
-
-try {
-const res = await fetch(`${WORKER_URL}/usage?key=${encodeURIComponent(key)}`);
-const data = await res.json();
-
-if (!res.ok) {
-throw new Error(data.error || "Could not fetch usage.");
-}
-
-const pct = Math.min(100, (data.used / data.limit) * 100);
-
-document.getElementById("usageUsed").textContent = data.used;
-document.getElementById("usageRemaining").textContent = data.remaining;
-
-const bar = document.getElementById("usageBarFill");
-bar.style.width = pct + "%";
-bar.className = "usage-bar-fill" + (pct >= 80 ? " danger" : "");
-
-resultBox.className = "usage-result visible";
-} catch (err) {
-errBox.textContent = "⚠️ " + err.message;
-errBox.className = "alert alert-error visible";
-}
-}
 </script>
-</body>
-</html>
+
+<!-- Firebase + App Logic -->
+<script type="module">
+// ════════════════════════════════════════════════════════════
+// !! STEP 1: PASTE YOUR FIREBASE CONFIG HERE !!
+// (You'll get this from console.firebase.google.com — see guide)
+// ════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+  projectId: "PASTE_YOUR_PROJECT_ID_HERE",
+  storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: "PASTE_YOUR_APP_ID_HERE"
+};
+
+// ════════════════════════════════════════════════════════════
+// !! STEP 2: PASTE YOUR CLOUDFLARE WORKER URL HERE !!
+// ════════════════════════════════════════════════════════════
+const WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
+
+// ────────────────────────────────────────────────────────────
+// Firebase init (CDN imports — no installation needed)
+// ────────────────────────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// ────────────────────────────────────────────────────────────
+// DOM refs
+// ────────────────────────────────────────────────────────────
+const screenLoading   = document.getElementById("screenLoading");
+const screenLogin     = document.getElementById("screenLogin");
+const screenDashboard = document.getElementById("screenDashboard");
+const btnSignIn       = document.getElementById("btnSignIn");
+const btnSignOut      = document.getElementById("btnSignOut");
+const btnRefresh      = document.getElementById("btnRefreshUsage");
+const btnCopyKey      = document.getElementById("btnCopyKey");
+const btnCopyJAI      = document.getElementById("btnCopyJAI");
+const btnCopyST       = document.getElementById("btnCopyST");
+const btnGachaClose   = document.getElementById("btnGachaClose");
+const gachaOverlay    = document.getElementById("gachaOverlay");
+const tickerDot       = document.getElementById("tickerDot");
+const tickerText      = document.getElementById("tickerText");
+
+document.getElementById("endpointDisplay").textContent = WORKER_URL;
+
+let currentKey = null;
+
+// ── Mascot moods ───────────────────────────────────────────
+const MOODS = [
+  { at: 5, art: "♪(ノ^_^)ノ",  mood: "Ready to perform!",        sub: "All passes available · まだいっぱい！" },
+  { at: 3, art: "(◕ᴗ◕✿)",    mood: "Vibe check!",               sub: "3-4 used · まあまあ" },
+  { at: 2, art: "(;´-`)",     mood: "Running low...",            sub: "2 left · 残り少ない" },
+  { at: 1, art: "(×﹏×)",     mood: "Almost gone!",              sub: "Last one · ラスト！" },
+  { at: 0, art: "(×_×)zZ",   mood: "Sold out! Come back at midnight~", sub: "See you tomorrow · また明日！" },
+];
+
+function setMascot(remaining) {
+  const m = MOODS.find(x => remaining >= x.at) || MOODS[MOODS.length - 1];
+  document.getElementById("mascotArt").textContent = m.art;
+  document.getElementById("mascotMood").textContent = m.mood;
+  document.getElementById("mascotSub").textContent = m.sub;
+}
+
+function setStubs(used) {
+  const stubs = document.querySelectorAll(".stub");
+  stubs.forEach((s, i) => {
+    s.className = "stub" + (i < used ? " used" : "");
+    s.textContent = i < used ? "🎫" : "🎟";
+  });
+}
+
+// ── Screen switching ──────────────────────────────────────
+function showScreen(id) {
+  [screenLoading, screenLogin, screenDashboard].forEach(s => {
+    s.classList.remove("active");
+  });
+  document.getElementById(id).classList.add("active");
+}
+
+// ── Status ticker ─────────────────────────────────────────
+async function checkStatus() {
+  try {
+    const r = await fetch(`${WORKER_URL}/status`);
+    const d = await r.json();
+    tickerDot.className = "ticker-dot" + (d.ok ? "" : " offline");
+    tickerText.textContent = d.ok
+      ? "✦ ADO LIVE — OPERATIONAL · オペレーショナル · All systems normal"
+      : "⚠ SERVICE DISRUPTION · Global pool issue · Check back soon";
+  } catch {
+    tickerDot.className = "ticker-dot offline";
+    tickerText.textContent = "⚠ Cannot reach ADO gateway";
+  }
+}
+
+// ── Fetch usage ───────────────────────────────────────────
+async function fetchUsage(key) {
+  try {
+    const r = await fetch(`${WORKER_URL}/usage?key=${encodeURIComponent(key)}`);
+    const d = await r.json();
+    const rem = d.remaining ?? 5;
+    const used = d.used ?? 0;
+    document.getElementById("usageRemaining").textContent = rem;
+    setStubs(used);
+    setMascot(rem);
+  } catch {
+    document.getElementById("usageRemaining").textContent = "?";
+  }
+}
+
+// ── Gacha particles ───────────────────────────────────────
+function spawnParticles() {
+  const container = document.getElementById("gachaParticles");
+  const colors = ["#c084fc","#f472b6","#67e8f9","#fbbf24","#4ade80"];
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    const angle = Math.random() * 360;
+    const dist = 100 + Math.random() * 200;
+    const tx = Math.cos(angle * Math.PI / 180) * dist;
+    const ty = Math.sin(angle * Math.PI / 180) * dist;
+    p.style.cssText = `
+      left: 50%; top: 50%;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      --tx: ${tx}px; --ty: ${ty}px;
+      animation-delay: ${Math.random() * 0.3}s;
+      animation-duration: ${1.2 + Math.random()}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => (container.innerHTML = ""), 2500);
+}
+
+function showGacha(key) {
+  document.getElementById("gachaKeyDisplay").textContent = key;
+  gachaOverlay.classList.add("active");
+  spawnParticles();
+}
+
+btnGachaClose.addEventListener("click", () => {
+  gachaOverlay.classList.remove("active");
+});
+
+// ── After login: load user data + fetch key ───────────────
+async function onUserSignedIn(user) {
+  document.getElementById("userName").textContent = user.displayName || "Anonymous";
+  document.getElementById("userEmail").textContent = user.email || "";
+
+  const photoEl = document.getElementById("userPhoto");
+  if (user.photoURL) {
+    photoEl.src = user.photoURL;
+    photoEl.style.display = "";
+  } else {
+    photoEl.style.display = "none";
+    document.getElementById("userPhotoPlaceholder").style.display = "flex";
+  }
+
+  showScreen("screenLoading");
+
+  try {
+    const idToken = await user.getIdToken();
+
+    const r = await fetch(`${WORKER_URL}/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
+    const d = await r.json();
+
+    if (!d.key) throw new Error(d.error || "Failed to get key");
+
+    currentKey = d.key;
+    document.getElementById("keyDisplay").textContent = d.key;
+
+    showScreen("screenDashboard");
+
+    if (d.isNew) {
+      // New user — show gacha reveal
+      setTimeout(() => showGacha(d.key), 300);
+    }
+
+    await fetchUsage(d.key);
