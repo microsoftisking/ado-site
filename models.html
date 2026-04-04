@@ -3,683 +3,220 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ADO // COMMAND CENTER</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <title>ADO Models — Available AI Models</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
-      --void:#000008;
-      --deep:#04040f;
-      --panel:#070714;
-      --panel2:#0a0a1c;
-      --rim:#141430;
-      --wire:#1e1e45;
-      --gold:#f0c040;
-      --gold2:#ffd700;
-      --cyan:#00e5ff;
-      --green:#00ff88;
-      --red:#ff2055;
-      --purple:#8040ff;
-      --text:#c8d0ff;
-      --muted:#404080;
-      --muted2:#282860;
-      --warn:#ff9500;
+      --bg:#07070f;--surface:#0f0f1c;--surface2:#15152a;--border:#252545;
+      --accent:#c084fc;--accent2:#f472b6;--accent3:#67e8f9;--accent4:#fbbf24;
+      --text:#ede8ff;--muted:#6060a0;--success:#4ade80;--error:#f87171;--warn:#fb923c;
     }
-
-    html,body{height:100%;background:var(--void);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;cursor:default;}
-
-    /* ── GRID BACKGROUND ── */
-    body::before{
-      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-      background-image:
-        linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);
-      background-size:40px 40px;
-    }
-    /* Scanlines */
-    body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);}
-
-    /* ── ANIMATED CORNER ACCENTS ── */
-    @keyframes cornerPulse{0%,100%{opacity:0.4}50%{opacity:1}}
-    .corner-accent{position:fixed;width:60px;height:60px;z-index:10;pointer-events:none;}
-    .corner-accent::before,.corner-accent::after{content:'';position:absolute;background:var(--gold);animation:cornerPulse 3s ease-in-out infinite;}
-    .corner-accent::before{width:2px;height:100%;}
-    .corner-accent::after{width:100%;height:2px;}
-    .ca-tl{top:12px;left:12px;}
-    .ca-tr{top:12px;right:12px;transform:scaleX(-1);}
-    .ca-bl{bottom:12px;left:12px;transform:scaleY(-1);}
-    .ca-br{bottom:12px;right:12px;transform:scale(-1);}
-
-    /* ── AUTH SCREEN ── */
-    #authScreen{
-      position:fixed;inset:0;z-index:500;
-      background:var(--void);
-      display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:2rem;
-    }
-    .auth-logo{
-      font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900;
-      letter-spacing:0.3em;color:var(--gold);
-      text-shadow:0 0 30px rgba(240,192,64,0.5),0 0 60px rgba(240,192,64,0.2);
-      animation:goldFlicker 4s ease-in-out infinite;
-    }
-    @keyframes goldFlicker{0%,100%{text-shadow:0 0 30px rgba(240,192,64,0.5),0 0 60px rgba(240,192,64,0.2)}50%{text-shadow:0 0 50px rgba(240,192,64,0.8),0 0 100px rgba(240,192,64,0.4),0 0 150px rgba(240,192,64,0.1)}}
-    .auth-sub{font-size:0.7rem;letter-spacing:0.4em;color:var(--muted);text-transform:uppercase;margin-top:-1.5rem;}
-    .auth-box{
-      width:100%;max-width:380px;
-      border:1px solid var(--wire);
-      background:var(--panel);
-      padding:2rem;
-      position:relative;
-    }
-    .auth-box::before{content:'ACCESS CONTROL';position:absolute;top:-0.6em;left:1rem;background:var(--panel);padding:0 0.5rem;font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;}
-    .auth-field-label{font-size:0.65rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;}
-    .auth-input{
-      width:100%;background:transparent;border:none;
-      border-bottom:1px solid var(--wire);
-      color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:1rem;
-      padding:0.5rem 0;outline:none;letter-spacing:0.1em;caret-color:var(--gold);
-      transition:border-color 0.2s;
-    }
-    .auth-input:focus{border-bottom-color:var(--gold);}
-    .auth-btn{
-      width:100%;margin-top:1.5rem;padding:0.75rem;
-      background:transparent;border:1px solid var(--gold);
-      color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.75rem;
-      font-weight:700;letter-spacing:0.2em;cursor:pointer;
-      transition:all 0.2s;text-transform:uppercase;
-    }
-    .auth-btn:hover{background:rgba(240,192,64,0.08);box-shadow:0 0 20px rgba(240,192,64,0.25),inset 0 0 20px rgba(240,192,64,0.05);}
-    .auth-err{font-size:0.72rem;color:var(--red);margin-top:0.75rem;min-height:1em;}
-    .auth-err:not(:empty)::before{content:'[ERR] ';}
-
-    /* ── MAIN LAYOUT ── */
-    #mainApp{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;}
-    #mainApp.active{display:flex;}
-
-    /* ── TOP BAR ── */
-    .topbar{
-      display:flex;align-items:center;gap:1rem;
-      padding:0.75rem 1.5rem;
-      border-bottom:1px solid var(--wire);
-      background:rgba(4,4,15,0.95);
-      backdrop-filter:blur(10px);
-      position:sticky;top:0;z-index:50;
-      flex-wrap:wrap;gap:0.5rem;
-    }
-    .topbar-logo{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:0.2em;color:var(--gold);}
-    .topbar-sep{color:var(--muted2);margin:0 0.25rem;}
-    .topbar-title{font-size:0.7rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;font-family:'Rajdhani',sans-serif;font-weight:600;}
-    .topbar-spacer{flex:1;}
-    .topbar-time{font-size:0.72rem;color:var(--cyan);letter-spacing:0.1em;}
-    .topbar-status{display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;letter-spacing:0.1em;}
-    .status-led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:ledPulse 2s ease-in-out infinite;}
-    @keyframes ledPulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .topbar-back{font-size:0.65rem;letter-spacing:0.12em;color:var(--muted);text-decoration:none;border:1px solid var(--muted2);padding:0.3rem 0.7rem;transition:all 0.15s;}
-    .topbar-back:hover{border-color:var(--cyan);color:var(--cyan);}
-
-    /* ── CONTENT ── */
-    .content{padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;max-width:1400px;margin:0 auto;width:100%;}
-
-    /* ── STAT GRID ── */
-    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire);}
-    .stat-cell{
-      background:var(--panel);padding:1.25rem 1.5rem;
-      position:relative;overflow:hidden;
-      transition:background 0.2s;
-    }
-    .stat-cell:hover{background:var(--panel2);}
-    .stat-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.3;}
-    .stat-label{font-size:0.6rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;}
-    .stat-val{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;color:var(--gold);line-height:1;}
-    .stat-val.cyan{color:var(--cyan);}
-    .stat-val.green{color:var(--green);}
-    .stat-val.red{color:var(--red);}
-    .stat-sub{font-size:0.62rem;color:var(--muted);margin-top:0.3rem;}
-
-    /* ── PANEL BLOCK ── */
-    .block{background:var(--panel);border:1px solid var(--wire);position:relative;}
-    .block-header{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0.75rem 1.25rem;border-bottom:1px solid var(--wire);
-      flex-wrap:wrap;gap:0.5rem;
-    }
-    .block-title{font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;}
-    .block-body{padding:1.25rem;}
-
-    /* ── MASTER KEY ── */
-    .mk-form{display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;}
-    .mk-input-wrap{flex:1;min-width:200px;}
-    .input-label{font-size:0.62rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;}
-    .cmd-input{
-      width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);
-      color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:0.88rem;
-      padding:0.4rem 0;outline:none;transition:border-color 0.2s;caret-color:var(--cyan);
-    }
-    .cmd-input:focus{border-bottom-color:var(--cyan);}
-    .cmd-input::placeholder{color:var(--muted2);}
-    .mk-status{font-size:0.72rem;margin-top:0.6rem;min-height:1em;}
-    .mk-status.ok{color:var(--green);}
-    .mk-status.ok::before{content:'[OK] ';}
-    .mk-status.err{color:var(--red);}
-    .mk-status.err::before{content:'[ERR] ';}
-
-    /* ── BUTTONS ── */
-    .btn-cmd{
-      padding:0.5rem 1.2rem;border:1px solid var(--gold);background:transparent;
-      color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.65rem;font-weight:700;
-      letter-spacing:0.15em;cursor:pointer;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;
-    }
-    .btn-cmd:hover{background:rgba(240,192,64,0.1);box-shadow:0 0 15px rgba(240,192,64,0.2);}
-    .btn-cmd:disabled{opacity:0.35;cursor:not-allowed;}
-    .btn-cmd.cyan{border-color:var(--cyan);color:var(--cyan);}
-    .btn-cmd.cyan:hover{background:rgba(0,229,255,0.08);box-shadow:0 0 15px rgba(0,229,255,0.2);}
-    .btn-cmd.green{border-color:var(--green);color:var(--green);}
-    .btn-cmd.green:hover{background:rgba(0,255,136,0.08);box-shadow:0 0 15px rgba(0,255,136,0.2);}
-    .btn-cmd.red{border-color:var(--red);color:var(--red);}
-    .btn-cmd.red:hover{background:rgba(255,32,85,0.08);box-shadow:0 0 15px rgba(255,32,85,0.2);}
-    .btn-cmd.sm{padding:0.3rem 0.7rem;font-size:0.58rem;}
-    .btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
-
-    /* ── SEARCH BAR ── */
-    .search-wrap{position:relative;flex:1;min-width:200px;}
-    .search-wrap::before{content:'>';position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);color:var(--gold);font-size:0.8rem;pointer-events:none;}
-    .search-input{
-      width:100%;background:var(--panel2);border:1px solid var(--wire);
-      color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;
-      padding:0.5rem 0.75rem 0.5rem 1.5rem;outline:none;
-      transition:border-color 0.2s;
-    }
-    .search-input:focus{border-color:var(--gold);}
-    .search-input::placeholder{color:var(--muted2);}
-
-    /* ── FILTER TABS ── */
-    .filter-tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--wire);padding:2px;}
-    .filter-tab{padding:0.3rem 0.9rem;background:transparent;border:none;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
-    .filter-tab.active{background:var(--gold);color:var(--void);font-weight:700;}
-    .filter-tab:hover:not(.active){color:var(--gold);}
-
-    /* ── KEYS TABLE ── */
-    .table-wrap{overflow-x:auto;}
-    table{width:100%;border-collapse:collapse;font-size:0.75rem;}
-    thead tr{border-bottom:1px solid var(--wire);}
-    th{padding:0.6rem 0.75rem;text-align:left;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;}
-    th.sort-asc::after{content:' ↑';}
-    th.sort-desc::after{content:' ↓';}
-    th[data-sort]{cursor:pointer;}
-    th[data-sort]:hover{color:var(--cyan);}
-    td{padding:0.6rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle;color:var(--text);}
-    tr:hover td{background:rgba(240,192,64,0.02);}
-    tr.banned td{opacity:0.4;}
-    tr.banned{background:rgba(255,32,85,0.03);}
-    .td-key{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--cyan);word-break:break-all;max-width:220px;}
-    .td-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.85rem;}
-    .td-email{font-size:0.68rem;color:var(--muted);}
-
-    /* Mini bar */
-    .mini-bar-bg{height:4px;background:var(--wire);border-radius:0;overflow:hidden;margin-top:3px;}
-    .mini-bar-fill{height:100%;background:var(--green);transition:width 0.4s;}
-    .mini-bar-fill.warn{background:var(--warn);}
-    .mini-bar-fill.danger{background:var(--red);}
-    .td-usage-num{font-family:'Orbitron',sans-serif;font-size:0.72rem;color:var(--text);}
-
-    /* Status badges */
-    .badge{display:inline-block;padding:1px 7px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'Orbitron',sans-serif;font-weight:700;}
-    .badge-active{background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);color:var(--green);}
-    .badge-banned{background:rgba(255,32,85,0.12);border:1px solid rgba(255,32,85,0.3);color:var(--red);}
-    .badge-new{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);color:var(--cyan);}
-
-    /* Action cell */
-    .action-cell{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
-
-    /* Quota boost inline */
-    .quota-inline{display:flex;align-items:center;gap:4px;}
-    .quota-input{width:48px;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.78rem;padding:1px 0;outline:none;text-align:center;}
-    .quota-input:focus{border-bottom-color:var(--gold);}
-
-    /* Empty / loading */
-    .table-msg{padding:2rem;text-align:center;color:var(--muted);font-size:0.78rem;}
-    .table-msg::before{content:'>>> ';}
-
-    /* ── LOG PANEL ── */
-    .log-panel{background:var(--void);border:1px solid var(--wire);padding:1rem;max-height:160px;overflow-y:auto;font-size:0.7rem;line-height:1.8;}
-    .log-line{color:var(--muted);}
-    .log-line.ok::before{content:'[OK] ';color:var(--green);}
-    .log-line.err::before{content:'[ERR] ';color:var(--red);}
-    .log-line.info::before{content:'[>>] ';color:var(--cyan);}
-    .log-line.warn::before{content:'[!!] ';color:var(--warn);}
-    .log-line.gold{color:var(--gold);}
-
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar{width:4px;height:4px;}
-    ::-webkit-scrollbar-track{background:var(--void);}
-    ::-webkit-scrollbar-thumb{background:var(--wire);}
-    ::-webkit-scrollbar-thumb:hover{background:var(--gold);}
-
-    /* ── SPINNER ── */
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;}
+    #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .topnav{position:relative;z-index:10;display:flex;align-items:center;gap:1rem;padding:0.75rem 1.5rem;background:rgba(7,7,15,0.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);flex-wrap:wrap;}
+    .topnav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.2em;color:var(--accent);}
+    .topnav-title{font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;}
+    .topnav-spacer{flex:1;}
+    .nav-link{font-size:0.78rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.8rem;border-radius:6px;transition:all 0.15s;}
+    .nav-link:hover{border-color:var(--accent);color:var(--accent);}
+    .beta-pill{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.35);border-radius:99px;padding:1px 8px;font-size:0.65rem;font-weight:800;color:var(--accent4);letter-spacing:0.1em;}
+    .page{position:relative;z-index:1;padding:2rem 1rem 4rem;max-width:920px;margin:0 auto;}
+    .page-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:0.15em;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .page-sub{color:var(--muted);font-size:0.85rem;margin-top:0.3rem;margin-bottom:1.75rem;}
+    .key-bar{display:flex;gap:0.6rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .key-input{flex:1;min-width:200px;padding:0.7rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+    .key-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,132,252,0.1);}
+    .key-input::placeholder{color:var(--muted);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.7rem 1.4rem;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.15s;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07070f;}
+    .btn-primary:hover:not(:disabled){box-shadow:0 4px 24px rgba(192,132,252,0.4);transform:translateY(-1px);}
+    .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+    .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+    .btn-ghost:hover{border-color:var(--accent3);color:var(--accent3);}
+    .error-box{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:1rem 1.25rem;color:var(--error);font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;display:none;}
+    .error-box.visible{display:block;}
+    .error-box::before{content:'⚠ ';}
+    .status-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem;}
+    .status-cell{background:var(--surface);padding:1rem 1.2rem;}
+    .status-cell-label{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
+    .status-cell-val{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;}
+    .status-cell-val.green{color:var(--success);}
+    .status-cell-val.yellow{color:var(--warn);}
+    .status-cell-val.red{color:var(--error);}
+    .filter-row{display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
+    .filter-pill{padding:0.35rem 0.9rem;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
+    .filter-pill.active{background:var(--accent);border-color:var(--accent);color:#07070f;}
+    .filter-pill:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+    .filter-spacer{flex:1;}
+    .model-count{font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace;}
+    .models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;}
+    .model-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;position:relative;overflow:hidden;transition:all 0.2s;}
+    .model-card:hover{border-color:var(--accent);box-shadow:0 4px 24px rgba(192,132,252,0.1);}
+    .model-card.degraded{border-color:rgba(251,146,60,0.3);}
+    .model-card.down{border-color:rgba(248,113,113,0.3);opacity:0.6;}
+    .model-card::before{content:'';position:absolute;top:-40px;right:-40px;width:100px;height:100px;background:radial-gradient(circle,rgba(192,132,252,0.06),transparent 70%);pointer-events:none;}
+    .model-top{display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem;}
+    .model-name{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent3);word-break:break-all;line-height:1.5;flex:1;}
+    .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+    .status-dot.available{background:var(--success);box-shadow:0 0 8px var(--success);}
+    .status-dot.degraded{background:var(--warn);box-shadow:0 0 8px var(--warn);}
+    .status-dot.down{background:var(--error);box-shadow:0 0 8px var(--error);}
+    .model-badges{display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.75rem;}
+    .mbadge{font-size:0.62rem;padding:2px 7px;border-radius:99px;font-weight:700;}
+    .mbadge-available{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:var(--success);}
+    .mbadge-degraded{background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:var(--warn);}
+    .mbadge-down{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--error);}
+    .mbadge-type{background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.2);color:var(--accent);}
+    .mbadge-ctx{background:rgba(103,232,249,0.07);border:1px solid rgba(103,232,249,0.18);color:var(--accent3);}
+    .model-meta{font-size:0.72rem;color:var(--muted);line-height:1.7;}
+    .model-meta strong{color:var(--text);}
+    .copy-btn{margin-top:0.9rem;width:100%;padding:0.45rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
+    .copy-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+    .copy-btn.copied{border-color:var(--success);color:var(--success);}
+    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:1rem;color:var(--muted);text-align:center;}
+    .state-icon{font-size:3rem;opacity:0.4;}
+    .state-title{font-size:1rem;font-weight:700;}
+    .state-sub{font-size:0.82rem;line-height:1.6;}
+    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .spinner{width:14px;height:14px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
-
-    /* ── TOOLTIP ── */
-    [title]{cursor:help;}
+    footer{color:var(--muted);font-size:0.75rem;text-align:center;margin-top:3rem;}
+    footer a{color:var(--accent);text-decoration:none;}
   </style>
 </head>
 <body>
-
-<!-- Corner accents -->
-<div class="corner-accent ca-tl"></div>
-<div class="corner-accent ca-tr"></div>
-<div class="corner-accent ca-bl"></div>
-<div class="corner-accent ca-br"></div>
-
-<!-- ════════════ AUTH SCREEN ════════════ -->
-<div id="authScreen">
-  <div class="auth-logo">ADO</div>
-  <div class="auth-sub">Command Center · Restricted Access</div>
-  <div class="auth-box">
-    <div class="auth-field-label">Admin Access Code</div>
-    <input class="auth-input" type="password" id="authInput" placeholder="Enter code..." autocomplete="off"/>
-    <button class="auth-btn" id="btnAuth">Authenticate →</button>
-    <div class="auth-err" id="authErr"></div>
-  </div>
+<canvas id="stars"></canvas>
+<div class="topnav">
+  <span class="topnav-logo">ADO</span>
+  <span style="color:var(--border)">//</span>
+  <span class="topnav-title">Model Lineup</span>
+  <span class="beta-pill">BETA</span>
+  <span class="topnav-spacer"></span>
+  <a class="nav-link" href="index.html">← Dashboard</a>
 </div>
-
-<!-- ════════════ MAIN APP ════════════ -->
-<div id="mainApp">
-
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <span class="topbar-logo">ADO</span>
-    <span class="topbar-sep">//</span>
-    <span class="topbar-title">Command Center · Admin v2</span>
-    <span class="topbar-spacer"></span>
-    <span class="topbar-status"><span class="status-led"></span><span style="color:var(--green)">SYSTEMS NOMINAL</span></span>
-    <span class="topbar-time" id="topbarTime">—</span>
-    <a class="topbar-back" href="index.html">← Exit</a>
+<div class="page">
+  <div class="page-title">Available Models</div>
+  <p class="page-sub">Enter your ADO key to see the full roster. Model names copy directly into SillyTavern or JanitorAI.</p>
+  <div class="key-bar">
+    <input class="key-input" type="text" id="keyInput" placeholder="ADO-XXXXXX-XXXXXX-XXXXXX-XXXXXX" spellcheck="false"/>
+    <button class="btn btn-primary" id="btnLoad">Load Models</button>
+    <button class="btn btn-ghost" id="btnRefresh" style="display:none" title="Refresh">↻</button>
   </div>
-
-  <div class="content">
-
-    <!-- STAT GRID -->
-    <div class="stat-grid" id="statGrid">
-      <div class="stat-cell"><div class="stat-label">Total Keys Issued</div><div class="stat-val" id="statTotal">—</div><div class="stat-sub">all time</div></div>
-      <div class="stat-cell"><div class="stat-label">Active Keys</div><div class="stat-val green" id="statActive">—</div><div class="stat-sub">not banned</div></div>
-      <div class="stat-cell"><div class="stat-label">Banned</div><div class="stat-val red" id="statBanned">—</div><div class="stat-sub">terminated</div></div>
-      <div class="stat-cell"><div class="stat-label">Requests Today</div><div class="stat-val cyan" id="statReqs">—</div><div class="stat-sub">total across all users</div></div>
-      <div class="stat-cell"><div class="stat-label">Pool Utilization</div><div class="stat-val" id="statUtil">—</div><div class="stat-sub">% of total capacity used</div></div>
+  <div class="error-box" id="errorBox"></div>
+  <div class="status-row" id="statusRow" style="display:none">
+    <div class="status-cell"><div class="status-cell-label">Total Models</div><div class="status-cell-val" id="sTotal">—</div></div>
+    <div class="status-cell"><div class="status-cell-label">Available</div><div class="status-cell-val green" id="sAvail">—</div></div>
+    <div class="status-cell"><div class="status-cell-label">Degraded</div><div class="status-cell-val yellow" id="sDeg">—</div></div>
+    <div class="status-cell"><div class="status-cell-label">Down</div><div class="status-cell-val red" id="sDown">—</div></div>
+  </div>
+  <div class="filter-row" id="filterRow" style="display:none">
+    <button class="filter-pill active" data-f="all">All</button>
+    <button class="filter-pill" data-f="available">Available</button>
+    <button class="filter-pill" data-f="degraded">Degraded</button>
+    <button class="filter-pill" data-f="down">Down</button>
+    <span class="filter-spacer"></span>
+    <span class="model-count" id="mCount"></span>
+  </div>
+  <div id="modelsArea">
+    <div class="state-box">
+      <div class="state-icon">🎙</div>
+      <div class="state-title">Enter your ADO key above</div>
+      <div class="state-sub">The full model roster will appear here.<br>Copy model IDs directly into your app.</div>
     </div>
-
-    <!-- MASTER KEY -->
-    <div class="block">
-      <div class="block-header">
-        <span class="block-title">⚡ Master Key Override</span>
-        <span style="font-size:0.65rem;color:var(--muted)">Instant · No redeploy required</span>
-      </div>
-      <div class="block-body">
-        <p style="font-size:0.72rem;color:var(--muted);margin-bottom:1rem">Paste a new upstream API key. The Worker reads from KV and switches instantly. The old key is overwritten.</p>
-        <div class="mk-form">
-          <div class="mk-input-wrap">
-            <div class="input-label">New API Key</div>
-            <input class="cmd-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-xxxxxxxxxxxx..."/>
-          </div>
-          <button class="btn-cmd" id="btnUpdateMK">Update Key →</button>
-        </div>
-        <div class="mk-status" id="mkStatus"></div>
-      </div>
-    </div>
-
-    <!-- KEYS TABLE -->
-    <div class="block">
-      <div class="block-header">
-        <span class="block-title">👥 Registered Users</span>
-        <div class="btn-row">
-          <button class="btn-cmd cyan sm" id="btnRefreshKeys">Refresh ↻</button>
-        </div>
-      </div>
-      <div class="block-body" style="padding-bottom:0.5rem">
-        <div class="btn-row" style="margin-bottom:1rem;flex-wrap:wrap;gap:0.6rem">
-          <div class="search-wrap">
-            <input class="search-input" type="text" id="searchInput" placeholder="Search by key, name, email..."/>
-          </div>
-          <div class="filter-tabs" id="filterTabs">
-            <button class="filter-tab active" data-filter="all">All</button>
-            <button class="filter-tab" data-filter="active">Active</button>
-            <button class="filter-tab" data-filter="banned">Banned</button>
-            <button class="filter-tab" data-filter="heavy">High Usage</button>
-          </div>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th data-sort="key">Pass ID</th>
-              <th data-sort="name">User</th>
-              <th data-sort="used">Usage Today</th>
-              <th>Daily Limit</th>
-              <th data-sort="created">Issued</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="keysBody">
-            <tr><td colspan="7" class="table-msg">Loading user registry...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="padding:0.6rem 1.25rem;border-top:1px solid var(--wire);font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between">
-        <span id="tableCount">—</span>
-        <span>Showing filtered results</span>
-      </div>
-    </div>
-
-    <!-- ACTIVITY LOG -->
-    <div class="block">
-      <div class="block-header">
-        <span class="block-title">📋 Activity Log</span>
-        <button class="btn-cmd sm" onclick="clearLog()">Clear</button>
-      </div>
-      <div class="block-body" style="padding:0">
-        <div class="log-panel" id="logPanel">
-          <div class="log-line gold">ADO Command Center initialized. Awaiting orders.</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end .content -->
-</div><!-- end #mainApp -->
-
+  </div>
+  <footer>ADO LIVE Beta · <a href="index.html">Dashboard</a></footer>
+</div>
 <script>
-// ════════════════════════════════════════════════════════
-// !! PASTE YOUR WORKER URL HERE — NO TRAILING SLASH !!
-// ════════════════════════════════════════════════════════
 const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
+let allModels = [], activeFilter = "all";
 
-let ADMIN_KEY = null;
-let allKeys = [];
-let sortField = "created";
-let sortDir = "desc";
-let filterMode = "all";
-let searchQuery = "";
+(function(){
+  const c=document.getElementById("stars"),ctx=c.getContext("2d");let s=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  function init(){s=[];const n=Math.floor(c.width*c.height/9000);for(let i=0;i<n;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+0.2,sp:Math.random()*0.003+0.001,ph:Math.random()*Math.PI*2});}
+  function draw(t){ctx.clearRect(0,0,c.width,c.height);for(const p of s){const a=0.15+0.6*(0.5+0.5*Math.sin(t*p.sp+p.ph));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,170,255,${a})`;ctx.fill();}requestAnimationFrame(draw);}
+  window.addEventListener("resize",()=>{resize();init();});resize();init();requestAnimationFrame(draw);
+})();
 
-// ── LOG ──────────────────────────────────────────────
-function log(msg, type = "info") {
-  const panel = document.getElementById("logPanel");
-  const line = document.createElement("div");
-  line.className = `log-line ${type}`;
-  const ts = new Date().toTimeString().slice(0, 8);
-  line.textContent = `[${ts}] ${msg}`;
-  panel.appendChild(line);
-  panel.scrollTop = panel.scrollHeight;
-}
-function clearLog() {
-  document.getElementById("logPanel").innerHTML = '<div class="log-line gold">Log cleared.</div>';
-}
+const saved = localStorage.getItem("ado_key_cache");
+if (saved) document.getElementById("keyInput").value = saved;
 
-// ── ADMIN FETCH ──────────────────────────────────────
-async function api(path, opts = {}) {
-  const res = await fetch(WORKER_URL + path, {
-    ...opts,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Key": ADMIN_KEY,
-      ...(opts.headers || {}),
-    },
-  });
-  return res;
-}
+document.getElementById("btnLoad").addEventListener("click", load);
+document.getElementById("btnRefresh").addEventListener("click", load);
+document.getElementById("keyInput").addEventListener("keydown", e => { if(e.key==="Enter") load(); });
 
-// ── CLOCK ────────────────────────────────────────────
-setInterval(() => {
-  const now = new Date();
-  document.getElementById("topbarTime").textContent =
-    now.toUTCString().slice(0, 25) + " UTC";
-}, 1000);
-
-// ── AUTH ──────────────────────────────────────────────
-document.getElementById("btnAuth").addEventListener("click", doAuth);
-document.getElementById("authInput").addEventListener("keydown", e => { if (e.key === "Enter") doAuth(); });
-
-async function doAuth() {
-  const code = document.getElementById("authInput").value.trim();
-  const errEl = document.getElementById("authErr");
-  if (!code) { errEl.textContent = "Enter your admin code."; return; }
-  errEl.textContent = "Authenticating...";
+async function load() {
+  const key = document.getElementById("keyInput").value.trim();
+  const errBox = document.getElementById("errorBox");
+  errBox.className = "error-box";
+  if (!key) { errBox.textContent = "Please enter your ADO key."; errBox.className = "error-box visible"; return; }
+  localStorage.setItem("ado_key_cache", key);
+  const btn = document.getElementById("btnLoad");
+  btn.disabled = true; btn.textContent = "Loading...";
+  document.getElementById("modelsArea").innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title" style="margin-top:0.5rem">Fetching roster...</div></div>';
+  document.getElementById("statusRow").style.display = "none";
+  document.getElementById("filterRow").style.display = "none";
+  document.getElementById("btnRefresh").style.display = "none";
   try {
-    const r = await fetch(WORKER_URL + "/admin/keys", {
-      headers: { "X-Admin-Key": code }
-    });
-    if (r.status === 403) { errEl.textContent = "Access denied. Wrong code."; return; }
-    ADMIN_KEY = code;
-    document.getElementById("authScreen").style.display = "none";
-    document.getElementById("mainApp").classList.add("active");
-    log("Authentication successful. Welcome, Administrator.", "ok");
-    loadKeys();
-  } catch (err) {
-    errEl.textContent = "Connection failed: " + err.message;
-  }
-}
-
-// ── LOAD KEYS ─────────────────────────────────────────
-async function loadKeys() {
-  log("Fetching user registry...", "info");
-  try {
-    const r = await api("/admin/keys");
+    const r = await fetch(`${WORKER_URL}/v1/models`, { headers: { "Authorization": `Bearer ${key}` } });
     const d = await r.json();
-    if (!r.ok) { log("Failed to load keys: " + d.error, "err"); return; }
-
-    allKeys = d.keys || [];
-    log(`Loaded ${allKeys.length} keys from KV.`, "ok");
-    updateStats();
-    renderTable();
-  } catch (err) {
-    log("Registry fetch error: " + err.message, "err");
-  }
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    if (!d.data || !Array.isArray(d.data)) throw new Error("Unexpected response — models endpoint may not be configured.");
+    allModels = d.data;
+    renderModels();
+    document.getElementById("statusRow").style.display = "";
+    document.getElementById("filterRow").style.display = "";
+    document.getElementById("btnRefresh").style.display = "";
+  } catch(err) {
+    errBox.textContent = err.message; errBox.className = "error-box visible";
+    document.getElementById("modelsArea").innerHTML = '<div class="state-box"><div class="state-icon">⚠️</div><div class="state-title">Could not load models</div><div class="state-sub">Check your key and try again.</div></div>';
+  } finally { btn.disabled = false; btn.textContent = "Load Models"; }
 }
 
-// ── STATS ─────────────────────────────────────────────
-function updateStats() {
-  const total = allKeys.length;
-  const banned = allKeys.filter(k => k.banned).length;
-  const active = total - banned;
-  const reqs = allKeys.reduce((a, k) => a + (k.usedToday || 0), 0);
-  const cap = total * 5;
-  const util = cap > 0 ? Math.round((reqs / cap) * 100) : 0;
-  document.getElementById("statTotal").textContent = total;
-  document.getElementById("statActive").textContent = active;
-  document.getElementById("statBanned").textContent = banned;
-  document.getElementById("statReqs").textContent = reqs;
-  document.getElementById("statUtil").textContent = util + "%";
-}
-
-// ── RENDER TABLE ──────────────────────────────────────
-function renderTable() {
-  const tbody = document.getElementById("keysBody");
-  let data = [...allKeys];
-
-  // Filter
-  if (filterMode === "active") data = data.filter(k => !k.banned);
-  else if (filterMode === "banned") data = data.filter(k => k.banned);
-  else if (filterMode === "heavy") data = data.filter(k => (k.usedToday || 0) >= 3);
-
-  // Search
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    data = data.filter(k =>
-      k.key.toLowerCase().includes(q) ||
-      (k.email || "").toLowerCase().includes(q) ||
-      (k.name || "").toLowerCase().includes(q)
-    );
-  }
-
-  // Sort
-  data.sort((a, b) => {
-    let av = a[sortField] ?? 0, bv = b[sortField] ?? 0;
-    if (typeof av === "string") av = av.toLowerCase(), bv = bv.toLowerCase();
-    if (av < bv) return sortDir === "asc" ? -1 : 1;
-    if (av > bv) return sortDir === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  document.getElementById("tableCount").textContent = `${data.length} of ${allKeys.length} users`;
-
-  if (!data.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="table-msg">No users match current filter.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = "";
-  for (const k of data) {
-    const used = k.usedToday || 0;
-    const pct = Math.min(100, (used / 5) * 100);
-    const barClass = pct >= 100 ? "danger" : pct >= 60 ? "warn" : "";
-    const dateStr = k.created ? new Date(k.created).toLocaleDateString() : "—";
-    const isNew = k.created && (Date.now() - k.created) < 86400000;
-    const tr = document.createElement("tr");
-    if (k.banned) tr.className = "banned";
-    tr.innerHTML = `
-      <td><div class="td-key">${k.key}</div></td>
-      <td>
-        <div class="td-name">${k.name || "—"}</div>
-        <div class="td-email">${k.email || "—"}</div>
-      </td>
-      <td>
-        <div class="td-usage-num">${used} / 5</div>
-        <div class="mini-bar-bg"><div class="mini-bar-fill ${barClass}" style="width:${pct}%"></div></div>
-      </td>
-      <td>
-        <div class="quota-inline">
-          <span style="font-size:0.72rem;color:var(--muted)">+</span>
-          <input class="quota-input" type="number" min="1" max="50" value="5" id="qinput_${k.key.replace(/-/g,'_')}"/>
-          <button class="btn-cmd green sm" onclick="boostQuota('${k.key}')">Boost</button>
-        </div>
-        <div style="font-size:0.62rem;color:var(--muted);margin-top:3px">add extra reqs today</div>
-      </td>
-      <td style="font-size:0.68rem;color:var(--muted)">${dateStr}${isNew ? ' <span class="badge badge-new">NEW</span>' : ''}</td>
-      <td>${k.banned
-        ? '<span class="badge badge-banned">Banned</span>'
-        : '<span class="badge badge-active">Active</span>'
-      }</td>
-      <td>
-        <div class="action-cell">
-          <button class="btn-cmd sm ${k.banned ? 'cyan' : 'red'}" onclick="toggleBan('${k.key}', ${k.banned})">
-            ${k.banned ? 'Unban' : 'Ban'}
-          </button>
-          <button class="btn-cmd sm" onclick="resetUsage('${k.key}')">Reset</button>
-        </div>
-      </td>
+function renderModels() {
+  let data = [...allModels];
+  if (activeFilter !== "all") data = data.filter(m => (m.ado_status||"available") === activeFilter);
+  const avail = allModels.filter(m=>!m.ado_status||m.ado_status==="available").length;
+  const deg = allModels.filter(m=>m.ado_status==="degraded").length;
+  const down = allModels.filter(m=>m.ado_status==="down").length;
+  document.getElementById("sTotal").textContent = allModels.length;
+  document.getElementById("sAvail").textContent = avail;
+  document.getElementById("sDeg").textContent = deg;
+  document.getElementById("sDown").textContent = down;
+  document.getElementById("mCount").textContent = `${data.length} model${data.length!==1?"s":""}`;
+  if (!data.length) { document.getElementById("modelsArea").innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-title">No models match this filter</div></div>'; return; }
+  const grid = document.createElement("div"); grid.className="models-grid";
+  for (const m of data) {
+    const status = m.ado_status||"available";
+    const ctx = m.context_length||m.context_window||null;
+    const card = document.createElement("div");
+    card.className = `model-card ${status!=="available"?status:""}`;
+    card.innerHTML = `
+      <div class="model-top">
+        <div class="model-name">${m.id}</div>
+        <div class="status-dot ${status}" title="${status}"></div>
+      </div>
+      <div class="model-badges">
+        <span class="mbadge mbadge-${status}">${status==="available"?"✓ Online":status==="degraded"?"⚡ Degraded":"✕ Offline"}</span>
+        ${m.type?`<span class="mbadge mbadge-type">${m.type}</span>`:""}
+        ${ctx?`<span class="mbadge mbadge-ctx">${fmt(ctx)} ctx</span>`:""}
+      </div>
+      <div class="model-meta">
+        ${m.owned_by?`Provider: <strong>${m.owned_by}</strong><br>`:""}
+        ${status==="degraded"?'<span style="color:var(--warn)">⚡ May be slow or unstable</span>':""}
+        ${status==="down"?'<span style="color:var(--error)">✕ Currently unavailable</span>':""}
+      </div>
+      <button class="copy-btn" onclick="copyModel('${m.id}',this)">Copy Model Name</button>
     `;
-    tbody.appendChild(tr);
+    grid.appendChild(card);
   }
+  document.getElementById("modelsArea").innerHTML="";
+  document.getElementById("modelsArea").appendChild(grid);
 }
 
-// ── SORT HEADERS ──────────────────────────────────────
-document.querySelectorAll("th[data-sort]").forEach(th => {
-  th.addEventListener("click", () => {
-    const field = th.dataset.sort;
-    if (sortField === field) sortDir = sortDir === "asc" ? "desc" : "asc";
-    else { sortField = field; sortDir = "desc"; }
-    document.querySelectorAll("th").forEach(t => t.classList.remove("sort-asc","sort-desc"));
-    th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
-    renderTable();
-  });
-});
-
-// ── FILTER TABS ───────────────────────────────────────
-document.getElementById("filterTabs").addEventListener("click", e => {
-  const tab = e.target.closest(".filter-tab");
-  if (!tab) return;
-  document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
-  tab.classList.add("active");
-  filterMode = tab.dataset.filter;
-  renderTable();
-});
-
-// ── SEARCH ────────────────────────────────────────────
-document.getElementById("searchInput").addEventListener("input", e => {
-  searchQuery = e.target.value.trim();
-  renderTable();
-});
-
-// ── REFRESH ───────────────────────────────────────────
-document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
-
-// ── BAN / UNBAN ───────────────────────────────────────
-async function toggleBan(key, currentlyBanned) {
-  const action = currentlyBanned ? "Unbanning" : "Banning";
-  log(`${action} key: ${key.slice(0, 18)}...`, "warn");
-  try {
-    const r = await api("/admin/ban", {
-      method: "POST",
-      body: JSON.stringify({ key, banned: !currentlyBanned }),
-    });
-    const d = await r.json();
-    if (d.ok) {
-      log(`${currentlyBanned ? "Unbanned" : "Banned"}: ${key.slice(0, 18)}...`, "ok");
-      const k = allKeys.find(x => x.key === key);
-      if (k) k.banned = !currentlyBanned;
-      updateStats();
-      renderTable();
-    } else log("Ban failed: " + d.error, "err");
-  } catch (err) { log("Ban error: " + err.message, "err"); }
-}
-
-// ── QUOTA BOOST ───────────────────────────────────────
-async function boostQuota(key) {
-  const inputId = "qinput_" + key.replace(/-/g,"_");
-  const bonus = parseInt(document.getElementById(inputId)?.value) || 5;
-  log(`Boosting quota for ${key.slice(0,18)}... +${bonus} requests`, "info");
-  try {
-    const r = await api("/admin/quota", {
-      method: "POST",
-      body: JSON.stringify({ key, bonus }),
-    });
-    const d = await r.json();
-    if (d.ok) log(`Quota boosted. ${key.slice(0,18)}... new daily limit: ${d.newDailyLimit}`, "ok");
-    else log("Boost failed: " + d.error, "err");
-  } catch (err) { log("Boost error: " + err.message, "err"); }
-}
-
-// ── RESET USAGE ───────────────────────────────────────
-async function resetUsage(key) {
-  if (!confirm(`Reset today's usage for ${key.slice(0,20)}...? This gives them their full quota back immediately.`)) return;
-  log(`Resetting usage for ${key.slice(0,18)}...`, "warn");
-  try {
-    const r = await api("/admin/resetusage", {
-      method: "POST",
-      body: JSON.stringify({ key }),
-    });
-    const d = await r.json();
-    if (d.ok) {
-      log(`Usage reset to 0 for ${key.slice(0,18)}...`, "ok");
-      const k = allKeys.find(x => x.key === key);
-      if (k) k.usedToday = 0;
-      updateStats();
-      renderTable();
-    } else log("Reset failed: " + d.error, "err");
-  } catch (err) { log("Reset error: " + err.message, "err"); }
-}
-
-// ── MASTER KEY ────────────────────────────────────────
-document.getElementById("btnUpdateMK").addEventListener("click", async () => {
-  const key = document.getElementById("masterKeyInput").value.trim();
-  const statusEl = document.getElementById("mkStatus");
-  if (!key || key.length < 8) { statusEl.textContent = "Key too short."; statusEl.className = "mk-status err"; return; }
-  statusEl.textContent = "Sending update..."; statusEl.className = "mk-status";
-  log("Updating master upstream key...", "warn");
-  try {
-    const r = await api("/admin/masterkey", {
-      method: "POST",
-      body: JSON.stringify({ masterKey: key }),
-    });
-    const d = await r.json();
-    if (d.ok) {
-      statusEl.textContent = "Master key updated. Workers now use new key."; statusEl.className = "mk-status ok";
-      document.getElementById("masterKeyInput").value = "";
-      log("Master key updated successfully in KV.", "ok");
-    } else { statusEl.textContent = d.error || "Unknown error."; statusEl.className = "mk-status err"; log("MK update failed: " + d.error, "err"); }
-  } catch (err) { statusEl.textContent = err.message; statusEl.className = "mk-status err"; }
-});
+function fmt(n){return n>=1000000?(n/1000000).toFixed(0)+"M":n>=1000?(n/1000).toFixed(0)+"K":String(n);}
+function copyModel(id,btn){navigator.clipboard.writeText(id).then(()=>{btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="Copy Model Name";btn.classList.remove("copied");},2000);});}
+document.querySelectorAll(".filter-pill").forEach(p=>{p.addEventListener("click",()=>{document.querySelectorAll(".filter-pill").forEach(x=>x.classList.remove("active"));p.classList.add("active");activeFilter=p.dataset.f;renderModels();});});
 </script>
 </body>
 </html>
