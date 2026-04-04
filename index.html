@@ -1,433 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADO :: SYSTEM TERMINAL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #020208;
-      --surface: #060614;
-      --surface2: #0a0a1e;
-      --border: #1a1a3a;
-      --green: #39ff14;
-      --cyan: #00f5ff;
-      --pink: #ff2d78;
-      --purple: #b44eff;
-      --muted: #3a3a7a;
-      --text: #c8c8ff;
-      --warn: #ffd600;
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      overflow-x: hidden;
-    }
-
-    /* CRT scanlines */
-    body::after {
-      content: '';
-      position: fixed; inset: 0; z-index: 999; pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 2px,
-        rgba(0,0,0,0.15) 2px,
-        rgba(0,0,0,0.15) 4px
-      );
-    }
-
-    /* Screen flicker */
-    @keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.97} 94%{opacity:1} }
-    body { animation: flicker 8s infinite; }
-
-    /* Cursor blink */
-    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-    .cursor { display: inline-block; animation: blink 1s infinite; }
-
-    .terminal {
-      max-width: 900px; margin: 0 auto;
-      padding: 1.5rem 1rem 4rem;
-    }
-
-    /* Boot header */
-    .boot-header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem; margin-bottom: 1.5rem;
-    }
-    .boot-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.2rem; letter-spacing: 0.2em;
-      color: var(--green);
-      text-shadow: 0 0 20px rgba(57,255,20,0.4);
-    }
-    .boot-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 4px; }
-    .boot-line { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .boot-line.ok::before { content: "[ OK ] "; color: var(--green); }
-    .boot-line.warn::before { content: "[ !! ] "; color: var(--warn); }
-    .boot-line.err::before { content: "[FAIL] "; color: var(--pink); }
-
-    /* Login box */
-    .login-panel {
-      border: 1px solid var(--border);
-      padding: 1.5rem;
-      margin: 2rem auto; max-width: 420px;
-      position: relative;
-    }
-    .login-panel::before {
-      content: 'AUTHENTICATION REQUIRED';
-      position: absolute; top: -0.55em; left: 1rem;
-      background: var(--bg); padding: 0 0.5rem;
-      font-size: 0.7rem; letter-spacing: 0.15em; color: var(--cyan);
-    }
-    .login-panel label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 0.4rem; }
-    .login-panel label span { color: var(--cyan); }
-    .terminal-input {
-      width: 100%; background: transparent; border: none;
-      border-bottom: 1px solid var(--muted); color: var(--green);
-      font-family: 'Share Tech Mono', monospace; font-size: 0.95rem;
-      padding: 0.4rem 0; outline: none; margin-bottom: 1rem;
-      caret-color: var(--green);
-    }
-    .terminal-input:focus { border-bottom-color: var(--green); }
-    .terminal-input::placeholder { color: var(--muted); }
-    .btn-terminal {
-      width: 100%; padding: 0.7rem; background: transparent;
-      border: 1px solid var(--green); color: var(--green);
-      font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
-      cursor: pointer; letter-spacing: 0.15em; transition: all 0.15s;
-      text-transform: uppercase;
-    }
-    .btn-terminal:hover { background: rgba(57,255,20,0.08); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
-    .btn-terminal:active { transform: scale(0.98); }
-    .btn-terminal.danger { border-color: var(--pink); color: var(--pink); }
-    .btn-terminal.danger:hover { background: rgba(255,45,120,0.08); box-shadow: 0 0 20px rgba(255,45,120,0.2); }
-    .btn-terminal.unban { border-color: var(--cyan); color: var(--cyan); }
-    .btn-terminal.unban:hover { background: rgba(0,245,255,0.08); }
-    .btn-terminal.sm { width: auto; padding: 0.3rem 0.9rem; font-size: 0.72rem; }
-
-    #loginError { font-size: 0.78rem; color: var(--pink); margin-top: 0.6rem; min-height: 1em; }
-
-    /* Main panel (hidden until auth) */
-    #mainPanel { display: none; }
-
-    .panel-section {
-      border: 1px solid var(--border); margin-bottom: 1.5rem;
-      position: relative;
-    }
-    .panel-section-title {
-      position: absolute; top: -0.55em; left: 1rem;
-      background: var(--bg); padding: 0 0.5rem;
-      font-size: 0.7rem; letter-spacing: 0.12em; color: var(--cyan);
-      text-transform: uppercase;
-    }
-    .panel-inner { padding: 1.5rem; }
-
-    /* Stats row */
-    .stats-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0; }
-    .stat-box { flex: 1; min-width: 120px; }
-    .stat-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
-    .stat-value { font-size: 1.8rem; color: var(--green); line-height: 1; margin-top: 2px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-
-    /* Master key form */
-    .mk-row { display: flex; gap: 0.7rem; align-items: flex-end; }
-    .mk-row .terminal-input { margin-bottom: 0; flex: 1; }
-    .mk-status { font-size: 0.75rem; margin-top: 0.6rem; min-height: 1em; }
-    .mk-status.ok { color: var(--green); }
-    .mk-status.err { color: var(--pink); }
-
-    /* Keys table */
-    .keys-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    .keys-table th {
-      text-align: left; padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--cyan); font-weight: 400; letter-spacing: 0.08em;
-      font-size: 0.68rem;
-    }
-    .keys-table td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      color: var(--text); vertical-align: middle;
-    }
-    .keys-table tr:hover td { background: rgba(57,255,20,0.02); }
-    .keys-table tr.banned td { opacity: 0.45; }
-    .key-mono { font-size: 0.7rem; color: var(--purple); word-break: break-all; }
-    .badge-banned { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(255,45,120,0.15); border: 1px solid rgba(255,45,120,0.3); color: var(--pink); }
-    .badge-ok { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(57,255,20,0.1); border: 1px solid rgba(57,255,20,0.25); color: var(--green); }
-    .usage-bar-mini { height: 4px; background: var(--border); border-radius: 99px; margin-top: 3px; overflow: hidden; }
-    .usage-bar-mini-fill { height: 100%; border-radius: 99px; background: var(--green); }
-    .usage-bar-mini-fill.danger { background: var(--pink); }
-
-    .loading-msg { color: var(--muted); font-size: 0.8rem; padding: 1rem 0; }
-    .loading-msg::before { content: ">>> "; color: var(--green); }
-
-    footer { color: var(--muted); font-size: 0.7rem; text-align: center; margin-top: 2rem; }
-    footer a { color: var(--cyan); text-decoration: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADO – AI Access Dashboard</title>
+    <!-- Supabase JS library (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0b0b14 0%, #15152a 100%);
+            font-family: 'Nunito', sans-serif;
+            color: #f0f0ff;
+            padding: 2rem;
+        }
+        /* Anime ID card style */
+        .card {
+            background: rgba(20, 20, 40, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(180, 142, 247, 0.3);
+            border-radius: 32px;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .dashboard-card {
+            background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
+            border-radius: 28px;
+            padding: 2rem;
+            border: 1px solid #b48ef7;
+        }
+        .pfp {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid #f78eb4;
+        }
+        .mana-bar-bg {
+            background: #2a2a3e;
+            border-radius: 20px;
+            height: 24px;
+            width: 100%;
+            margin: 1rem 0;
+        }
+        .mana-bar-fill {
+            background: linear-gradient(90deg, #b48ef7, #f78eb4);
+            border-radius: 20px;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .key-box {
+            background: #0d0d1a;
+            border-radius: 16px;
+            padding: 1rem;
+            font-family: 'Space Mono', monospace;
+            word-break: break-all;
+            margin: 1rem 0;
+        }
+        button {
+            background: #b48ef7;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(0.98); }
+        .admin-only { display: none; }
+        .ascii-mascot {
+            font-family: monospace;
+            white-space: pre;
+            text-align: center;
+            font-size: 0.8rem;
+            background: #0a0a12;
+            padding: 1rem;
+            border-radius: 16px;
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 <body>
 
-<div class="terminal">
-
-  <!-- Boot header -->
-  <div class="boot-header">
-    <div class="boot-title">ADO :: SYSTEM TERMINAL<span class="cursor">_</span></div>
-    <div class="boot-sub">Administrative Access Portal · v2.0 · RESTRICTED</div>
-    <div class="boot-line ok" style="margin-top:0.6rem">Cloudflare KV database connected</div>
-    <div class="boot-line ok">Worker gateway online</div>
-    <div class="boot-line warn">Authentication required before proceeding</div>
-  </div>
-
-  <!-- Login -->
-  <div class="login-panel" id="loginPanel">
-    <label><span>>_</span> ENTER ADMIN CODE</label>
-    <input class="terminal-input" type="password" id="adminCodeInput" placeholder="••••••••••••" />
-    <button class="btn-terminal" id="btnLogin">AUTHENTICATE &gt;&gt;</button>
-    <div id="loginError"></div>
-  </div>
-
-  <!-- Main Panel (shown after auth) -->
-  <div id="mainPanel">
-
-    <!-- Stats -->
-    <div class="panel-section">
-      <div class="panel-section-title">SYSTEM STATUS</div>
-      <div class="panel-inner">
-        <div class="stats-row">
-          <div class="stat-box">
-            <div class="stat-label">TOTAL KEYS ISSUED</div>
-            <div class="stat-value" id="statTotal">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">ACTIVE (NOT BANNED)</div>
-            <div class="stat-value" id="statActive">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">BANNED KEYS</div>
-            <div class="stat-value" id="statBanned" style="color:var(--pink)">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">REQUESTS TODAY</div>
-            <div class="stat-value" id="statRequests" style="color:var(--cyan)">—</div>
-          </div>
-        </div>
-      </div>
+<div id="authSection" style="max-width: 400px; margin: 4rem auto; text-align: center;">
+    <div class="card">
+        <h2>✨ ADO ✨</h2>
+        <p>Sign in to get your personal AI key (5 requests/day during beta)</p>
+        <button id="googleSignInBtn">🔐 Sign in with Google</button>
+        <br/><br/>
+        <p>or use email magic link:</p>
+        <input type="email" id="magicEmail" placeholder="your@email.com" style="width:100%; padding:0.5rem; margin:0.5rem 0;">
+        <button id="magicLinkBtn">📧 Send Magic Link</button>
     </div>
+</div>
 
-    <!-- Master Key Override -->
-    <div class="panel-section">
-      <div class="panel-section-title">MASTER KEY OVERRIDE</div>
-      <div class="panel-inner">
-        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem;">
-          Paste a new Bluesminds API key below. The Worker will use it instantly — no redeploy needed. The old key is immediately replaced in KV.
+<div id="dashboardSection" style="display: none;">
+    <div class="dashboard-card">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <img id="userAvatar" class="pfp" src="" alt="avatar">
+            <div>
+                <h2 id="userName">Anime fan</h2>
+                <p>Your ADO Key</p>
+                <div class="key-box" id="adoKeyDisplay">—</div>
+                <button id="copyKeyBtn">📋 Copy Key</button>
+                <button id="generateKeyBtn" style="margin-left: 0.5rem;">✨ Gacha Summon ✨</button>
+            </div>
         </div>
-        <div class="mk-row">
-          <input class="terminal-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-xxxxxxxx..." />
-          <button class="btn-terminal sm" id="btnUpdateMasterKey">UPDATE &gt;&gt;</button>
+        <div>
+            <p>⚡ Mana (requests used today)</p>
+            <div class="mana-bar-bg"><div class="mana-bar-fill" id="manaFill"></div></div>
+            <p><span id="usedCount">0</span> / <span id="limitCount">5</span> used</p>
         </div>
-        <div class="mk-status" id="masterKeyStatus"></div>
-      </div>
+        <div id="asciiMascot" class="ascii-mascot"></div>
+        <div style="margin-top: 2rem;">
+            <p><strong>⚙️ How to use in JanitorAI / SillyTavern:</strong></p>
+            <p>API Base URL: <code>https://apiado.burgerboixs.workers.dev/</code></p>
+            <p>API Key: <span id="keyForCopy" style="font-family: monospace;"></span></p>
+            <button id="copyEndpointBtn">📋 Copy Endpoint</button>
+        </div>
+        <button id="logoutBtn" style="margin-top: 2rem; background: #3a2a4a;">🚪 Logout</button>
     </div>
+</div>
 
-    <!-- Keys Table -->
-    <div class="panel-section">
-      <div class="panel-section-title">REGISTERED KEYS</div>
-      <div class="panel-inner" style="padding-top:1.2rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-          <span style="font-size:0.72rem;color:var(--muted)">Showing all issued ADO keys</span>
-          <button class="btn-terminal sm" id="btnRefreshKeys">REFRESH &gt;&gt;</button>
-        </div>
-        <div id="keysContainer">
-          <div class="loading-msg">Loading key registry...</div>
-        </div>
-      </div>
+<div id="adminPanel" style="display: none; margin-top: 2rem;" class="card">
+    <h3>🔧 Admin Panel</h3>
+    <input type="password" id="adminSecret" placeholder="Admin secret">
+    <button id="unlockAdminBtn">Unlock</button>
+    <div id="adminControls" style="display: none;">
+        <h4>Ban user</h4>
+        <input type="text" id="banUserId" placeholder="User ID (from Supabase)">
+        <button id="banUserBtn">Ban User</button>
+        <h4>Update master Bluesminds key</h4>
+        <input type="password" id="newMasterKey" placeholder="New master key">
+        <button id="updateMasterKeyBtn">Update Master Key</button>
     </div>
-
-  </div><!-- end #mainPanel -->
-
-  <footer><a href="index.html">&laquo; Back to ADO Live</a> · SYSTEM TERMINAL v2.0</footer>
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// !! PASTE YOUR CLOUDFLARE WORKER URL HERE !!
-// ════════════════════════════════════════════════════════════
-const WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
+    // ------------------- CONFIGURATION -------------------
+    const SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co';   // <-- CHANGE
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';                    // <-- CHANGE
+    const WORKER_URL = 'https://apiado.burgerboixs.workers.dev';
+    const ADMIN_SECRET = 'adoAdminSecret123';                     // same as in Worker
 
-let ADMIN_KEY = null;
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-async function doAdminFetch(path, opts = {}) {
-  const r = await fetch(WORKER_URL + path, {
-    ...opts,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Key": ADMIN_KEY,
-      ...(opts.headers || {}),
-    },
-  });
-  return r;
-}
+    let currentUser = null;
+    let currentAdoKey = null;
 
-async function loadKeys() {
-  const container = document.getElementById("keysContainer");
-  container.innerHTML = '<div class="loading-msg">Fetching key registry...</div>';
-  try {
-    const r = await doAdminFetch("/admin/keys");
-    const d = await r.json();
-    if (!r.ok) { container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Error: ${d.error}</div>`; return; }
-
-    const keys = d.keys || [];
-
-    // Update stats
-    document.getElementById("statTotal").textContent = keys.length;
-    document.getElementById("statActive").textContent = keys.filter(k => !k.banned).length;
-    document.getElementById("statBanned").textContent = keys.filter(k => k.banned).length;
-    document.getElementById("statRequests").textContent = keys.reduce((a, k) => a + (k.usedToday || 0), 0);
-
-    if (!keys.length) {
-      container.innerHTML = '<div class="loading-msg">No keys registered yet.</div>';
-      return;
-    }
-
-    const table = document.createElement("table");
-    table.className = "keys-table";
-    table.innerHTML = `
-      <thead><tr>
-        <th>ADO KEY</th>
-        <th>USER</th>
-        <th>TODAY / 5</th>
-        <th>STATUS</th>
-        <th>ACTION</th>
-      </tr></thead>
-      <tbody id="keysBody"></tbody>
-    `;
-    container.innerHTML = "";
-    container.appendChild(table);
-    const tbody = document.getElementById("keysBody");
-
-    for (const k of keys) {
-      const pct = Math.min(100, ((k.usedToday || 0) / 5) * 100);
-      const tr = document.createElement("tr");
-      if (k.banned) tr.className = "banned";
-      tr.innerHTML = `
-        <td><div class="key-mono">${k.key}</div></td>
-        <td>
-          <div>${k.name || "—"}</div>
-          <div style="font-size:0.68rem;color:var(--muted)">${k.email || "—"}</div>
-        </td>
-        <td>
-          <div>${k.usedToday || 0} / 5</div>
-          <div class="usage-bar-mini">
-            <div class="usage-bar-mini-fill ${pct >= 80 ? 'danger' : ''}" style="width:${pct}%"></div>
-          </div>
-        </td>
-        <td>${k.banned
-          ? '<span class="badge-banned">BANNED</span>'
-          : '<span class="badge-ok">ACTIVE</span>'
-        }</td>
-        <td>
-          <button class="btn-terminal sm ${k.banned ? 'unban' : 'danger'}" data-key="${k.key}" data-banned="${k.banned}">
-            ${k.banned ? 'UNBAN' : 'BAN'}
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    // Attach ban/unban handlers
-    tbody.querySelectorAll("[data-key]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const key = btn.dataset.key;
-        const currentlyBanned = btn.dataset.banned === "true";
-        btn.textContent = "...";
-        btn.disabled = true;
-        try {
-          const r = await doAdminFetch("/admin/ban", {
-            method: "POST",
-            body: JSON.stringify({ key, banned: !currentlyBanned }),
-          });
-          const d = await r.json();
-          if (d.ok) { await loadKeys(); }
-          else { btn.textContent = "ERR"; btn.disabled = false; }
-        } catch {
-          btn.textContent = "ERR"; btn.disabled = false;
+    // Helper: update dashboard UI
+    async function refreshDashboard() {
+        if (!currentUser) return;
+        const userId = currentUser.id;
+        const response = await fetch(`${WORKER_URL}/usage?userId=${userId}`);
+        const data = await response.json();
+        if (data.adoKey) {
+            currentAdoKey = data.adoKey;
+            document.getElementById('adoKeyDisplay').innerText = data.adoKey;
+            document.getElementById('keyForCopy').innerText = data.adoKey;
+            const used = data.used;
+            const limit = data.limit;
+            const percent = (used / limit) * 100;
+            document.getElementById('manaFill').style.width = percent + '%';
+            document.getElementById('usedCount').innerText = used;
+            document.getElementById('limitCount').innerText = limit;
+            // ASCII mascot based on remaining
+            const remaining = limit - used;
+            let mascot = '';
+            if (remaining > 3) mascot = '(◕‿◕)  ✨  Energy full!';
+            else if (remaining > 0) mascot = '(◕︿◕)  ⚡  Getting low...';
+            else mascot = '(×﹏×)  💤  Mana depleted! Come back tomorrow.';
+            document.getElementById('asciiMascot').innerText = mascot;
+        } else {
+            document.getElementById('adoKeyDisplay').innerText = 'No key yet. Click "Gacha Summon"!';
         }
-      });
+    }
+
+    // Generate key (one per user)
+    async function generateKey() {
+        if (!currentUser) return;
+        const userId = currentUser.id;
+        const response = await fetch(`${WORKER_URL}/generate`, {
+            method: 'POST',
+            headers: { 'X-User-Id': userId }
+        });
+        const data = await response.json();
+        if (data.key) {
+            currentAdoKey = data.key;
+            alert('🎉 New key generated! It has been assigned to your account.');
+            refreshDashboard();
+        } else {
+            alert('Error: ' + (data.error || 'unknown'));
+        }
+    }
+
+    // Copy key to clipboard
+    function copyKey() {
+        if (currentAdoKey) {
+            navigator.clipboard.writeText(currentAdoKey);
+            alert('Key copied!');
+        }
+    }
+
+    function copyEndpoint() {
+        navigator.clipboard.writeText(WORKER_URL + '/');
+        alert('Endpoint copied!');
+    }
+
+    // Admin functions
+    async function banUser(userId) {
+        const response = await fetch(`${WORKER_URL}/admin/ban`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Token': ADMIN_SECRET },
+            body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        alert(data.success ? 'User banned' : 'Error: ' + (data.error || 'unknown'));
+    }
+
+    async function updateMasterKey(newKey) {
+        const response = await fetch(`${WORKER_URL}/admin/masterkey`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Token': ADMIN_SECRET },
+            body: JSON.stringify({ masterKey: newKey })
+        });
+        const data = await response.json();
+        alert(data.success ? 'Master key updated' : 'Error: ' + (data.error || 'unknown'));
+    }
+
+    // Supabase auth handling
+    async function handleSession(session) {
+        if (session?.user) {
+            currentUser = session.user;
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('userName').innerText = currentUser.user_metadata?.full_name || currentUser.email;
+            if (currentUser.user_metadata?.avatar_url) {
+                document.getElementById('userAvatar').src = currentUser.user_metadata.avatar_url;
+            } else {
+                document.getElementById('userAvatar').src = 'https://via.placeholder.com/64';
+            }
+            await refreshDashboard();
+        } else {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            currentUser = null;
+        }
+    }
+
+    supabase.auth.onAuthStateChange((event, session) => {
+        handleSession(session);
     });
 
-  } catch (err) {
-    container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Failed: ${err.message}</div>`;
-  }
-}
+    // Login methods
+    document.getElementById('googleSignInBtn').onclick = () => supabase.auth.signInWithOAuth({ provider: 'google' });
+    document.getElementById('magicLinkBtn').onclick = async () => {
+        const email = document.getElementById('magicEmail').value;
+        if (!email) return alert('Enter email');
+        await supabase.auth.signInWithOtp({ email });
+        alert('Magic link sent! Check your inbox.');
+    };
+    document.getElementById('logoutBtn').onclick = () => supabase.auth.signOut();
 
-// Master key update
-document.getElementById("btnUpdateMasterKey").addEventListener("click", async () => {
-  const key = document.getElementById("masterKeyInput").value.trim();
-  const statusEl = document.getElementById("masterKeyStatus");
-  if (!key) { statusEl.textContent = "> Error: paste a key first."; statusEl.className = "mk-status err"; return; }
-  statusEl.textContent = "> Sending update..."; statusEl.className = "mk-status";
-  try {
-    const r = await doAdminFetch("/admin/masterkey", {
-      method: "POST",
-      body: JSON.stringify({ masterKey: key }),
-    });
-    const d = await r.json();
-    if (d.ok) {
-      statusEl.textContent = "> SUCCESS: Master key updated in KV. Workers using it immediately.";
-      statusEl.className = "mk-status ok";
-      document.getElementById("masterKeyInput").value = "";
-    } else {
-      statusEl.textContent = "> Error: " + (d.error || "unknown");
-      statusEl.className = "mk-status err";
-    }
-  } catch (err) {
-    statusEl.textContent = "> Error: " + err.message;
-    statusEl.className = "mk-status err";
-  }
-});
+    // Dashboard buttons
+    document.getElementById('generateKeyBtn').onclick = generateKey;
+    document.getElementById('copyKeyBtn').onclick = copyKey;
+    document.getElementById('copyEndpointBtn').onclick = copyEndpoint;
 
-document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
+    // Admin panel unlock
+    document.getElementById('unlockAdminBtn').onclick = () => {
+        const secret = document.getElementById('adminSecret').value;
+        if (secret === ADMIN_SECRET) {
+            document.getElementById('adminControls').style.display = 'block';
+        } else {
+            alert('Wrong secret');
+        }
+    };
+    document.getElementById('banUserBtn').onclick = () => {
+        const userId = document.getElementById('banUserId').value;
+        if (userId) banUser(userId);
+    };
+    document.getElementById('updateMasterKeyBtn').onclick = () => {
+        const newKey = document.getElementById('newMasterKey').value;
+        if (newKey) updateMasterKey(newKey);
+    };
 
-// Login
-document.getElementById("btnLogin").addEventListener("click", async () => {
-  const code = document.getElementById("adminCodeInput").value.trim();
-  const errEl = document.getElementById("loginError");
-  if (!code) { errEl.textContent = "> Error: enter admin code."; return; }
-
-  errEl.textContent = "> Authenticating...";
-
-  // Verify by attempting an admin fetch
-  try {
-    const r = await fetch(WORKER_URL + "/admin/keys", {
-      headers: { "X-Admin-Key": code }
-    });
-    if (r.status === 403) {
-      errEl.textContent = "> ACCESS DENIED. Invalid code.";
-      return;
-    }
-    if (!r.ok && r.status !== 200) {
-      // Might be a valid auth but worker error — still accept
-    }
-    ADMIN_KEY = code;
-    document.getElementById("loginPanel").style.display = "none";
-    document.getElementById("mainPanel").style.display = "block";
-    errEl.textContent = "";
-    await loadKeys();
-  } catch (err) {
-    errEl.textContent = "> Connection error: " + err.message;
-  }
-});
-
-document.getElementById("adminCodeInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("btnLogin").click();
-});
+    // Check existing session on page load
+    supabase.auth.getSession().then(({ data: { session } }) => handleSession(session));
 </script>
-
 </body>
 </html>
