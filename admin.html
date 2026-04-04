@@ -3,824 +3,430 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADO LIVE — Free AI Access</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <title>ADO :: SYSTEM TERMINAL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #07070f;
-      --surface: #0f0f1c;
-      --surface2: #15152a;
-      --border: #252545;
-      --accent: #c084fc;
-      --accent2: #f472b6;
-      --accent3: #67e8f9;
-      --accent4: #fbbf24;
-      --text: #ede8ff;
-      --muted: #6060a0;
-      --success: #4ade80;
-      --error: #f87171;
-      --glow-p: rgba(192,132,252,0.3);
-      --glow-p2: rgba(244,114,182,0.2);
+      --bg: #020208;
+      --surface: #060614;
+      --surface2: #0a0a1e;
+      --border: #1a1a3a;
+      --green: #39ff14;
+      --cyan: #00f5ff;
+      --pink: #ff2d78;
+      --purple: #b44eff;
+      --muted: #3a3a7a;
+      --text: #c8c8ff;
+      --warn: #ffd600;
     }
 
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; overflow-x: hidden; }
-
-    /* ── CANVAS ── */
-    #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-    /* ── STATUS TICKER ── */
-    #statusTicker {
-      position: relative; z-index: 10;
-      width: 100%; padding: 6px 0;
-      background: linear-gradient(90deg, #1a0033, #0d001a, #1a0033);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-    }
-    #statusTicker .ticker-inner {
-      display: flex; align-items: center; gap: 2rem;
-      animation: scrollTicker 30s linear infinite;
-      white-space: nowrap;
-    }
-    @keyframes scrollTicker { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
-    .ticker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; flex-shrink: 0; }
-    .ticker-dot.offline { background: var(--error); box-shadow: 0 0 8px var(--error); }
-    #tickerText { color: var(--text); }
-
-    /* ── PAGE WRAPPER ── */
-    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 4rem; gap: 2rem; }
-
-    /* ── HEADER ── */
-    header { text-align: center; padding-top: 0.5rem; }
-    .logo-ado {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 5rem;
-      letter-spacing: 0.25em;
-      background: linear-gradient(135deg, #fff 0%, var(--accent) 40%, var(--accent2) 80%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      filter: drop-shadow(0 0 30px rgba(192,132,252,0.6));
-      line-height: 1;
-    }
-    .logo-sub {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.5em;
-      color: var(--accent2);
-      margin-top: -4px;
-      opacity: 0.8;
-    }
-    .logo-tagline { margin-top: 0.5rem; color: var(--muted); font-size: 0.82rem; letter-spacing: 0.04em; }
-
-    /* ── SCREENS ── */
-    .screen { width: 100%; max-width: 600px; display: none; flex-direction: column; align-items: center; gap: 1.5rem; }
-    .screen.active { display: flex; }
-
-    /* ── LOGIN CARD ── */
-    .login-card {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      text-align: center;
-      box-shadow: 0 0 60px rgba(192,132,252,0.08), 0 0 0 1px rgba(192,132,252,0.05);
-      position: relative; overflow: hidden;
-    }
-    .login-card::before {
-      content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(192,132,252,0.12), transparent 70%);
-      pointer-events: none;
-    }
-    .login-icon { font-size: 3rem; margin-bottom: 1rem; display: block; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    .login-title { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 0.4rem; }
-    .login-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.8rem; }
-    .login-rules {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
-      padding: 0.9rem 1rem; margin-bottom: 1.8rem; text-align: left; font-size: 0.82rem; color: var(--muted); line-height: 1.8;
-    }
-    .login-rules span { color: var(--accent3); }
-
-    .btn-google {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
-      padding: 0.85rem 2rem; border-radius: 14px; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--text); font-family: 'Nunito', sans-serif;
-      font-weight: 700; font-size: 1rem; cursor: pointer;
-      transition: all 0.2s; width: 100%;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-    }
-    .btn-google:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--glow-p); transform: translateY(-1px); }
-    .btn-google:active { transform: scale(0.98); }
-    .btn-google svg { width: 20px; height: 20px; }
-
-    /* ── LOADING ── */
-    .loading-ring {
-      width: 48px; height: 48px; border: 3px solid var(--border);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.8s linear infinite; margin: 2rem auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── CONCERT TICKET DASHBOARD ── */
-    .ticket {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 8px 60px rgba(192,132,252,0.12), 0 0 0 1px rgba(192,132,252,0.06);
-      position: relative;
-    }
-
-    /* Ticket header band */
-    .ticket-header {
-      background: linear-gradient(135deg, #1a0040, #2d0060, #1a0040);
-      border-bottom: 1px solid rgba(192,132,252,0.3);
-      padding: 0.9rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      position: relative;
-    }
-    .ticket-header::before {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(192,132,252,0.03) 3px, rgba(192,132,252,0.03) 4px);
-    }
-    .ticket-event { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.15em; color: var(--accent); }
-    .ticket-type { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; color: var(--accent2); text-transform: uppercase; }
-
-    /* User info section */
-    .ticket-user {
-      display: flex; align-items: center; gap: 1rem;
-      padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07);
-    }
-    .user-photo {
-      width: 52px; height: 52px; border-radius: 50%;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 16px var(--glow-p);
-      object-fit: cover; flex-shrink: 0;
-    }
-    .user-photo-placeholder {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--surface2); border: 2px solid var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; flex-shrink: 0;
-    }
-    .user-name { font-weight: 800; font-size: 1rem; color: var(--text); }
-    .user-email { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .user-badge {
-      margin-left: auto; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.3);
-      border-radius: 99px; padding: 0.25rem 0.75rem;
-      font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
-
-    /* Key section */
-    .ticket-key { padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07); }
-    .field-label {
-      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.4rem; font-family: 'Space Mono', monospace;
-    }
-    .field-label em { color: var(--accent3); font-style: normal; }
-    .key-display {
-      font-family: 'Space Mono', monospace; font-size: 0.92rem; color: var(--accent3);
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 0.7rem 1rem;
-      word-break: break-all; user-select: all;
-      margin-bottom: 0.75rem;
-    }
-    .copy-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-    .btn-copy-tag {
-      flex: 1; min-width: 120px;
-      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-      padding: 0.55rem 0.9rem; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--surface2);
-      color: var(--muted); font-family: 'Nunito', sans-serif;
-      font-size: 0.8rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-copy-tag:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-copy-tag.copied { border-color: var(--success); color: var(--success); }
-
-    /* Ticket usage / quota */
-    .ticket-usage { padding: 1.2rem 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.07); }
-    .usage-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; }
-    .usage-label-row .field-label { margin-bottom: 0; }
-    .usage-counter { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--text); }
-    .usage-counter span { color: var(--accent); }
-
-    /* Ticket stubs (5 icons) */
-    .stubs { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .stub {
-      flex: 1; height: 36px;
-      background: linear-gradient(135deg, rgba(192,132,252,0.2), rgba(244,114,182,0.15));
-      border: 1px solid rgba(192,132,252,0.35);
-      border-radius: 8px; position: relative; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; transition: all 0.3s;
-    }
-    .stub.used {
-      background: rgba(255,255,255,0.03);
-      border: 1px dashed rgba(255,255,255,0.08);
-      filter: grayscale(1) opacity(0.3);
-    }
-    .stub::after {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: linear-gradient(to bottom, var(--accent), var(--accent2));
-      opacity: 0.5;
-    }
-    .stub.used::after { display: none; }
-
-    /* Mascot */
-    .ticket-mascot {
-      padding: 1rem 1.5rem;
-      display: flex; align-items: center; gap: 1rem;
-    }
-    .mascot-art {
-      font-family: 'Space Mono', monospace;
-      font-size: 1.1rem;
-      transition: all 0.5s;
-      flex-shrink: 0;
-    }
-    .mascot-speech {
-      font-size: 0.8rem; line-height: 1.5;
-      color: var(--muted);
-      flex: 1;
-    }
-    .mascot-speech strong { font-size: 0.85rem; display: block; margin-bottom: 2px; }
-
-    /* Ticket tearline */
-    .tearline {
-      height: 1px; position: relative; overflow: visible;
-      margin: 0;
-    }
-    .tearline::before {
-      content: '';
-      position: absolute; top: 50%; left: -12px; right: -12px;
-      height: 1px; border-top: 2px dashed rgba(255,255,255,0.08);
-      transform: translateY(-50%);
-    }
-    .tearline-circles {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 100%; display: flex; justify-content: space-between; pointer-events: none;
-    }
-    .tearline-circles::before,
-    .tearline-circles::after {
-      content: '';
-      width: 24px; height: 24px; border-radius: 50%;
+    html, body {
+      height: 100%;
       background: var(--bg);
-      border: 1px solid rgba(255,255,255,0.06);
-      margin: 0 -12px;
-      flex-shrink: 0;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      overflow-x: hidden;
     }
 
-    /* Bottom actions bar */
-    .ticket-footer { padding: 1.2rem 1.5rem; display: flex; gap: 0.6rem; align-items: center; }
-    .btn-signout {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.5rem 1rem; border-radius: 8px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--muted); font-family: 'Nunito', sans-serif;
-      font-size: 0.8rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s; margin-left: auto;
-    }
-    .btn-signout:hover { border-color: var(--error); color: var(--error); }
-
-    .btn-refresh {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.5rem 1rem; border-radius: 8px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--muted); font-family: 'Nunito', sans-serif;
-      font-size: 0.8rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-refresh:hover { border-color: var(--accent3); color: var(--accent3); }
-
-    /* ── ENDPOINT CARD ── */
-    .endpoint-card {
-      width: 100%; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.3rem 1.5rem;
-    }
-    .endpoint-card .field-label { margin-bottom: 0.6rem; }
-    .endpoint-url {
-      font-family: 'Space Mono', monospace; font-size: 0.82rem;
-      color: var(--accent4); word-break: break-all;
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 999; pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      );
     }
 
-    /* ── HOW TO USE ── */
-    .howto-card {
-      width: 100%; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.5rem;
-    }
-    .howto-title { font-weight: 800; font-size: 1rem; color: var(--accent); margin-bottom: 1rem; }
-    .steps { display: flex; flex-direction: column; gap: 0.8rem; }
-    .step { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
-    .step-n { width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); color: var(--accent); font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-    code { font-family: 'Space Mono', monospace; font-size: 0.8em; background: var(--surface2); border: 1px solid var(--border); padding: 0.1em 0.4em; border-radius: 4px; color: var(--accent3); word-break: break-all; }
+    /* Screen flicker */
+    @keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.97} 94%{opacity:1} }
+    body { animation: flicker 8s infinite; }
 
-    /* ── GACHA OVERLAY ── */
-    #gachaOverlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(5, 5, 20, 0.97);
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 1.5rem;
-    }
-    #gachaOverlay.active { display: flex; }
+    /* Cursor blink */
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+    .cursor { display: inline-block; animation: blink 1s infinite; }
 
-    .gacha-title {
+    .terminal {
+      max-width: 900px; margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* Boot header */
+    .boot-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem; margin-bottom: 1.5rem;
+    }
+    .boot-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem; letter-spacing: 0.3em;
-      color: var(--accent2);
-      animation: gachaGlow 1s ease-in-out infinite alternate;
+      font-size: 2.2rem; letter-spacing: 0.2em;
+      color: var(--green);
+      text-shadow: 0 0 20px rgba(57,255,20,0.4);
     }
-    @keyframes gachaGlow { from { text-shadow: 0 0 20px rgba(244,114,182,0.4); } to { text-shadow: 0 0 40px rgba(244,114,182,0.9), 0 0 80px rgba(192,132,252,0.4); } }
+    .boot-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 4px; }
+    .boot-line { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .boot-line.ok::before { content: "[ OK ] "; color: var(--green); }
+    .boot-line.warn::before { content: "[ !! ] "; color: var(--warn); }
+    .boot-line.err::before { content: "[FAIL] "; color: var(--pink); }
 
-    .gacha-card {
-      width: 280px; background: linear-gradient(135deg, #1a0040, #2d0060);
-      border: 1px solid rgba(192,132,252,0.5); border-radius: 20px;
-      padding: 2rem 1.5rem; text-align: center;
-      box-shadow: 0 0 60px rgba(192,132,252,0.3), 0 0 120px rgba(244,114,182,0.1);
-      animation: gachaReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    /* Login box */
+    .login-panel {
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin: 2rem auto; max-width: 420px;
+      position: relative;
     }
-    @keyframes gachaReveal {
-      0% { transform: scale(0.3) rotateY(180deg); opacity: 0; }
-      60% { transform: scale(1.1) rotateY(-10deg); }
-      100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+    .login-panel::before {
+      content: 'AUTHENTICATION REQUIRED';
+      position: absolute; top: -0.55em; left: 1rem;
+      background: var(--bg); padding: 0 0.5rem;
+      font-size: 0.7rem; letter-spacing: 0.15em; color: var(--cyan);
     }
-    .gacha-star { font-size: 2rem; margin-bottom: 0.5rem; animation: spin 3s linear infinite; display: inline-block; }
-    .gacha-label { font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent2); text-transform: uppercase; font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; }
-    .gacha-key { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--accent3); word-break: break-all; margin-bottom: 1rem; line-height: 1.6; }
-    .gacha-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-    .particle {
-      position: absolute; width: 4px; height: 4px; border-radius: 50%;
-      animation: particleFly 2s ease-out forwards;
+    .login-panel label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 0.4rem; }
+    .login-panel label span { color: var(--cyan); }
+    .terminal-input {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid var(--muted); color: var(--green);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.95rem;
+      padding: 0.4rem 0; outline: none; margin-bottom: 1rem;
+      caret-color: var(--green);
     }
-    @keyframes particleFly {
-      0% { transform: translate(0,0) scale(1); opacity: 1; }
-      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    .terminal-input:focus { border-bottom-color: var(--green); }
+    .terminal-input::placeholder { color: var(--muted); }
+    .btn-terminal {
+      width: 100%; padding: 0.7rem; background: transparent;
+      border: 1px solid var(--green); color: var(--green);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
+      cursor: pointer; letter-spacing: 0.15em; transition: all 0.15s;
+      text-transform: uppercase;
     }
-    .btn-gacha-close {
-      padding: 0.7rem 2rem; border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; color: #07070f; font-family: 'Nunito', sans-serif;
-      font-weight: 800; font-size: 0.95rem; cursor: pointer;
-      transition: transform 0.15s;
-    }
-    .btn-gacha-close:hover { transform: scale(1.05); }
+    .btn-terminal:hover { background: rgba(57,255,20,0.08); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+    .btn-terminal:active { transform: scale(0.98); }
+    .btn-terminal.danger { border-color: var(--pink); color: var(--pink); }
+    .btn-terminal.danger:hover { background: rgba(255,45,120,0.08); box-shadow: 0 0 20px rgba(255,45,120,0.2); }
+    .btn-terminal.unban { border-color: var(--cyan); color: var(--cyan); }
+    .btn-terminal.unban:hover { background: rgba(0,245,255,0.08); }
+    .btn-terminal.sm { width: auto; padding: 0.3rem 0.9rem; font-size: 0.72rem; }
 
-    footer { color: var(--muted); font-size: 0.78rem; text-align: center; }
-    footer a { color: var(--accent); text-decoration: none; }
+    #loginError { font-size: 0.78rem; color: var(--pink); margin-top: 0.6rem; min-height: 1em; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .screen.active { animation: fadeIn 0.4s ease-out; }
+    /* Main panel (hidden until auth) */
+    #mainPanel { display: none; }
+
+    .panel-section {
+      border: 1px solid var(--border); margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .panel-section-title {
+      position: absolute; top: -0.55em; left: 1rem;
+      background: var(--bg); padding: 0 0.5rem;
+      font-size: 0.7rem; letter-spacing: 0.12em; color: var(--cyan);
+      text-transform: uppercase;
+    }
+    .panel-inner { padding: 1.5rem; }
+
+    /* Stats row */
+    .stats-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0; }
+    .stat-box { flex: 1; min-width: 120px; }
+    .stat-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+    .stat-value { font-size: 1.8rem; color: var(--green); line-height: 1; margin-top: 2px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+
+    /* Master key form */
+    .mk-row { display: flex; gap: 0.7rem; align-items: flex-end; }
+    .mk-row .terminal-input { margin-bottom: 0; flex: 1; }
+    .mk-status { font-size: 0.75rem; margin-top: 0.6rem; min-height: 1em; }
+    .mk-status.ok { color: var(--green); }
+    .mk-status.err { color: var(--pink); }
+
+    /* Keys table */
+    .keys-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .keys-table th {
+      text-align: left; padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--cyan); font-weight: 400; letter-spacing: 0.08em;
+      font-size: 0.68rem;
+    }
+    .keys-table td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--text); vertical-align: middle;
+    }
+    .keys-table tr:hover td { background: rgba(57,255,20,0.02); }
+    .keys-table tr.banned td { opacity: 0.45; }
+    .key-mono { font-size: 0.7rem; color: var(--purple); word-break: break-all; }
+    .badge-banned { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(255,45,120,0.15); border: 1px solid rgba(255,45,120,0.3); color: var(--pink); }
+    .badge-ok { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(57,255,20,0.1); border: 1px solid rgba(57,255,20,0.25); color: var(--green); }
+    .usage-bar-mini { height: 4px; background: var(--border); border-radius: 99px; margin-top: 3px; overflow: hidden; }
+    .usage-bar-mini-fill { height: 100%; border-radius: 99px; background: var(--green); }
+    .usage-bar-mini-fill.danger { background: var(--pink); }
+
+    .loading-msg { color: var(--muted); font-size: 0.8rem; padding: 1rem 0; }
+    .loading-msg::before { content: ">>> "; color: var(--green); }
+
+    footer { color: var(--muted); font-size: 0.7rem; text-align: center; margin-top: 2rem; }
+    footer a { color: var(--cyan); text-decoration: none; }
   </style>
 </head>
 <body>
 
-<canvas id="stars"></canvas>
+<div class="terminal">
 
-<!-- Status Ticker -->
-<div id="statusTicker">
-  <div class="ticker-inner">
-    <span class="ticker-dot" id="tickerDot"></span>
-    <span id="tickerText">Connecting to ADO systems...</span>
-    &nbsp;&nbsp;✦&nbsp;&nbsp; ADO LIVE BETA — 5 REQUESTS/DAY &nbsp;&nbsp;✦&nbsp;&nbsp; FREE FOR THE COMMUNITY &nbsp;&nbsp;✦&nbsp;&nbsp; RESETS MIDNIGHT UTC &nbsp;&nbsp;✦&nbsp;&nbsp;
+  <!-- Boot header -->
+  <div class="boot-header">
+    <div class="boot-title">ADO :: SYSTEM TERMINAL<span class="cursor">_</span></div>
+    <div class="boot-sub">Administrative Access Portal · v2.0 · RESTRICTED</div>
+    <div class="boot-line ok" style="margin-top:0.6rem">Cloudflare KV database connected</div>
+    <div class="boot-line ok">Worker gateway online</div>
+    <div class="boot-line warn">Authentication required before proceeding</div>
   </div>
+
+  <!-- Login -->
+  <div class="login-panel" id="loginPanel">
+    <label><span>>_</span> ENTER ADMIN CODE</label>
+    <input class="terminal-input" type="password" id="adminCodeInput" placeholder="••••••••••••" />
+    <button class="btn-terminal" id="btnLogin">AUTHENTICATE &gt;&gt;</button>
+    <div id="loginError"></div>
+  </div>
+
+  <!-- Main Panel (shown after auth) -->
+  <div id="mainPanel">
+
+    <!-- Stats -->
+    <div class="panel-section">
+      <div class="panel-section-title">SYSTEM STATUS</div>
+      <div class="panel-inner">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-label">TOTAL KEYS ISSUED</div>
+            <div class="stat-value" id="statTotal">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">ACTIVE (NOT BANNED)</div>
+            <div class="stat-value" id="statActive">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">BANNED KEYS</div>
+            <div class="stat-value" id="statBanned" style="color:var(--pink)">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">REQUESTS TODAY</div>
+            <div class="stat-value" id="statRequests" style="color:var(--cyan)">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Key Override -->
+    <div class="panel-section">
+      <div class="panel-section-title">MASTER KEY OVERRIDE</div>
+      <div class="panel-inner">
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem;">
+          Paste a new Bluesminds API key below. The Worker will use it instantly — no redeploy needed. The old key is immediately replaced in KV.
+        </div>
+        <div class="mk-row">
+          <input class="terminal-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-xxxxxxxx..." />
+          <button class="btn-terminal sm" id="btnUpdateMasterKey">UPDATE &gt;&gt;</button>
+        </div>
+        <div class="mk-status" id="masterKeyStatus"></div>
+      </div>
+    </div>
+
+    <!-- Keys Table -->
+    <div class="panel-section">
+      <div class="panel-section-title">REGISTERED KEYS</div>
+      <div class="panel-inner" style="padding-top:1.2rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <span style="font-size:0.72rem;color:var(--muted)">Showing all issued ADO keys</span>
+          <button class="btn-terminal sm" id="btnRefreshKeys">REFRESH &gt;&gt;</button>
+        </div>
+        <div id="keysContainer">
+          <div class="loading-msg">Loading key registry...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #mainPanel -->
+
+  <footer><a href="index.html">&laquo; Back to ADO Live</a> · SYSTEM TERMINAL v2.0</footer>
 </div>
 
-<div class="page">
-
-  <!-- HEADER -->
-  <header>
-    <div class="logo-ado">ADO</div>
-    <div class="logo-sub">Live · Beta Season</div>
-    <p class="logo-tagline">Your backstage pass to free AI · ログイン not optional ✦</p>
-  </header>
-
-  <!-- LOADING SCREEN -->
-  <div class="screen active" id="screenLoading">
-    <div class="loading-ring"></div>
-  </div>
-
-  <!-- LOGIN SCREEN -->
-  <div class="screen" id="screenLogin">
-    <div class="login-card">
-      <span class="login-icon">🎟️</span>
-      <h2 class="login-title">Claim Your Backstage Pass</h2>
-      <p class="login-desc">Sign in with Google to get your permanent ADO key.<br/>One pass per account. Free. Always.</p>
-      <div class="login-rules">
-        <span>✦</span> <strong>5 free AI requests / day</strong> (beta)<br/>
-        <span>✦</span> One key per Google account<br/>
-        <span>✦</span> Works with SillyTavern, JanitorAI, and any OpenAI-compatible app<br/>
-        <span>✦</span> Your pass <strong>never expires</strong> · quota resets midnight UTC
-      </div>
-      <button class="btn-google" id="btnSignIn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Continue with Google / グーグルでログイン
-      </button>
-    </div>
-  </div>
-
-  <!-- DASHBOARD SCREEN -->
-  <div class="screen" id="screenDashboard">
-
-    <!-- Concert Ticket Card -->
-    <div class="ticket">
-      <!-- Ticket Header Band -->
-      <div class="ticket-header">
-        <div>
-          <div class="ticket-event">ADO LIVE WORLD TOUR</div>
-          <div class="ticket-type">Backstage Pass · バックステージパス</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent2);letter-spacing:0.1em;">BETA</div>
-          <div style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);">SEASON 01</div>
-        </div>
-      </div>
-
-      <!-- User Info -->
-      <div class="ticket-user">
-        <img class="user-photo" id="userPhoto" src="" alt="" onerror="this.style.display='none';document.getElementById('userPhotoPlaceholder').style.display='flex'" />
-        <div id="userPhotoPlaceholder" class="user-photo-placeholder" style="display:none">🎤</div>
-        <div>
-          <div class="user-name" id="userName">—</div>
-          <div class="user-email" id="userEmail">—</div>
-        </div>
-        <div class="user-badge">VIP ACCESS</div>
-      </div>
-
-      <!-- Key Display -->
-      <div class="ticket-key">
-        <div class="field-label">Pass ID / <em>鍵</em></div>
-        <div class="key-display" id="keyDisplay">Generating your pass...</div>
-        <div class="copy-row">
-          <button class="btn-copy-tag" id="btnCopyKey">📋 Copy Key / 鍵をコピー</button>
-          <button class="btn-copy-tag" id="btnCopyJAI">🤖 JanitorAI Format</button>
-          <button class="btn-copy-tag" id="btnCopyST">🧠 SillyTavern Format</button>
-        </div>
-      </div>
-
-      <div class="tearline"><div class="tearline-circles"></div></div>
-
-      <!-- Usage / Tickets -->
-      <div class="ticket-usage">
-        <div class="usage-label-row">
-          <div class="field-label">Today's Tickets / <em>チケット</em></div>
-          <div class="usage-counter"><span id="usageRemaining">?</span> / 5 remaining</div>
-        </div>
-        <div class="stubs" id="stubsRow">
-          <div class="stub">🎟</div>
-          <div class="stub">🎟</div>
-          <div class="stub">🎟</div>
-          <div class="stub">🎟</div>
-          <div class="stub">🎟</div>
-        </div>
-      </div>
-
-      <!-- ASCII Mascot -->
-      <div class="ticket-mascot">
-        <div class="mascot-art" id="mascotArt">(✿◠‿◠)</div>
-        <div class="mascot-speech">
-          <strong id="mascotMood">Ready to perform!</strong>
-          <span id="mascotSub">All passes available · まだいっぱい！</span>
-        </div>
-      </div>
-
-      <!-- Footer Bar -->
-      <div class="ticket-footer">
-        <button class="btn-refresh" id="btnRefreshUsage">↻ Refresh Usage</button>
-        <button class="btn-signout" id="btnSignOut">Sign Out / ログアウト</button>
-      </div>
-    </div>
-
-    <!-- Endpoint Reference -->
-    <div class="endpoint-card">
-      <div class="field-label">API Endpoint / <em>エンドポイント</em></div>
-      <div class="endpoint-url" id="endpointDisplay">https://your-worker.workers.dev</div>
-    </div>
-
-    <!-- How To Use -->
-    <div class="howto-card">
-      <div class="howto-title">🛠 Setup Guide / セットアップ</div>
-      <div class="steps">
-        <div class="step">
-          <div class="step-n">1</div>
-          <div>Copy your <strong>Pass ID</strong> using the button above.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">2</div>
-          <div>In <strong>SillyTavern</strong>: API → Chat Completion → OpenAI → paste the API URL and your key. Use the <em>SillyTavern Format</em> copy button above for pre-formatted text.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">3</div>
-          <div>In <strong>JanitorAI</strong>: Settings → API → Custom. Paste the API URL as the base, and your key in the key field. Use the <em>JanitorAI Format</em> button.</div>
-        </div>
-        <div class="step">
-          <div class="step-n">4</div>
-          <div>You get <strong>5 requests/day</strong> during beta. Quota resets at <strong>midnight UTC</strong> automatically.</div>
-        </div>
-      </div>
-    </div>
-
-    <footer>ADO LIVE Beta · Free for the community · <a href="admin.html">Admin ⚙</a></footer>
-  </div>
-
-</div><!-- end .page -->
-
-<!-- Gacha Reveal Overlay -->
-<div id="gachaOverlay">
-  <div class="gacha-particles" id="gachaParticles"></div>
-  <div class="gacha-title">✦ NEW PASS ISSUED ✦</div>
-  <div class="gacha-card">
-    <div class="gacha-star">⭐</div>
-    <div class="gacha-label">Your Backstage Pass / バックステージパス</div>
-    <div class="gacha-key" id="gachaKeyDisplay"></div>
-  </div>
-  <button class="btn-gacha-close" id="btnGachaClose">Claim My Pass ✦</button>
-</div>
-
-<!-- Starfield -->
 <script>
-(function(){
-  const c = document.getElementById("stars"), ctx = c.getContext("2d");
-  let stars=[];
-  function resize(){ c.width=innerWidth; c.height=innerHeight; }
-  function init(){
-    stars=[];
-    const n=Math.floor(c.width*c.height/7000);
-    for(let i=0;i<n;i++) stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+0.2,sp:Math.random()*0.003+0.001,ph:Math.random()*Math.PI*2});
-  }
-  function draw(t){
-    ctx.clearRect(0,0,c.width,c.height);
-    for(const s of stars){
-      const a=0.25+0.75*(0.5+0.5*Math.sin(t*s.sp+s.ph));
-      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(210,180,255,${a})`; ctx.fill();
-    }
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener("resize",()=>{resize();init();});
-  resize(); init(); requestAnimationFrame(draw);
-})();
-</script>
-
-<!-- Firebase + App Logic -->
-<script type="module">
 // ════════════════════════════════════════════════════════════
-// !! STEP 1: PASTE YOUR FIREBASE CONFIG HERE !!
-// (You'll get this from console.firebase.google.com — see guide)
-// ════════════════════════════════════════════════════════════
-const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-  projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: "PASTE_YOUR_APP_ID_HERE"
-};
-
-// ════════════════════════════════════════════════════════════
-// !! STEP 2: PASTE YOUR CLOUDFLARE WORKER URL HERE !!
+// !! PASTE YOUR CLOUDFLARE WORKER URL HERE !!
 // ════════════════════════════════════════════════════════════
 const WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
 
-// ────────────────────────────────────────────────────────────
-// Firebase init (CDN imports — no installation needed)
-// ────────────────────────────────────────────────────────────
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+let ADMIN_KEY = null;
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-// ────────────────────────────────────────────────────────────
-// DOM refs
-// ────────────────────────────────────────────────────────────
-const screenLoading   = document.getElementById("screenLoading");
-const screenLogin     = document.getElementById("screenLogin");
-const screenDashboard = document.getElementById("screenDashboard");
-const btnSignIn       = document.getElementById("btnSignIn");
-const btnSignOut      = document.getElementById("btnSignOut");
-const btnRefresh      = document.getElementById("btnRefreshUsage");
-const btnCopyKey      = document.getElementById("btnCopyKey");
-const btnCopyJAI      = document.getElementById("btnCopyJAI");
-const btnCopyST       = document.getElementById("btnCopyST");
-const btnGachaClose   = document.getElementById("btnGachaClose");
-const gachaOverlay    = document.getElementById("gachaOverlay");
-const tickerDot       = document.getElementById("tickerDot");
-const tickerText      = document.getElementById("tickerText");
-
-document.getElementById("endpointDisplay").textContent = WORKER_URL;
-
-let currentKey = null;
-
-// ── Mascot moods ───────────────────────────────────────────
-const MOODS = [
-  { at: 5, art: "♪(ノ^_^)ノ",  mood: "Ready to perform!",        sub: "All passes available · まだいっぱい！" },
-  { at: 3, art: "(◕ᴗ◕✿)",    mood: "Vibe check!",               sub: "3-4 used · まあまあ" },
-  { at: 2, art: "(;´-`)",     mood: "Running low...",            sub: "2 left · 残り少ない" },
-  { at: 1, art: "(×﹏×)",     mood: "Almost gone!",              sub: "Last one · ラスト！" },
-  { at: 0, art: "(×_×)zZ",   mood: "Sold out! Come back at midnight~", sub: "See you tomorrow · また明日！" },
-];
-
-function setMascot(remaining) {
-  const m = MOODS.find(x => remaining >= x.at) || MOODS[MOODS.length - 1];
-  document.getElementById("mascotArt").textContent = m.art;
-  document.getElementById("mascotMood").textContent = m.mood;
-  document.getElementById("mascotSub").textContent = m.sub;
-}
-
-function setStubs(used) {
-  const stubs = document.querySelectorAll(".stub");
-  stubs.forEach((s, i) => {
-    s.className = "stub" + (i < used ? " used" : "");
-    s.textContent = i < used ? "🎫" : "🎟";
+async function doAdminFetch(path, opts = {}) {
+  const r = await fetch(WORKER_URL + path, {
+    ...opts,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Key": ADMIN_KEY,
+      ...(opts.headers || {}),
+    },
   });
+  return r;
 }
 
-// ── Screen switching ──────────────────────────────────────
-function showScreen(id) {
-  [screenLoading, screenLogin, screenDashboard].forEach(s => {
-    s.classList.remove("active");
-  });
-  document.getElementById(id).classList.add("active");
-}
-
-// ── Status ticker ─────────────────────────────────────────
-async function checkStatus() {
+async function loadKeys() {
+  const container = document.getElementById("keysContainer");
+  container.innerHTML = '<div class="loading-msg">Fetching key registry...</div>';
   try {
-    const r = await fetch(`${WORKER_URL}/status`);
+    const r = await doAdminFetch("/admin/keys");
     const d = await r.json();
-    tickerDot.className = "ticker-dot" + (d.ok ? "" : " offline");
-    tickerText.textContent = d.ok
-      ? "✦ ADO LIVE — OPERATIONAL · オペレーショナル · All systems normal"
-      : "⚠ SERVICE DISRUPTION · Global pool issue · Check back soon";
-  } catch {
-    tickerDot.className = "ticker-dot offline";
-    tickerText.textContent = "⚠ Cannot reach ADO gateway";
-  }
-}
+    if (!r.ok) { container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Error: ${d.error}</div>`; return; }
 
-// ── Fetch usage ───────────────────────────────────────────
-async function fetchUsage(key) {
-  try {
-    const r = await fetch(`${WORKER_URL}/usage?key=${encodeURIComponent(key)}`);
-    const d = await r.json();
-    const rem = d.remaining ?? 5;
-    const used = d.used ?? 0;
-    document.getElementById("usageRemaining").textContent = rem;
-    setStubs(used);
-    setMascot(rem);
-  } catch {
-    document.getElementById("usageRemaining").textContent = "?";
-  }
-}
+    const keys = d.keys || [];
 
-// ── Gacha particles ───────────────────────────────────────
-function spawnParticles() {
-  const container = document.getElementById("gachaParticles");
-  const colors = ["#c084fc","#f472b6","#67e8f9","#fbbf24","#4ade80"];
-  for (let i = 0; i < 40; i++) {
-    const p = document.createElement("div");
-    p.className = "particle";
-    const angle = Math.random() * 360;
-    const dist = 100 + Math.random() * 200;
-    const tx = Math.cos(angle * Math.PI / 180) * dist;
-    const ty = Math.sin(angle * Math.PI / 180) * dist;
-    p.style.cssText = `
-      left: 50%; top: 50%;
-      background: ${colors[Math.floor(Math.random()*colors.length)]};
-      --tx: ${tx}px; --ty: ${ty}px;
-      animation-delay: ${Math.random() * 0.3}s;
-      animation-duration: ${1.2 + Math.random()}s;
-    `;
-    container.appendChild(p);
-  }
-  setTimeout(() => (container.innerHTML = ""), 2500);
-}
+    // Update stats
+    document.getElementById("statTotal").textContent = keys.length;
+    document.getElementById("statActive").textContent = keys.filter(k => !k.banned).length;
+    document.getElementById("statBanned").textContent = keys.filter(k => k.banned).length;
+    document.getElementById("statRequests").textContent = keys.reduce((a, k) => a + (k.usedToday || 0), 0);
 
-function showGacha(key) {
-  document.getElementById("gachaKeyDisplay").textContent = key;
-  gachaOverlay.classList.add("active");
-  spawnParticles();
-}
-
-btnGachaClose.addEventListener("click", () => {
-  gachaOverlay.classList.remove("active");
-});
-
-// ── After login: load user data + fetch key ───────────────
-async function onUserSignedIn(user) {
-  document.getElementById("userName").textContent = user.displayName || "Anonymous";
-  document.getElementById("userEmail").textContent = user.email || "";
-
-  const photoEl = document.getElementById("userPhoto");
-  if (user.photoURL) {
-    photoEl.src = user.photoURL;
-    photoEl.style.display = "";
-  } else {
-    photoEl.style.display = "none";
-    document.getElementById("userPhotoPlaceholder").style.display = "flex";
-  }
-
-  showScreen("screenLoading");
-
-  try {
-    const idToken = await user.getIdToken();
-
-    const r = await fetch(`${WORKER_URL}/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken }),
-    });
-    const d = await r.json();
-
-    if (!d.key) throw new Error(d.error || "Failed to get key");
-
-    currentKey = d.key;
-    document.getElementById("keyDisplay").textContent = d.key;
-
-    showScreen("screenDashboard");
-
-    if (d.isNew) {
-      // New user — show gacha reveal
-      setTimeout(() => showGacha(d.key), 300);
+    if (!keys.length) {
+      container.innerHTML = '<div class="loading-msg">No keys registered yet.</div>';
+      return;
     }
 
-    await fetchUsage(d.key);
+    const table = document.createElement("table");
+    table.className = "keys-table";
+    table.innerHTML = `
+      <thead><tr>
+        <th>ADO KEY</th>
+        <th>USER</th>
+        <th>TODAY / 5</th>
+        <th>STATUS</th>
+        <th>ACTION</th>
+      </tr></thead>
+      <tbody id="keysBody"></tbody>
+    `;
+    container.innerHTML = "";
+    container.appendChild(table);
+    const tbody = document.getElementById("keysBody");
+
+    for (const k of keys) {
+      const pct = Math.min(100, ((k.usedToday || 0) / 5) * 100);
+      const tr = document.createElement("tr");
+      if (k.banned) tr.className = "banned";
+      tr.innerHTML = `
+        <td><div class="key-mono">${k.key}</div></td>
+        <td>
+          <div>${k.name || "—"}</div>
+          <div style="font-size:0.68rem;color:var(--muted)">${k.email || "—"}</div>
+        </td>
+        <td>
+          <div>${k.usedToday || 0} / 5</div>
+          <div class="usage-bar-mini">
+            <div class="usage-bar-mini-fill ${pct >= 80 ? 'danger' : ''}" style="width:${pct}%"></div>
+          </div>
+        </td>
+        <td>${k.banned
+          ? '<span class="badge-banned">BANNED</span>'
+          : '<span class="badge-ok">ACTIVE</span>'
+        }</td>
+        <td>
+          <button class="btn-terminal sm ${k.banned ? 'unban' : 'danger'}" data-key="${k.key}" data-banned="${k.banned}">
+            ${k.banned ? 'UNBAN' : 'BAN'}
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Attach ban/unban handlers
+    tbody.querySelectorAll("[data-key]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const key = btn.dataset.key;
+        const currentlyBanned = btn.dataset.banned === "true";
+        btn.textContent = "...";
+        btn.disabled = true;
+        try {
+          const r = await doAdminFetch("/admin/ban", {
+            method: "POST",
+            body: JSON.stringify({ key, banned: !currentlyBanned }),
+          });
+          const d = await r.json();
+          if (d.ok) { await loadKeys(); }
+          else { btn.textContent = "ERR"; btn.disabled = false; }
+        } catch {
+          btn.textContent = "ERR"; btn.disabled = false;
+        }
+      });
+    });
+
   } catch (err) {
-    document.getElementById("keyDisplay").textContent = "Error: " + err.message;
-    showScreen("screenDashboard");
+    container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Failed: ${err.message}</div>`;
   }
 }
 
-// ── Copy helpers ──────────────────────────────────────────
-function tempLabel(btn, original, newLabel) {
-  btn.textContent = newLabel;
-  btn.classList.add("copied");
-  setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 2000);
-}
-
-btnCopyKey.addEventListener("click", () => {
-  if (!currentKey) return;
-  navigator.clipboard.writeText(currentKey);
-  tempLabel(btnCopyKey, "📋 Copy Key / 鍵をコピー", "✓ Copied!");
-});
-
-btnCopyJAI.addEventListener("click", () => {
-  if (!currentKey) return;
-  const text = `API URL: ${WORKER_URL}\nAPI Key: ${currentKey}`;
-  navigator.clipboard.writeText(text);
-  tempLabel(btnCopyJAI, "🤖 JanitorAI Format", "✓ Copied!");
-});
-
-btnCopyST.addEventListener("click", () => {
-  if (!currentKey) return;
-  const text = `Custom API\nAPI Url: ${WORKER_URL}\nAPI Key: ${currentKey}\n(Set model manually in SillyTavern)`;
-  navigator.clipboard.writeText(text);
-  tempLabel(btnCopyST, "🧠 SillyTavern Format", "✓ Copied!");
-});
-
-btnRefresh.addEventListener("click", () => {
-  if (currentKey) fetchUsage(currentKey);
-});
-
-// ── Auth state listener ───────────────────────────────────
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    await onUserSignedIn(user);
-  } else {
-    currentKey = null;
-    showScreen("screenLogin");
-  }
-});
-
-btnSignIn.addEventListener("click", async () => {
+// Master key update
+document.getElementById("btnUpdateMasterKey").addEventListener("click", async () => {
+  const key = document.getElementById("masterKeyInput").value.trim();
+  const statusEl = document.getElementById("masterKeyStatus");
+  if (!key) { statusEl.textContent = "> Error: paste a key first."; statusEl.className = "mk-status err"; return; }
+  statusEl.textContent = "> Sending update..."; statusEl.className = "mk-status";
   try {
-    await signInWithPopup(auth, provider);
+    const r = await doAdminFetch("/admin/masterkey", {
+      method: "POST",
+      body: JSON.stringify({ masterKey: key }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      statusEl.textContent = "> SUCCESS: Master key updated in KV. Workers using it immediately.";
+      statusEl.className = "mk-status ok";
+      document.getElementById("masterKeyInput").value = "";
+    } else {
+      statusEl.textContent = "> Error: " + (d.error || "unknown");
+      statusEl.className = "mk-status err";
+    }
   } catch (err) {
-    console.error("Sign in error:", err.message);
-    alert("Sign in failed: " + err.message);
+    statusEl.textContent = "> Error: " + err.message;
+    statusEl.className = "mk-status err";
   }
 });
 
-btnSignOut.addEventListener("click", () => signOut(auth));
+document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
 
-// Init
-checkStatus();
+// Login
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  const code = document.getElementById("adminCodeInput").value.trim();
+  const errEl = document.getElementById("loginError");
+  if (!code) { errEl.textContent = "> Error: enter admin code."; return; }
+
+  errEl.textContent = "> Authenticating...";
+
+  // Verify by attempting an admin fetch
+  try {
+    const r = await fetch(WORKER_URL + "/admin/keys", {
+      headers: { "X-Admin-Key": code }
+    });
+    if (r.status === 403) {
+      errEl.textContent = "> ACCESS DENIED. Invalid code.";
+      return;
+    }
+    if (!r.ok && r.status !== 200) {
+      // Might be a valid auth but worker error — still accept
+    }
+    ADMIN_KEY = code;
+    document.getElementById("loginPanel").style.display = "none";
+    document.getElementById("mainPanel").style.display = "block";
+    errEl.textContent = "";
+    await loadKeys();
+  } catch (err) {
+    errEl.textContent = "> Connection error: " + err.message;
+  }
+});
+
+document.getElementById("adminCodeInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("btnLogin").click();
+});
 </script>
 
 </body>
