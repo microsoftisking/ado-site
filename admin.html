@@ -1,269 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADO :: SYSTEM TERMINAL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ADO // COMMAND CENTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #020208;
-      --surface: #060614;
-      --surface2: #0a0a1e;
-      --border: #1a1a3a;
-      --green: #39ff14;
-      --cyan: #00f5ff;
-      --pink: #ff2d78;
-      --purple: #b44eff;
-      --muted: #3a3a7a;
-      --text: #c8c8ff;
-      --warn: #ffd600;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --void:#000008;
+      --deep:#04040f;
+      --panel:#070714;
+      --panel2:#0a0a1c;
+      --rim:#141430;
+      --wire:#1e1e45;
+      --gold:#f0c040;
+      --gold2:#ffd700;
+      --cyan:#00e5ff;
+      --green:#00ff88;
+      --red:#ff2055;
+      --purple:#8040ff;
+      --text:#c8d0ff;
+      --muted:#404080;
+      --muted2:#282860;
+      --warn:#ff9500;
     }
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      overflow-x: hidden;
+    html,body{height:100%;background:var(--void);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;cursor:default;}
+
+    /* ── GRID BACKGROUND ── */
+    body::before{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);
+      background-size:40px 40px;
     }
+    /* Scanlines */
+    body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);}
 
-    /* CRT scanlines */
-    body::after {
-      content: '';
-      position: fixed; inset: 0; z-index: 999; pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 2px,
-        rgba(0,0,0,0.15) 2px,
-        rgba(0,0,0,0.15) 4px
-      );
+    /* ── ANIMATED CORNER ACCENTS ── */
+    @keyframes cornerPulse{0%,100%{opacity:0.4}50%{opacity:1}}
+    .corner-accent{position:fixed;width:60px;height:60px;z-index:10;pointer-events:none;}
+    .corner-accent::before,.corner-accent::after{content:'';position:absolute;background:var(--gold);animation:cornerPulse 3s ease-in-out infinite;}
+    .corner-accent::before{width:2px;height:100%;}
+    .corner-accent::after{width:100%;height:2px;}
+    .ca-tl{top:12px;left:12px;}
+    .ca-tr{top:12px;right:12px;transform:scaleX(-1);}
+    .ca-bl{bottom:12px;left:12px;transform:scaleY(-1);}
+    .ca-br{bottom:12px;right:12px;transform:scale(-1);}
+
+    /* ── AUTH SCREEN ── */
+    #authScreen{
+      position:fixed;inset:0;z-index:500;
+      background:var(--void);
+      display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:2rem;
     }
-
-    /* Screen flicker */
-    @keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.97} 94%{opacity:1} }
-    body { animation: flicker 8s infinite; }
-
-    /* Cursor blink */
-    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-    .cursor { display: inline-block; animation: blink 1s infinite; }
-
-    .terminal {
-      max-width: 900px; margin: 0 auto;
-      padding: 1.5rem 1rem 4rem;
+    .auth-logo{
+      font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900;
+      letter-spacing:0.3em;color:var(--gold);
+      text-shadow:0 0 30px rgba(240,192,64,0.5),0 0 60px rgba(240,192,64,0.2);
+      animation:goldFlicker 4s ease-in-out infinite;
     }
-
-    /* Boot header */
-    .boot-header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem; margin-bottom: 1.5rem;
+    @keyframes goldFlicker{0%,100%{text-shadow:0 0 30px rgba(240,192,64,0.5),0 0 60px rgba(240,192,64,0.2)}50%{text-shadow:0 0 50px rgba(240,192,64,0.8),0 0 100px rgba(240,192,64,0.4),0 0 150px rgba(240,192,64,0.1)}}
+    .auth-sub{font-size:0.7rem;letter-spacing:0.4em;color:var(--muted);text-transform:uppercase;margin-top:-1.5rem;}
+    .auth-box{
+      width:100%;max-width:380px;
+      border:1px solid var(--wire);
+      background:var(--panel);
+      padding:2rem;
+      position:relative;
     }
-    .boot-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.2rem; letter-spacing: 0.2em;
-      color: var(--green);
-      text-shadow: 0 0 20px rgba(57,255,20,0.4);
+    .auth-box::before{content:'ACCESS CONTROL';position:absolute;top:-0.6em;left:1rem;background:var(--panel);padding:0 0.5rem;font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;}
+    .auth-field-label{font-size:0.65rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;}
+    .auth-input{
+      width:100%;background:transparent;border:none;
+      border-bottom:1px solid var(--wire);
+      color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:1rem;
+      padding:0.5rem 0;outline:none;letter-spacing:0.1em;caret-color:var(--gold);
+      transition:border-color 0.2s;
     }
-    .boot-sub { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 4px; }
-    .boot-line { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-    .boot-line.ok::before { content: "[ OK ] "; color: var(--green); }
-    .boot-line.warn::before { content: "[ !! ] "; color: var(--warn); }
-    .boot-line.err::before { content: "[FAIL] "; color: var(--pink); }
-
-    /* Login box */
-    .login-panel {
-      border: 1px solid var(--border);
-      padding: 1.5rem;
-      margin: 2rem auto; max-width: 420px;
-      position: relative;
+    .auth-input:focus{border-bottom-color:var(--gold);}
+    .auth-btn{
+      width:100%;margin-top:1.5rem;padding:0.75rem;
+      background:transparent;border:1px solid var(--gold);
+      color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.75rem;
+      font-weight:700;letter-spacing:0.2em;cursor:pointer;
+      transition:all 0.2s;text-transform:uppercase;
     }
-    .login-panel::before {
-      content: 'AUTHENTICATION REQUIRED';
-      position: absolute; top: -0.55em; left: 1rem;
-      background: var(--bg); padding: 0 0.5rem;
-      font-size: 0.7rem; letter-spacing: 0.15em; color: var(--cyan);
+    .auth-btn:hover{background:rgba(240,192,64,0.08);box-shadow:0 0 20px rgba(240,192,64,0.25),inset 0 0 20px rgba(240,192,64,0.05);}
+    .auth-err{font-size:0.72rem;color:var(--red);margin-top:0.75rem;min-height:1em;}
+    .auth-err:not(:empty)::before{content:'[ERR] ';}
+
+    /* ── MAIN LAYOUT ── */
+    #mainApp{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;}
+    #mainApp.active{display:flex;}
+
+    /* ── TOP BAR ── */
+    .topbar{
+      display:flex;align-items:center;gap:1rem;
+      padding:0.75rem 1.5rem;
+      border-bottom:1px solid var(--wire);
+      background:rgba(4,4,15,0.95);
+      backdrop-filter:blur(10px);
+      position:sticky;top:0;z-index:50;
+      flex-wrap:wrap;gap:0.5rem;
     }
-    .login-panel label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 0.4rem; }
-    .login-panel label span { color: var(--cyan); }
-    .terminal-input {
-      width: 100%; background: transparent; border: none;
-      border-bottom: 1px solid var(--muted); color: var(--green);
-      font-family: 'Share Tech Mono', monospace; font-size: 0.95rem;
-      padding: 0.4rem 0; outline: none; margin-bottom: 1rem;
-      caret-color: var(--green);
+    .topbar-logo{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:0.2em;color:var(--gold);}
+    .topbar-sep{color:var(--muted2);margin:0 0.25rem;}
+    .topbar-title{font-size:0.7rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;font-family:'Rajdhani',sans-serif;font-weight:600;}
+    .topbar-spacer{flex:1;}
+    .topbar-time{font-size:0.72rem;color:var(--cyan);letter-spacing:0.1em;}
+    .topbar-status{display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;letter-spacing:0.1em;}
+    .status-led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:ledPulse 2s ease-in-out infinite;}
+    @keyframes ledPulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    .topbar-back{font-size:0.65rem;letter-spacing:0.12em;color:var(--muted);text-decoration:none;border:1px solid var(--muted2);padding:0.3rem 0.7rem;transition:all 0.15s;}
+    .topbar-back:hover{border-color:var(--cyan);color:var(--cyan);}
+
+    /* ── CONTENT ── */
+    .content{padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;max-width:1400px;margin:0 auto;width:100%;}
+
+    /* ── STAT GRID ── */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire);}
+    .stat-cell{
+      background:var(--panel);padding:1.25rem 1.5rem;
+      position:relative;overflow:hidden;
+      transition:background 0.2s;
     }
-    .terminal-input:focus { border-bottom-color: var(--green); }
-    .terminal-input::placeholder { color: var(--muted); }
-    .btn-terminal {
-      width: 100%; padding: 0.7rem; background: transparent;
-      border: 1px solid var(--green); color: var(--green);
-      font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;
-      cursor: pointer; letter-spacing: 0.15em; transition: all 0.15s;
-      text-transform: uppercase;
+    .stat-cell:hover{background:var(--panel2);}
+    .stat-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.3;}
+    .stat-label{font-size:0.6rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;}
+    .stat-val{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;color:var(--gold);line-height:1;}
+    .stat-val.cyan{color:var(--cyan);}
+    .stat-val.green{color:var(--green);}
+    .stat-val.red{color:var(--red);}
+    .stat-sub{font-size:0.62rem;color:var(--muted);margin-top:0.3rem;}
+
+    /* ── PANEL BLOCK ── */
+    .block{background:var(--panel);border:1px solid var(--wire);position:relative;}
+    .block-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0.75rem 1.25rem;border-bottom:1px solid var(--wire);
+      flex-wrap:wrap;gap:0.5rem;
     }
-    .btn-terminal:hover { background: rgba(57,255,20,0.08); box-shadow: 0 0 20px rgba(57,255,20,0.2); }
-    .btn-terminal:active { transform: scale(0.98); }
-    .btn-terminal.danger { border-color: var(--pink); color: var(--pink); }
-    .btn-terminal.danger:hover { background: rgba(255,45,120,0.08); box-shadow: 0 0 20px rgba(255,45,120,0.2); }
-    .btn-terminal.unban { border-color: var(--cyan); color: var(--cyan); }
-    .btn-terminal.unban:hover { background: rgba(0,245,255,0.08); }
-    .btn-terminal.sm { width: auto; padding: 0.3rem 0.9rem; font-size: 0.72rem; }
+    .block-title{font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;}
+    .block-body{padding:1.25rem;}
 
-    #loginError { font-size: 0.78rem; color: var(--pink); margin-top: 0.6rem; min-height: 1em; }
-
-    /* Main panel (hidden until auth) */
-    #mainPanel { display: none; }
-
-    .panel-section {
-      border: 1px solid var(--border); margin-bottom: 1.5rem;
-      position: relative;
+    /* ── MASTER KEY ── */
+    .mk-form{display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;}
+    .mk-input-wrap{flex:1;min-width:200px;}
+    .input-label{font-size:0.62rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;}
+    .cmd-input{
+      width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);
+      color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:0.88rem;
+      padding:0.4rem 0;outline:none;transition:border-color 0.2s;caret-color:var(--cyan);
     }
-    .panel-section-title {
-      position: absolute; top: -0.55em; left: 1rem;
-      background: var(--bg); padding: 0 0.5rem;
-      font-size: 0.7rem; letter-spacing: 0.12em; color: var(--cyan);
-      text-transform: uppercase;
+    .cmd-input:focus{border-bottom-color:var(--cyan);}
+    .cmd-input::placeholder{color:var(--muted2);}
+    .mk-status{font-size:0.72rem;margin-top:0.6rem;min-height:1em;}
+    .mk-status.ok{color:var(--green);}
+    .mk-status.ok::before{content:'[OK] ';}
+    .mk-status.err{color:var(--red);}
+    .mk-status.err::before{content:'[ERR] ';}
+
+    /* ── BUTTONS ── */
+    .btn-cmd{
+      padding:0.5rem 1.2rem;border:1px solid var(--gold);background:transparent;
+      color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.65rem;font-weight:700;
+      letter-spacing:0.15em;cursor:pointer;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;
     }
-    .panel-inner { padding: 1.5rem; }
+    .btn-cmd:hover{background:rgba(240,192,64,0.1);box-shadow:0 0 15px rgba(240,192,64,0.2);}
+    .btn-cmd:disabled{opacity:0.35;cursor:not-allowed;}
+    .btn-cmd.cyan{border-color:var(--cyan);color:var(--cyan);}
+    .btn-cmd.cyan:hover{background:rgba(0,229,255,0.08);box-shadow:0 0 15px rgba(0,229,255,0.2);}
+    .btn-cmd.green{border-color:var(--green);color:var(--green);}
+    .btn-cmd.green:hover{background:rgba(0,255,136,0.08);box-shadow:0 0 15px rgba(0,255,136,0.2);}
+    .btn-cmd.red{border-color:var(--red);color:var(--red);}
+    .btn-cmd.red:hover{background:rgba(255,32,85,0.08);box-shadow:0 0 15px rgba(255,32,85,0.2);}
+    .btn-cmd.sm{padding:0.3rem 0.7rem;font-size:0.58rem;}
+    .btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
 
-    /* Stats row */
-    .stats-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0; }
-    .stat-box { flex: 1; min-width: 120px; }
-    .stat-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
-    .stat-value { font-size: 1.8rem; color: var(--green); line-height: 1; margin-top: 2px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-
-    /* Master key form */
-    .mk-row { display: flex; gap: 0.7rem; align-items: flex-end; }
-    .mk-row .terminal-input { margin-bottom: 0; flex: 1; }
-    .mk-status { font-size: 0.75rem; margin-top: 0.6rem; min-height: 1em; }
-    .mk-status.ok { color: var(--green); }
-    .mk-status.err { color: var(--pink); }
-
-    /* Keys table */
-    .keys-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    .keys-table th {
-      text-align: left; padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--cyan); font-weight: 400; letter-spacing: 0.08em;
-      font-size: 0.68rem;
+    /* ── SEARCH BAR ── */
+    .search-wrap{position:relative;flex:1;min-width:200px;}
+    .search-wrap::before{content:'>';position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);color:var(--gold);font-size:0.8rem;pointer-events:none;}
+    .search-input{
+      width:100%;background:var(--panel2);border:1px solid var(--wire);
+      color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;
+      padding:0.5rem 0.75rem 0.5rem 1.5rem;outline:none;
+      transition:border-color 0.2s;
     }
-    .keys-table td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      color: var(--text); vertical-align: middle;
-    }
-    .keys-table tr:hover td { background: rgba(57,255,20,0.02); }
-    .keys-table tr.banned td { opacity: 0.45; }
-    .key-mono { font-size: 0.7rem; color: var(--purple); word-break: break-all; }
-    .badge-banned { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(255,45,120,0.15); border: 1px solid rgba(255,45,120,0.3); color: var(--pink); }
-    .badge-ok { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; background: rgba(57,255,20,0.1); border: 1px solid rgba(57,255,20,0.25); color: var(--green); }
-    .usage-bar-mini { height: 4px; background: var(--border); border-radius: 99px; margin-top: 3px; overflow: hidden; }
-    .usage-bar-mini-fill { height: 100%; border-radius: 99px; background: var(--green); }
-    .usage-bar-mini-fill.danger { background: var(--pink); }
+    .search-input:focus{border-color:var(--gold);}
+    .search-input::placeholder{color:var(--muted2);}
 
-    .loading-msg { color: var(--muted); font-size: 0.8rem; padding: 1rem 0; }
-    .loading-msg::before { content: ">>> "; color: var(--green); }
+    /* ── FILTER TABS ── */
+    .filter-tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--wire);padding:2px;}
+    .filter-tab{padding:0.3rem 0.9rem;background:transparent;border:none;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+    .filter-tab.active{background:var(--gold);color:var(--void);font-weight:700;}
+    .filter-tab:hover:not(.active){color:var(--gold);}
 
-    footer { color: var(--muted); font-size: 0.7rem; text-align: center; margin-top: 2rem; }
-    footer a { color: var(--cyan); text-decoration: none; }
+    /* ── KEYS TABLE ── */
+    .table-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:0.75rem;}
+    thead tr{border-bottom:1px solid var(--wire);}
+    th{padding:0.6rem 0.75rem;text-align:left;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;}
+    th.sort-asc::after{content:' ↑';}
+    th.sort-desc::after{content:' ↓';}
+    th[data-sort]{cursor:pointer;}
+    th[data-sort]:hover{color:var(--cyan);}
+    td{padding:0.6rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle;color:var(--text);}
+    tr:hover td{background:rgba(240,192,64,0.02);}
+    tr.banned td{opacity:0.4;}
+    tr.banned{background:rgba(255,32,85,0.03);}
+    .td-key{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--cyan);word-break:break-all;max-width:220px;}
+    .td-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.85rem;}
+    .td-email{font-size:0.68rem;color:var(--muted);}
+
+    /* Mini bar */
+    .mini-bar-bg{height:4px;background:var(--wire);border-radius:0;overflow:hidden;margin-top:3px;}
+    .mini-bar-fill{height:100%;background:var(--green);transition:width 0.4s;}
+    .mini-bar-fill.warn{background:var(--warn);}
+    .mini-bar-fill.danger{background:var(--red);}
+    .td-usage-num{font-family:'Orbitron',sans-serif;font-size:0.72rem;color:var(--text);}
+
+    /* Status badges */
+    .badge{display:inline-block;padding:1px 7px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'Orbitron',sans-serif;font-weight:700;}
+    .badge-active{background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);color:var(--green);}
+    .badge-banned{background:rgba(255,32,85,0.12);border:1px solid rgba(255,32,85,0.3);color:var(--red);}
+    .badge-new{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.25);color:var(--cyan);}
+
+    /* Action cell */
+    .action-cell{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+
+    /* Quota boost inline */
+    .quota-inline{display:flex;align-items:center;gap:4px;}
+    .quota-input{width:48px;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.78rem;padding:1px 0;outline:none;text-align:center;}
+    .quota-input:focus{border-bottom-color:var(--gold);}
+
+    /* Empty / loading */
+    .table-msg{padding:2rem;text-align:center;color:var(--muted);font-size:0.78rem;}
+    .table-msg::before{content:'>>> ';}
+
+    /* ── LOG PANEL ── */
+    .log-panel{background:var(--void);border:1px solid var(--wire);padding:1rem;max-height:160px;overflow-y:auto;font-size:0.7rem;line-height:1.8;}
+    .log-line{color:var(--muted);}
+    .log-line.ok::before{content:'[OK] ';color:var(--green);}
+    .log-line.err::before{content:'[ERR] ';color:var(--red);}
+    .log-line.info::before{content:'[>>] ';color:var(--cyan);}
+    .log-line.warn::before{content:'[!!] ';color:var(--warn);}
+    .log-line.gold{color:var(--gold);}
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-track{background:var(--void);}
+    ::-webkit-scrollbar-thumb{background:var(--wire);}
+    ::-webkit-scrollbar-thumb:hover{background:var(--gold);}
+
+    /* ── SPINNER ── */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{width:14px;height:14px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+
+    /* ── TOOLTIP ── */
+    [title]{cursor:help;}
   </style>
 </head>
 <body>
 
-<div class="terminal">
+<!-- Corner accents -->
+<div class="corner-accent ca-tl"></div>
+<div class="corner-accent ca-tr"></div>
+<div class="corner-accent ca-bl"></div>
+<div class="corner-accent ca-br"></div>
 
-  <!-- Boot header -->
-  <div class="boot-header">
-    <div class="boot-title">ADO :: SYSTEM TERMINAL<span class="cursor">_</span></div>
-    <div class="boot-sub">Administrative Access Portal · v2.0 · RESTRICTED</div>
-    <div class="boot-line ok" style="margin-top:0.6rem">Cloudflare KV database connected</div>
-    <div class="boot-line ok">Worker gateway online</div>
-    <div class="boot-line warn">Authentication required before proceeding</div>
+<!-- ════════════ AUTH SCREEN ════════════ -->
+<div id="authScreen">
+  <div class="auth-logo">ADO</div>
+  <div class="auth-sub">Command Center · Restricted Access</div>
+  <div class="auth-box">
+    <div class="auth-field-label">Admin Access Code</div>
+    <input class="auth-input" type="password" id="authInput" placeholder="Enter code..." autocomplete="off"/>
+    <button class="auth-btn" id="btnAuth">Authenticate →</button>
+    <div class="auth-err" id="authErr"></div>
   </div>
-
-  <!-- Login -->
-  <div class="login-panel" id="loginPanel">
-    <label><span>>_</span> ENTER ADMIN CODE</label>
-    <input class="terminal-input" type="password" id="adminCodeInput" placeholder="••••••••••••" />
-    <button class="btn-terminal" id="btnLogin">AUTHENTICATE &gt;&gt;</button>
-    <div id="loginError"></div>
-  </div>
-
-  <!-- Main Panel (shown after auth) -->
-  <div id="mainPanel">
-
-    <!-- Stats -->
-    <div class="panel-section">
-      <div class="panel-section-title">SYSTEM STATUS</div>
-      <div class="panel-inner">
-        <div class="stats-row">
-          <div class="stat-box">
-            <div class="stat-label">TOTAL KEYS ISSUED</div>
-            <div class="stat-value" id="statTotal">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">ACTIVE (NOT BANNED)</div>
-            <div class="stat-value" id="statActive">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">BANNED KEYS</div>
-            <div class="stat-value" id="statBanned" style="color:var(--pink)">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">REQUESTS TODAY</div>
-            <div class="stat-value" id="statRequests" style="color:var(--cyan)">—</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Master Key Override -->
-    <div class="panel-section">
-      <div class="panel-section-title">MASTER KEY OVERRIDE</div>
-      <div class="panel-inner">
-        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem;">
-          Paste a new Bluesminds API key below. The Worker will use it instantly — no redeploy needed. The old key is immediately replaced in KV.
-        </div>
-        <div class="mk-row">
-          <input class="terminal-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-xxxxxxxx..." />
-          <button class="btn-terminal sm" id="btnUpdateMasterKey">UPDATE &gt;&gt;</button>
-        </div>
-        <div class="mk-status" id="masterKeyStatus"></div>
-      </div>
-    </div>
-
-    <!-- Keys Table -->
-    <div class="panel-section">
-      <div class="panel-section-title">REGISTERED KEYS</div>
-      <div class="panel-inner" style="padding-top:1.2rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-          <span style="font-size:0.72rem;color:var(--muted)">Showing all issued ADO keys</span>
-          <button class="btn-terminal sm" id="btnRefreshKeys">REFRESH &gt;&gt;</button>
-        </div>
-        <div id="keysContainer">
-          <div class="loading-msg">Loading key registry...</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end #mainPanel -->
-
-  <footer><a href="index.html">&laquo; Back to ADO Live</a> · SYSTEM TERMINAL v2.0</footer>
 </div>
 
+<!-- ════════════ MAIN APP ════════════ -->
+<div id="mainApp">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="topbar-logo">ADO</span>
+    <span class="topbar-sep">//</span>
+    <span class="topbar-title">Command Center · Admin v2</span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-status"><span class="status-led"></span><span style="color:var(--green)">SYSTEMS NOMINAL</span></span>
+    <span class="topbar-time" id="topbarTime">—</span>
+    <a class="topbar-back" href="index.html">← Exit</a>
+  </div>
+
+  <div class="content">
+
+    <!-- STAT GRID -->
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-cell"><div class="stat-label">Total Keys Issued</div><div class="stat-val" id="statTotal">—</div><div class="stat-sub">all time</div></div>
+      <div class="stat-cell"><div class="stat-label">Active Keys</div><div class="stat-val green" id="statActive">—</div><div class="stat-sub">not banned</div></div>
+      <div class="stat-cell"><div class="stat-label">Banned</div><div class="stat-val red" id="statBanned">—</div><div class="stat-sub">terminated</div></div>
+      <div class="stat-cell"><div class="stat-label">Requests Today</div><div class="stat-val cyan" id="statReqs">—</div><div class="stat-sub">total across all users</div></div>
+      <div class="stat-cell"><div class="stat-label">Pool Utilization</div><div class="stat-val" id="statUtil">—</div><div class="stat-sub">% of total capacity used</div></div>
+    </div>
+
+    <!-- MASTER KEY -->
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">⚡ Master Key Override</span>
+        <span style="font-size:0.65rem;color:var(--muted)">Instant · No redeploy required</span>
+      </div>
+      <div class="block-body">
+        <p style="font-size:0.72rem;color:var(--muted);margin-bottom:1rem">Paste a new upstream API key. The Worker reads from KV and switches instantly. The old key is overwritten.</p>
+        <div class="mk-form">
+          <div class="mk-input-wrap">
+            <div class="input-label">New API Key</div>
+            <input class="cmd-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-xxxxxxxxxxxx..."/>
+          </div>
+          <button class="btn-cmd" id="btnUpdateMK">Update Key →</button>
+        </div>
+        <div class="mk-status" id="mkStatus"></div>
+      </div>
+    </div>
+
+    <!-- KEYS TABLE -->
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">👥 Registered Users</span>
+        <div class="btn-row">
+          <button class="btn-cmd cyan sm" id="btnRefreshKeys">Refresh ↻</button>
+        </div>
+      </div>
+      <div class="block-body" style="padding-bottom:0.5rem">
+        <div class="btn-row" style="margin-bottom:1rem;flex-wrap:wrap;gap:0.6rem">
+          <div class="search-wrap">
+            <input class="search-input" type="text" id="searchInput" placeholder="Search by key, name, email..."/>
+          </div>
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="active">Active</button>
+            <button class="filter-tab" data-filter="banned">Banned</button>
+            <button class="filter-tab" data-filter="heavy">High Usage</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="key">Pass ID</th>
+              <th data-sort="name">User</th>
+              <th data-sort="used">Usage Today</th>
+              <th>Daily Limit</th>
+              <th data-sort="created">Issued</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="keysBody">
+            <tr><td colspan="7" class="table-msg">Loading user registry...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:0.6rem 1.25rem;border-top:1px solid var(--wire);font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between">
+        <span id="tableCount">—</span>
+        <span>Showing filtered results</span>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="block">
+      <div class="block-header">
+        <span class="block-title">📋 Activity Log</span>
+        <button class="btn-cmd sm" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="block-body" style="padding:0">
+        <div class="log-panel" id="logPanel">
+          <div class="log-line gold">ADO Command Center initialized. Awaiting orders.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end #mainApp -->
+
 <script>
-// ════════════════════════════════════════════════════════════
-// !! PASTE YOUR CLOUDFLARE WORKER URL HERE !!
-// ════════════════════════════════════════════════════════════
-const WORKER_URL = "https://apiado.burgerboixs.workers.dev/";
+// ════════════════════════════════════════════════════════
+// !! PASTE YOUR WORKER URL HERE — NO TRAILING SLASH !!
+// ════════════════════════════════════════════════════════
+const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
 
 let ADMIN_KEY = null;
+let allKeys = [];
+let sortField = "created";
+let sortDir = "desc";
+let filterMode = "all";
+let searchQuery = "";
 
-async function doAdminFetch(path, opts = {}) {
-  const r = await fetch(WORKER_URL + path, {
+// ── LOG ──────────────────────────────────────────────
+function log(msg, type = "info") {
+  const panel = document.getElementById("logPanel");
+  const line = document.createElement("div");
+  line.className = `log-line ${type}`;
+  const ts = new Date().toTimeString().slice(0, 8);
+  line.textContent = `[${ts}] ${msg}`;
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+}
+function clearLog() {
+  document.getElementById("logPanel").innerHTML = '<div class="log-line gold">Log cleared.</div>';
+}
+
+// ── ADMIN FETCH ──────────────────────────────────────
+async function api(path, opts = {}) {
+  const res = await fetch(WORKER_URL + path, {
     ...opts,
     headers: {
       "Content-Type": "application/json",
@@ -271,163 +426,260 @@ async function doAdminFetch(path, opts = {}) {
       ...(opts.headers || {}),
     },
   });
-  return r;
+  return res;
 }
 
-async function loadKeys() {
-  const container = document.getElementById("keysContainer");
-  container.innerHTML = '<div class="loading-msg">Fetching key registry...</div>';
+// ── CLOCK ────────────────────────────────────────────
+setInterval(() => {
+  const now = new Date();
+  document.getElementById("topbarTime").textContent =
+    now.toUTCString().slice(0, 25) + " UTC";
+}, 1000);
+
+// ── AUTH ──────────────────────────────────────────────
+document.getElementById("btnAuth").addEventListener("click", doAuth);
+document.getElementById("authInput").addEventListener("keydown", e => { if (e.key === "Enter") doAuth(); });
+
+async function doAuth() {
+  const code = document.getElementById("authInput").value.trim();
+  const errEl = document.getElementById("authErr");
+  if (!code) { errEl.textContent = "Enter your admin code."; return; }
+  errEl.textContent = "Authenticating...";
   try {
-    const r = await doAdminFetch("/admin/keys");
-    const d = await r.json();
-    if (!r.ok) { container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Error: ${d.error}</div>`; return; }
-
-    const keys = d.keys || [];
-
-    // Update stats
-    document.getElementById("statTotal").textContent = keys.length;
-    document.getElementById("statActive").textContent = keys.filter(k => !k.banned).length;
-    document.getElementById("statBanned").textContent = keys.filter(k => k.banned).length;
-    document.getElementById("statRequests").textContent = keys.reduce((a, k) => a + (k.usedToday || 0), 0);
-
-    if (!keys.length) {
-      container.innerHTML = '<div class="loading-msg">No keys registered yet.</div>';
-      return;
-    }
-
-    const table = document.createElement("table");
-    table.className = "keys-table";
-    table.innerHTML = `
-      <thead><tr>
-        <th>ADO KEY</th>
-        <th>USER</th>
-        <th>TODAY / 5</th>
-        <th>STATUS</th>
-        <th>ACTION</th>
-      </tr></thead>
-      <tbody id="keysBody"></tbody>
-    `;
-    container.innerHTML = "";
-    container.appendChild(table);
-    const tbody = document.getElementById("keysBody");
-
-    for (const k of keys) {
-      const pct = Math.min(100, ((k.usedToday || 0) / 5) * 100);
-      const tr = document.createElement("tr");
-      if (k.banned) tr.className = "banned";
-      tr.innerHTML = `
-        <td><div class="key-mono">${k.key}</div></td>
-        <td>
-          <div>${k.name || "—"}</div>
-          <div style="font-size:0.68rem;color:var(--muted)">${k.email || "—"}</div>
-        </td>
-        <td>
-          <div>${k.usedToday || 0} / 5</div>
-          <div class="usage-bar-mini">
-            <div class="usage-bar-mini-fill ${pct >= 80 ? 'danger' : ''}" style="width:${pct}%"></div>
-          </div>
-        </td>
-        <td>${k.banned
-          ? '<span class="badge-banned">BANNED</span>'
-          : '<span class="badge-ok">ACTIVE</span>'
-        }</td>
-        <td>
-          <button class="btn-terminal sm ${k.banned ? 'unban' : 'danger'}" data-key="${k.key}" data-banned="${k.banned}">
-            ${k.banned ? 'UNBAN' : 'BAN'}
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    // Attach ban/unban handlers
-    tbody.querySelectorAll("[data-key]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const key = btn.dataset.key;
-        const currentlyBanned = btn.dataset.banned === "true";
-        btn.textContent = "...";
-        btn.disabled = true;
-        try {
-          const r = await doAdminFetch("/admin/ban", {
-            method: "POST",
-            body: JSON.stringify({ key, banned: !currentlyBanned }),
-          });
-          const d = await r.json();
-          if (d.ok) { await loadKeys(); }
-          else { btn.textContent = "ERR"; btn.disabled = false; }
-        } catch {
-          btn.textContent = "ERR"; btn.disabled = false;
-        }
-      });
+    const r = await fetch(WORKER_URL + "/admin/keys", {
+      headers: { "X-Admin-Key": code }
     });
-
+    if (r.status === 403) { errEl.textContent = "Access denied. Wrong code."; return; }
+    ADMIN_KEY = code;
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("mainApp").classList.add("active");
+    log("Authentication successful. Welcome, Administrator.", "ok");
+    loadKeys();
   } catch (err) {
-    container.innerHTML = `<div class="loading-msg" style="color:var(--pink)">Failed: ${err.message}</div>`;
+    errEl.textContent = "Connection failed: " + err.message;
   }
 }
 
-// Master key update
-document.getElementById("btnUpdateMasterKey").addEventListener("click", async () => {
-  const key = document.getElementById("masterKeyInput").value.trim();
-  const statusEl = document.getElementById("masterKeyStatus");
-  if (!key) { statusEl.textContent = "> Error: paste a key first."; statusEl.className = "mk-status err"; return; }
-  statusEl.textContent = "> Sending update..."; statusEl.className = "mk-status";
+// ── LOAD KEYS ─────────────────────────────────────────
+async function loadKeys() {
+  log("Fetching user registry...", "info");
   try {
-    const r = await doAdminFetch("/admin/masterkey", {
+    const r = await api("/admin/keys");
+    const d = await r.json();
+    if (!r.ok) { log("Failed to load keys: " + d.error, "err"); return; }
+
+    allKeys = d.keys || [];
+    log(`Loaded ${allKeys.length} keys from KV.`, "ok");
+    updateStats();
+    renderTable();
+  } catch (err) {
+    log("Registry fetch error: " + err.message, "err");
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────
+function updateStats() {
+  const total = allKeys.length;
+  const banned = allKeys.filter(k => k.banned).length;
+  const active = total - banned;
+  const reqs = allKeys.reduce((a, k) => a + (k.usedToday || 0), 0);
+  const cap = total * 5;
+  const util = cap > 0 ? Math.round((reqs / cap) * 100) : 0;
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statActive").textContent = active;
+  document.getElementById("statBanned").textContent = banned;
+  document.getElementById("statReqs").textContent = reqs;
+  document.getElementById("statUtil").textContent = util + "%";
+}
+
+// ── RENDER TABLE ──────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById("keysBody");
+  let data = [...allKeys];
+
+  // Filter
+  if (filterMode === "active") data = data.filter(k => !k.banned);
+  else if (filterMode === "banned") data = data.filter(k => k.banned);
+  else if (filterMode === "heavy") data = data.filter(k => (k.usedToday || 0) >= 3);
+
+  // Search
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    data = data.filter(k =>
+      k.key.toLowerCase().includes(q) ||
+      (k.email || "").toLowerCase().includes(q) ||
+      (k.name || "").toLowerCase().includes(q)
+    );
+  }
+
+  // Sort
+  data.sort((a, b) => {
+    let av = a[sortField] ?? 0, bv = b[sortField] ?? 0;
+    if (typeof av === "string") av = av.toLowerCase(), bv = bv.toLowerCase();
+    if (av < bv) return sortDir === "asc" ? -1 : 1;
+    if (av > bv) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  document.getElementById("tableCount").textContent = `${data.length} of ${allKeys.length} users`;
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="table-msg">No users match current filter.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = "";
+  for (const k of data) {
+    const used = k.usedToday || 0;
+    const pct = Math.min(100, (used / 5) * 100);
+    const barClass = pct >= 100 ? "danger" : pct >= 60 ? "warn" : "";
+    const dateStr = k.created ? new Date(k.created).toLocaleDateString() : "—";
+    const isNew = k.created && (Date.now() - k.created) < 86400000;
+    const tr = document.createElement("tr");
+    if (k.banned) tr.className = "banned";
+    tr.innerHTML = `
+      <td><div class="td-key">${k.key}</div></td>
+      <td>
+        <div class="td-name">${k.name || "—"}</div>
+        <div class="td-email">${k.email || "—"}</div>
+      </td>
+      <td>
+        <div class="td-usage-num">${used} / 5</div>
+        <div class="mini-bar-bg"><div class="mini-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+      </td>
+      <td>
+        <div class="quota-inline">
+          <span style="font-size:0.72rem;color:var(--muted)">+</span>
+          <input class="quota-input" type="number" min="1" max="50" value="5" id="qinput_${k.key.replace(/-/g,'_')}"/>
+          <button class="btn-cmd green sm" onclick="boostQuota('${k.key}')">Boost</button>
+        </div>
+        <div style="font-size:0.62rem;color:var(--muted);margin-top:3px">add extra reqs today</div>
+      </td>
+      <td style="font-size:0.68rem;color:var(--muted)">${dateStr}${isNew ? ' <span class="badge badge-new">NEW</span>' : ''}</td>
+      <td>${k.banned
+        ? '<span class="badge badge-banned">Banned</span>'
+        : '<span class="badge badge-active">Active</span>'
+      }</td>
+      <td>
+        <div class="action-cell">
+          <button class="btn-cmd sm ${k.banned ? 'cyan' : 'red'}" onclick="toggleBan('${k.key}', ${k.banned})">
+            ${k.banned ? 'Unban' : 'Ban'}
+          </button>
+          <button class="btn-cmd sm" onclick="resetUsage('${k.key}')">Reset</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ── SORT HEADERS ──────────────────────────────────────
+document.querySelectorAll("th[data-sort]").forEach(th => {
+  th.addEventListener("click", () => {
+    const field = th.dataset.sort;
+    if (sortField === field) sortDir = sortDir === "asc" ? "desc" : "asc";
+    else { sortField = field; sortDir = "desc"; }
+    document.querySelectorAll("th").forEach(t => t.classList.remove("sort-asc","sort-desc"));
+    th.classList.add(sortDir === "asc" ? "sort-asc" : "sort-desc");
+    renderTable();
+  });
+});
+
+// ── FILTER TABS ───────────────────────────────────────
+document.getElementById("filterTabs").addEventListener("click", e => {
+  const tab = e.target.closest(".filter-tab");
+  if (!tab) return;
+  document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+  tab.classList.add("active");
+  filterMode = tab.dataset.filter;
+  renderTable();
+});
+
+// ── SEARCH ────────────────────────────────────────────
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  renderTable();
+});
+
+// ── REFRESH ───────────────────────────────────────────
+document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
+
+// ── BAN / UNBAN ───────────────────────────────────────
+async function toggleBan(key, currentlyBanned) {
+  const action = currentlyBanned ? "Unbanning" : "Banning";
+  log(`${action} key: ${key.slice(0, 18)}...`, "warn");
+  try {
+    const r = await api("/admin/ban", {
+      method: "POST",
+      body: JSON.stringify({ key, banned: !currentlyBanned }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      log(`${currentlyBanned ? "Unbanned" : "Banned"}: ${key.slice(0, 18)}...`, "ok");
+      const k = allKeys.find(x => x.key === key);
+      if (k) k.banned = !currentlyBanned;
+      updateStats();
+      renderTable();
+    } else log("Ban failed: " + d.error, "err");
+  } catch (err) { log("Ban error: " + err.message, "err"); }
+}
+
+// ── QUOTA BOOST ───────────────────────────────────────
+async function boostQuota(key) {
+  const inputId = "qinput_" + key.replace(/-/g,"_");
+  const bonus = parseInt(document.getElementById(inputId)?.value) || 5;
+  log(`Boosting quota for ${key.slice(0,18)}... +${bonus} requests`, "info");
+  try {
+    const r = await api("/admin/quota", {
+      method: "POST",
+      body: JSON.stringify({ key, bonus }),
+    });
+    const d = await r.json();
+    if (d.ok) log(`Quota boosted. ${key.slice(0,18)}... new daily limit: ${d.newDailyLimit}`, "ok");
+    else log("Boost failed: " + d.error, "err");
+  } catch (err) { log("Boost error: " + err.message, "err"); }
+}
+
+// ── RESET USAGE ───────────────────────────────────────
+async function resetUsage(key) {
+  if (!confirm(`Reset today's usage for ${key.slice(0,20)}...? This gives them their full quota back immediately.`)) return;
+  log(`Resetting usage for ${key.slice(0,18)}...`, "warn");
+  try {
+    const r = await api("/admin/resetusage", {
+      method: "POST",
+      body: JSON.stringify({ key }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      log(`Usage reset to 0 for ${key.slice(0,18)}...`, "ok");
+      const k = allKeys.find(x => x.key === key);
+      if (k) k.usedToday = 0;
+      updateStats();
+      renderTable();
+    } else log("Reset failed: " + d.error, "err");
+  } catch (err) { log("Reset error: " + err.message, "err"); }
+}
+
+// ── MASTER KEY ────────────────────────────────────────
+document.getElementById("btnUpdateMK").addEventListener("click", async () => {
+  const key = document.getElementById("masterKeyInput").value.trim();
+  const statusEl = document.getElementById("mkStatus");
+  if (!key || key.length < 8) { statusEl.textContent = "Key too short."; statusEl.className = "mk-status err"; return; }
+  statusEl.textContent = "Sending update..."; statusEl.className = "mk-status";
+  log("Updating master upstream key...", "warn");
+  try {
+    const r = await api("/admin/masterkey", {
       method: "POST",
       body: JSON.stringify({ masterKey: key }),
     });
     const d = await r.json();
     if (d.ok) {
-      statusEl.textContent = "> SUCCESS: Master key updated in KV. Workers using it immediately.";
-      statusEl.className = "mk-status ok";
+      statusEl.textContent = "Master key updated. Workers now use new key."; statusEl.className = "mk-status ok";
       document.getElementById("masterKeyInput").value = "";
-    } else {
-      statusEl.textContent = "> Error: " + (d.error || "unknown");
-      statusEl.className = "mk-status err";
-    }
-  } catch (err) {
-    statusEl.textContent = "> Error: " + err.message;
-    statusEl.className = "mk-status err";
-  }
-});
-
-document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
-
-// Login
-document.getElementById("btnLogin").addEventListener("click", async () => {
-  const code = document.getElementById("adminCodeInput").value.trim();
-  const errEl = document.getElementById("loginError");
-  if (!code) { errEl.textContent = "> Error: enter admin code."; return; }
-
-  errEl.textContent = "> Authenticating...";
-
-  // Verify by attempting an admin fetch
-  try {
-    const r = await fetch(WORKER_URL + "/admin/keys", {
-      headers: { "X-Admin-Key": code }
-    });
-    if (r.status === 403) {
-      errEl.textContent = "> ACCESS DENIED. Invalid code.";
-      return;
-    }
-    if (!r.ok && r.status !== 200) {
-      // Might be a valid auth but worker error — still accept
-    }
-    ADMIN_KEY = code;
-    document.getElementById("loginPanel").style.display = "none";
-    document.getElementById("mainPanel").style.display = "block";
-    errEl.textContent = "";
-    await loadKeys();
-  } catch (err) {
-    errEl.textContent = "> Connection error: " + err.message;
-  }
-});
-
-document.getElementById("adminCodeInput").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("btnLogin").click();
+      log("Master key updated successfully in KV.", "ok");
+    } else { statusEl.textContent = d.error || "Unknown error."; statusEl.className = "mk-status err"; log("MK update failed: " + d.error, "err"); }
+  } catch (err) { statusEl.textContent = err.message; statusEl.className = "mk-status err"; }
 });
 </script>
-
 </body>
 </html>
