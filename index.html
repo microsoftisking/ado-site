@@ -135,7 +135,7 @@
     .tearline-circles::before,.tearline-circles::after { content:''; width:24px; height:24px; border-radius:50%; background:var(--bg); border:1px solid rgba(255,255,255,0.05); margin:0 -12px; flex-shrink:0; }
     .ticket-footer { padding:1rem 1.5rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
     .ticket-footer-right { margin-left:auto; display:flex; gap:0.5rem; }
-    .btn-icon { display:inline-flex; align-items:center; gap:0.35rem; padding:0.45rem 0.9rem; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Nunito',sans-serif; font-size:0.76rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
+    .btn-icon { display:inline-flex; align-items:center; gap:0.35rem; padding:0.45rem 0.9rem; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:'Nunito',sans-serif; font-size:0.76rem; font-weight:700; cursor:pointer; transition:all 0.15s; text-decoration:none; }
     .btn-icon:hover { border-color:var(--accent3); color:var(--accent3); }
     .btn-icon.red:hover { border-color:var(--error); color:var(--error); }
 
@@ -355,6 +355,7 @@
 
       <div class="ticket-footer">
         <button class="btn-icon" id="btnHowToUse">📖 How to Use</button>
+        <a class="btn-icon" href="models.html">🎙 Models</a>
         <button class="btn-icon" id="btnRefreshUsage">↻ Refresh</button>
         <div class="ticket-footer-right">
           <button class="btn-icon red" id="btnSignOut">Sign Out</button>
@@ -867,15 +868,20 @@ function startCountdown() {
   countdownInterval = setInterval(update, 1000);
 }
 
-// ── STATUS TICKER ──
+// ── STATUS TICKER (UPDATED) ──
 async function checkStatus() {
   try {
     const r = await fetch(`${WORKER_URL}/status`);
     const d = await r.json();
     document.getElementById("tickerDot").className = "ticker-dot" + (d.ok ? "" : " offline");
-    document.getElementById("tickerText").textContent = d.ok
-      ? "✦ ADO LIVE BETA — All systems operational · オペレーショナル · 5 req/day"
-      : "⚠ SERVICE DISRUPTION · Global pool issue · Check back soon";
+    if (d.announcement) {
+      document.getElementById("tickerText").textContent =
+        `📢 ${d.announcement}   ✦   ADO LIVE BETA · ${d.limit || 5} REQ/DAY   ✦   FREE FOR THE COMMUNITY   ✦   RESETS MIDNIGHT UTC`;
+    } else {
+      document.getElementById("tickerText").textContent = d.ok
+        ? `✦ ADO LIVE BETA — All systems operational · ${d.limit || 5} req/day · Free forever`
+        : "⚠ SERVICE DISRUPTION · Global pool issue · Check back soon";
+    }
   } catch {
     document.getElementById("tickerDot").className = "ticker-dot offline";
     document.getElementById("tickerText").textContent = "⚠ Cannot reach ADO gateway";
