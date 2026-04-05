@@ -3,192 +3,214 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ADO // COMMAND CENTER v3</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <title>ADO // COMMAND CENTER v4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
-      --void:#000008;--deep:#04040f;--panel:#070714;--panel2:#0a0a1c;
-      --rim:#141430;--wire:#1e1e45;
-      --gold:#f0c040;--gold2:#ffd700;
-      --cyan:#00e5ff;--green:#00ff88;--red:#ff2055;--purple:#8040ff;
-      --text:#c8d0ff;--muted:#404080;--muted2:#282860;--warn:#ff9500;
+      --void:#000008;--panel:#060614;--panel2:#0a0a1c;
+      --wire:#1a1a3a;--wire2:#252550;
+      --gold:#f0c040;--cyan:#00e5ff;--green:#00ff88;
+      --red:#ff2055;--warn:#ff9500;--purple:#a040ff;
+      --text:#c8d0ff;--muted:#404070;--muted2:#202050;
     }
     html,body{height:100%;background:var(--void);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;}
-    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);background-size:40px 40px;}
-    body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px);}
-    @keyframes cornerPulse{0%,100%{opacity:0.4}50%{opacity:1}}
-    .ca{position:fixed;width:60px;height:60px;z-index:10;pointer-events:none;}
-    .ca::before,.ca::after{content:'';position:absolute;background:var(--gold);animation:cornerPulse 3s ease-in-out infinite;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(0,229,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.018) 1px,transparent 1px);
+      background-size:44px 44px;}
+    body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;
+      background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);}
+    @keyframes ca{0%,100%{opacity:.35}50%{opacity:1}}
+    .ca{position:fixed;width:56px;height:56px;z-index:10;pointer-events:none;}
+    .ca::before,.ca::after{content:'';position:absolute;background:var(--gold);animation:ca 3.5s ease-in-out infinite;}
     .ca::before{width:2px;height:100%;} .ca::after{width:100%;height:2px;}
     .ca-tl{top:12px;left:12px;} .ca-tr{top:12px;right:12px;transform:scaleX(-1);}
     .ca-bl{bottom:12px;left:12px;transform:scaleY(-1);} .ca-br{bottom:12px;right:12px;transform:scale(-1);}
 
     /* ── AUTH ── */
-    #authScreen{position:fixed;inset:0;z-index:500;background:var(--void);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem;}
-    .auth-logo{font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900;letter-spacing:0.3em;color:var(--gold);text-shadow:0 0 30px rgba(240,192,64,0.5);animation:goldFlicker 4s ease-in-out infinite;}
-    @keyframes goldFlicker{0%,100%{text-shadow:0 0 30px rgba(240,192,64,0.5)}50%{text-shadow:0 0 60px rgba(240,192,64,0.9),0 0 120px rgba(240,192,64,0.3)}}
-    .auth-sub{font-size:0.7rem;letter-spacing:0.4em;color:var(--muted);margin-top:-1.5rem;}
-    .auth-box{width:100%;max-width:380px;border:1px solid var(--wire);background:var(--panel);padding:2rem;position:relative;}
-    .auth-box::before{content:'ACCESS CONTROL';position:absolute;top:-0.6em;left:1rem;background:var(--panel);padding:0 0.5rem;font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);}
-    .auth-label{font-size:0.65rem;letter-spacing:0.2em;color:var(--muted);margin-bottom:0.5rem;}
-    .auth-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:1rem;padding:0.5rem 0;outline:none;caret-color:var(--gold);transition:border-color 0.2s;}
-    .auth-input:focus{border-bottom-color:var(--gold);}
-    .auth-btn{width:100%;margin-top:1.5rem;padding:0.75rem;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.2em;cursor:pointer;transition:all 0.2s;}
-    .auth-btn:hover{background:rgba(240,192,64,0.08);box-shadow:0 0 20px rgba(240,192,64,0.25);}
-    .auth-err{font-size:0.72rem;color:var(--red);margin-top:0.75rem;min-height:1em;}
-    .auth-err:not(:empty)::before{content:'[ERR] ';}
+    #authScreen{position:fixed;inset:0;z-index:500;background:var(--void);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.75rem;}
+    .auth-logo{font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:900;letter-spacing:.3em;color:var(--gold);
+      text-shadow:0 0 30px rgba(240,192,64,.5),0 0 80px rgba(240,192,64,.15);
+      animation:glow 4s ease-in-out infinite;}
+    @keyframes glow{0%,100%{text-shadow:0 0 30px rgba(240,192,64,.4)}50%{text-shadow:0 0 60px rgba(240,192,64,.9),0 0 120px rgba(240,192,64,.3)}}
+    .auth-sub{font-size:.68rem;letter-spacing:.4em;color:var(--muted);margin-top:-1.25rem;}
+    .auth-box{width:100%;max-width:360px;border:1px solid var(--wire);background:var(--panel);padding:1.75rem;position:relative;}
+    .auth-box::before{content:'ACCESS CONTROL';position:absolute;top:-.55em;left:1rem;background:var(--panel);padding:0 .5rem;font-size:.62rem;letter-spacing:.2em;color:var(--gold);}
+    .a-label{font-size:.6rem;letter-spacing:.2em;color:var(--muted);margin-bottom:.4rem;}
+    .a-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:.95rem;padding:.45rem 0;outline:none;caret-color:var(--gold);transition:border-color .2s;}
+    .a-input:focus{border-bottom-color:var(--gold);}
+    .a-btn{width:100%;margin-top:1.25rem;padding:.7rem;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.18em;cursor:pointer;transition:all .2s;}
+    .a-btn:hover{background:rgba(240,192,64,.08);box-shadow:0 0 20px rgba(240,192,64,.2);}
+    .a-err{font-size:.7rem;color:var(--red);margin-top:.6rem;min-height:1em;}
+    .a-err:not(:empty)::before{content:'[ERR] ';}
 
     /* ── LAYOUT ── */
     #mainApp{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;}
     #mainApp.active{display:flex;}
-    .topbar{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;border-bottom:1px solid var(--wire);background:rgba(4,4,15,0.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
-    .topbar-logo{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:0.2em;color:var(--gold);}
-    .topbar-title{font-size:0.68rem;letter-spacing:0.18em;color:var(--muted);font-family:'Rajdhani',sans-serif;font-weight:600;}
-    .topbar-spacer{flex:1;}
-    .topbar-time{font-size:0.7rem;color:var(--cyan);letter-spacing:0.08em;}
-    .led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:ledPulse 2s ease-in-out infinite;}
-    @keyframes ledPulse{0%,100%{opacity:1}50%{opacity:0.3}}
-    .status-badge{display:flex;align-items:center;gap:0.4rem;font-size:0.65rem;letter-spacing:0.08em;}
-    .topbar-back{font-size:0.62rem;letter-spacing:0.1em;color:var(--muted);text-decoration:none;border:1px solid var(--muted2);padding:0.25rem 0.6rem;transition:all 0.15s;}
-    .topbar-back:hover{border-color:var(--cyan);color:var(--cyan);}
 
-    /* ── TAB NAV ── */
-    .tabnav{display:flex;gap:0;border-bottom:1px solid var(--wire);background:var(--panel);overflow-x:auto;}
-    .tab{padding:0.7rem 1.3rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Orbitron',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+    /* ── TOPBAR ── */
+    .topbar{display:flex;align-items:center;gap:.6rem;padding:.65rem 1.4rem;border-bottom:1px solid var(--wire);background:rgba(4,4,12,.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+    .tb-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.2em;color:var(--gold);}
+    .tb-sep{color:var(--muted2);}
+    .tb-title{font-size:.65rem;letter-spacing:.15em;color:var(--muted);font-family:'Rajdhani',sans-serif;font-weight:600;}
+    .tb-sp{flex:1;}
+    .tb-time{font-size:.68rem;color:var(--cyan);letter-spacing:.06em;}
+    .led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:ledp 2s ease-in-out infinite;display:inline-block;}
+    @keyframes ledp{0%,100%{opacity:1}50%{opacity:.3}}
+    .tb-status{display:flex;align-items:center;gap:.35rem;font-size:.62rem;}
+    .tb-back{font-size:.6rem;letter-spacing:.1em;color:var(--muted);text-decoration:none;border:1px solid var(--muted2);padding:.22rem .55rem;transition:all .15s;}
+    .tb-back:hover{border-color:var(--cyan);color:var(--cyan);}
+
+    /* ── TABS ── */
+    .tabnav{display:flex;border-bottom:1px solid var(--wire);background:var(--panel);overflow-x:auto;}
+    .tab{padding:.65rem 1.15rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;cursor:pointer;transition:all .2s;white-space:nowrap;}
     .tab:hover{color:var(--text);}
     .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 
     /* ── CONTENT ── */
-    .content{padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;max-width:1400px;margin:0 auto;width:100%;}
-    .tab-panel{display:none;flex-direction:column;gap:1.25rem;}
-    .tab-panel.active{display:flex;}
+    .content{padding:1.4rem;display:flex;flex-direction:column;gap:1.15rem;max-width:1400px;margin:0 auto;width:100%;}
+    .tp{display:none;flex-direction:column;gap:1.15rem;}
+    .tp.active{display:flex;}
 
     /* ── STAT GRID ── */
-    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire);}
-    .stat-cell{background:var(--panel);padding:1.1rem 1.4rem;position:relative;overflow:hidden;transition:background 0.2s;cursor:default;}
-    .stat-cell:hover{background:var(--panel2);}
-    .stat-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.25;}
-    .stat-label{font-size:0.58rem;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:0.45rem;}
-    .stat-val{font-family:'Orbitron',sans-serif;font-size:1.9rem;font-weight:700;color:var(--gold);line-height:1;}
-    .stat-val.cyan{color:var(--cyan);} .stat-val.green{color:var(--green);} .stat-val.red{color:var(--red);} .stat-val.warn{color:var(--warn);}
-    .stat-sub{font-size:0.6rem;color:var(--muted);margin-top:0.25rem;}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--wire);border:1px solid var(--wire);}
+    .sc{background:var(--panel);padding:1rem 1.25rem;position:relative;overflow:hidden;transition:background .2s;}
+    .sc:hover{background:var(--panel2);}
+    .sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.2;}
+    .sc-label{font-size:.56rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:.4rem;}
+    .sc-val{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:700;color:var(--gold);line-height:1;}
+    .sc-val.c{color:var(--cyan);} .sc-val.g{color:var(--green);} .sc-val.r{color:var(--red);} .sc-val.w{color:var(--warn);}
+    .sc-sub{font-size:.58rem;color:var(--muted);margin-top:.22rem;}
 
     /* ── BLOCK ── */
-    .block{background:var(--panel);border:1px solid var(--wire);position:relative;}
-    .block-header{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.2rem;border-bottom:1px solid var(--wire);flex-wrap:wrap;gap:0.5rem;}
-    .block-title{font-family:'Orbitron',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;}
-    .block-body{padding:1.2rem;}
+    .block{background:var(--panel);border:1px solid var(--wire);}
+    .bh{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.15rem;border-bottom:1px solid var(--wire);flex-wrap:wrap;gap:.4rem;}
+    .bt{font-family:'Orbitron',sans-serif;font-size:.64rem;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;}
+    .bb{padding:1.15rem;}
 
-    /* ── INPUTS ── */
-    .field-group{margin-bottom:1rem;}
-    .field-label{font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:0.35rem;}
-    .cmd-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:0.88rem;padding:0.4rem 0;outline:none;caret-color:var(--cyan);transition:border-color 0.2s;}
-    .cmd-input:focus{border-bottom-color:var(--cyan);}
-    .cmd-input::placeholder{color:var(--muted2);}
-    .cmd-input.gold{color:var(--gold);caret-color:var(--gold);}
-    .cmd-input.gold:focus{border-bottom-color:var(--gold);}
-    .cmd-select{width:100%;background:var(--panel2);border:1px solid var(--wire);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;padding:0.4rem 0.6rem;outline:none;}
-    .cmd-select:focus{border-color:var(--gold);}
-    .form-row{display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;}
-    .form-row .field-group{flex:1;min-width:120px;margin-bottom:0;}
+    /* ── FORMS ── */
+    .fg{margin-bottom:.9rem;}
+    .fl{font-size:.58rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:.32rem;}
+    .fi{width:100%;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:.85rem;padding:.38rem 0;outline:none;caret-color:var(--cyan);transition:border-color .2s;}
+    .fi:focus{border-bottom-color:var(--cyan);}
+    .fi::placeholder{color:var(--muted2);}
+    .fi.gold{color:var(--gold);caret-color:var(--gold);}
+    .fi.gold:focus{border-bottom-color:var(--gold);}
+    .fi-sel{width:100%;background:var(--panel2);border:1px solid var(--wire);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.8rem;padding:.38rem .55rem;outline:none;}
+    .fi-sel:focus{border-color:var(--gold);}
+    .fr{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
+    .fr .fg{flex:1;min-width:110px;margin-bottom:0;}
 
     /* ── BUTTONS ── */
-    .btn-cmd{padding:0.5rem 1.2rem;border:1px solid var(--gold);background:transparent;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.12em;cursor:pointer;text-transform:uppercase;transition:all 0.15s;white-space:nowrap;}
-    .btn-cmd:hover{background:rgba(240,192,64,0.1);box-shadow:0 0 15px rgba(240,192,64,0.2);}
-    .btn-cmd:disabled{opacity:0.3;cursor:not-allowed;}
-    .btn-cmd.cyan{border-color:var(--cyan);color:var(--cyan);}
-    .btn-cmd.cyan:hover{background:rgba(0,229,255,0.08);box-shadow:0 0 15px rgba(0,229,255,0.2);}
-    .btn-cmd.green{border-color:var(--green);color:var(--green);}
-    .btn-cmd.green:hover{background:rgba(0,255,136,0.08);}
-    .btn-cmd.red{border-color:var(--red);color:var(--red);}
-    .btn-cmd.red:hover{background:rgba(255,32,85,0.08);}
-    .btn-cmd.warn{border-color:var(--warn);color:var(--warn);}
-    .btn-cmd.warn:hover{background:rgba(255,149,0,0.08);}
-    .btn-cmd.sm{padding:0.28rem 0.65rem;font-size:0.56rem;}
-    .btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
-    .status-line{font-size:0.7rem;margin-top:0.5rem;min-height:1em;}
-    .status-line.ok{color:var(--green);}
-    .status-line.ok::before{content:'[OK] ';}
-    .status-line.err{color:var(--red);}
-    .status-line.err::before{content:'[ERR] ';}
-    .status-line.warn{color:var(--warn);}
-    .status-line.warn::before{content:'[!!] ';}
+    .btn{padding:.48rem 1.1rem;border:1px solid var(--gold);background:transparent;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+    .btn:hover{background:rgba(240,192,64,.1);box-shadow:0 0 14px rgba(240,192,64,.2);}
+    .btn:disabled{opacity:.3;cursor:not-allowed;}
+    .btn.c{border-color:var(--cyan);color:var(--cyan);}
+    .btn.c:hover{background:rgba(0,229,255,.08);}
+    .btn.g{border-color:var(--green);color:var(--green);}
+    .btn.g:hover{background:rgba(0,255,136,.08);}
+    .btn.r{border-color:var(--red);color:var(--red);}
+    .btn.r:hover{background:rgba(255,32,85,.08);}
+    .btn.w{border-color:var(--warn);color:var(--warn);}
+    .btn.w:hover{background:rgba(255,149,0,.08);}
+    .btn.p{border-color:var(--purple);color:var(--purple);}
+    .btn.p:hover{background:rgba(160,64,255,.08);}
+    .btn.sm{padding:.26rem .6rem;font-size:.54rem;}
+    .btn-row{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;}
+    .sl{font-size:.68rem;margin-top:.45rem;min-height:1em;}
+    .sl.ok{color:var(--green);} .sl.ok::before{content:'[OK] ';}
+    .sl.err{color:var(--red);} .sl.err::before{content:'[ERR] ';}
+    .sl.w{color:var(--warn);} .sl.w::before{content:'[!!] ';}
 
-    /* ── SEARCH / FILTER ── */
-    .search-wrap{position:relative;flex:1;min-width:180px;}
-    .search-wrap::before{content:'>';position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);color:var(--gold);font-size:0.8rem;pointer-events:none;}
-    .search-input{width:100%;background:var(--panel2);border:1px solid var(--wire);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;padding:0.45rem 0.75rem 0.45rem 1.4rem;outline:none;transition:border-color 0.2s;}
-    .search-input:focus{border-color:var(--gold);}
-    .search-input::placeholder{color:var(--muted2);}
-    .filter-tabs{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--wire);padding:2px;}
-    .filter-tab{padding:0.28rem 0.8rem;background:transparent;border:none;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
-    .filter-tab.active{background:var(--gold);color:var(--void);font-weight:700;}
-    .filter-tab:hover:not(.active){color:var(--gold);}
+    /* ── SEARCH/FILTER ── */
+    .sw{position:relative;flex:1;min-width:170px;}
+    .sw::before{content:'>';position:absolute;left:.45rem;top:50%;transform:translateY(-50%);color:var(--gold);font-size:.76rem;pointer-events:none;}
+    .si{width:100%;background:var(--panel2);border:1px solid var(--wire);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:.42rem .7rem .42rem 1.3rem;outline:none;transition:border-color .2s;}
+    .si:focus{border-color:var(--gold);}
+    .si::placeholder{color:var(--muted2);}
+    .fts{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--wire);padding:2px;}
+    .ft{padding:.26rem .75rem;background:transparent;border:none;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .ft.active{background:var(--gold);color:var(--void);font-weight:700;}
+    .ft:hover:not(.active){color:var(--gold);}
 
     /* ── TABLE ── */
-    .table-wrap{overflow-x:auto;}
-    table{width:100%;border-collapse:collapse;font-size:0.72rem;}
+    .tw{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;font-size:.7rem;}
     thead tr{border-bottom:1px solid var(--wire);}
-    th{padding:0.55rem 0.7rem;text-align:left;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:0.56rem;font-weight:700;letter-spacing:0.12em;white-space:nowrap;}
+    th{padding:.5rem .65rem;text-align:left;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:.12em;white-space:nowrap;}
     th[data-sort]{cursor:pointer;}
     th[data-sort]:hover{color:var(--cyan);}
-    th.sort-asc::after{content:' ↑';} th.sort-desc::after{content:' ↓';}
-    td{padding:0.55rem 0.7rem;border-bottom:1px solid rgba(255,255,255,0.025);vertical-align:middle;}
-    tr:hover td{background:rgba(240,192,64,0.02);}
-    tr.banned td{opacity:0.38;}
-    tr.banned{background:rgba(255,32,85,0.025);}
-    .td-key{font-family:'Share Tech Mono',monospace;font-size:0.67rem;color:var(--cyan);word-break:break-all;max-width:200px;}
-    .td-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.82rem;color:var(--text);}
-    .td-email{font-size:0.65rem;color:var(--muted);}
-    .mini-bar-bg{height:3px;background:var(--wire);overflow:hidden;margin-top:3px;}
-    .mini-bar-fill{height:100%;background:var(--green);transition:width 0.4s;}
-    .mini-bar-fill.warn{background:var(--warn);} .mini-bar-fill.danger{background:var(--red);}
-    .badge{display:inline-block;padding:1px 7px;font-size:0.58rem;letter-spacing:0.1em;font-family:'Orbitron',sans-serif;font-weight:700;}
-    .badge-active{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green);}
-    .badge-banned{background:rgba(255,32,85,0.1);border:1px solid rgba(255,32,85,0.3);color:var(--red);}
-    .badge-new{background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);color:var(--cyan);}
-    .badge-temp{background:rgba(255,149,0,0.1);border:1px solid rgba(255,149,0,0.3);color:var(--warn);}
-    .action-cell{display:flex;gap:3px;flex-wrap:wrap;}
-    .quota-inline{display:flex;align-items:center;gap:3px;}
-    .quota-input{width:44px;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.75rem;padding:1px 0;outline:none;text-align:center;}
-    .quota-input:focus{border-bottom-color:var(--gold);}
-    .table-msg{padding:2rem;text-align:center;color:var(--muted);font-size:0.75rem;}
-    .table-msg::before{content:'>>> ';}
-    .table-footer{padding:0.5rem 1.1rem;border-top:1px solid var(--wire);font-size:0.62rem;color:var(--muted);display:flex;justify-content:space-between;}
+    th.sa::after{content:' ↑';} th.sd::after{content:' ↓';}
+    td{padding:.5rem .65rem;border-bottom:1px solid rgba(255,255,255,.023);vertical-align:middle;}
+    tr:hover td{background:rgba(240,192,64,.018);}
+    tr.banned td{opacity:.35;} tr.banned{background:rgba(255,32,85,.022);}
+    .tk{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--cyan);word-break:break-all;max-width:180px;}
+    .tn{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.8rem;color:var(--text);}
+    .te{font-size:.62rem;color:var(--muted);}
+    .mb{height:3px;background:var(--wire);overflow:hidden;margin-top:3px;}
+    .mbf{height:100%;background:var(--green);transition:width .4s;}
+    .mbf.w{background:var(--warn);} .mbf.d{background:var(--red);}
+    .badge{display:inline-block;padding:1px 6px;font-size:.56rem;letter-spacing:.08em;font-family:'Orbitron',sans-serif;font-weight:700;}
+    .ba{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:var(--green);}
+    .bb2{background:rgba(255,32,85,.1);border:1px solid rgba(255,32,85,.3);color:var(--red);}
+    .bn{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.22);color:var(--cyan);}
+    .bw{background:rgba(255,149,0,.1);border:1px solid rgba(255,149,0,.3);color:var(--warn);}
+    .ac{display:flex;gap:3px;flex-wrap:wrap;}
+    .qi{width:42px;background:transparent;border:none;border-bottom:1px solid var(--wire);color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:.72rem;padding:1px 0;outline:none;text-align:center;}
+    .qi:focus{border-bottom-color:var(--gold);}
+    .qi-row{display:flex;align-items:center;gap:3px;}
+    .tm{padding:1.75rem;text-align:center;color:var(--muted);font-size:.72rem;}
+    .tm::before{content:'>>> ';}
+    .tf{padding:.45rem 1rem;border-top:1px solid var(--wire);font-size:.6rem;color:var(--muted);display:flex;justify-content:space-between;}
 
-    /* ── TEMP KEYS ── */
-    .temp-key-card{border:1px solid var(--wire);padding:0.9rem 1.1rem;margin-bottom:0.6rem;background:var(--panel2);position:relative;}
-    .temp-key-card::before{content:'TRIAL';position:absolute;top:-0.55em;left:0.75rem;background:var(--panel2);padding:0 0.4rem;font-size:0.58rem;letter-spacing:0.15em;color:var(--warn);}
-    .temp-key-val{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--warn);word-break:break-all;margin-bottom:0.4rem;}
-    .temp-key-meta{font-size:0.65rem;color:var(--muted);line-height:1.7;}
-    .temp-key-meta span{color:var(--text);}
-    .expiry-bar-bg{height:3px;background:var(--wire);margin-top:0.5rem;overflow:hidden;}
-    .expiry-bar-fill{height:100%;background:var(--warn);}
+    /* ── TEMP KEY CARDS ── */
+    .tkc{border:1px solid var(--wire);padding:.85rem 1rem;margin-bottom:.55rem;background:var(--panel2);position:relative;}
+    .tkc::before{content:'TRIAL';position:absolute;top:-.5em;left:.7rem;background:var(--panel2);padding:0 .35rem;font-size:.56rem;letter-spacing:.14em;color:var(--warn);}
+    .tkv{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--warn);word-break:break-all;margin-bottom:.35rem;}
+    .tkm{font-size:.62rem;color:var(--muted);line-height:1.7;}
+    .tkm span{color:var(--text);}
+    .ebar{height:3px;background:var(--wire);margin-top:.45rem;overflow:hidden;}
+    .ebf{height:100%;background:var(--warn);}
 
-    /* ── MODEL STATUS ── */
-    .model-status-list{display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto;}
-    .model-status-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.7rem;background:var(--panel2);border:1px solid var(--wire);}
-    .model-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-    .model-dot.available{background:var(--green);}
-    .model-dot.degraded{background:var(--warn);}
-    .model-dot.down{background:var(--red);}
-    .model-id{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--cyan);flex:1;word-break:break-all;}
+    /* ── PROVIDER CARDS ── */
+    .pcard{border:1px solid var(--wire);background:var(--panel2);padding:.9rem 1.1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .pcard.active-p{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.03);}
+    .pc-led{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .pc-led.on{background:var(--green);box-shadow:0 0 8px var(--green);}
+    .pc-led.off{background:var(--muted2);}
+    .pc-info{flex:1;min-width:150px;}
+    .pc-name{font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;color:var(--gold);}
+    .pc-url{font-size:.65rem;color:var(--muted);margin-top:2px;word-break:break-all;}
+    .pc-key{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--cyan);margin-top:2px;}
+    .pc-badge{font-size:.58rem;letter-spacing:.1em;}
+
+    /* ── CREDITS DISPLAY ── */
+    .credits-box{background:var(--panel2);border:1px solid var(--wire);padding:1rem 1.2rem;font-size:.72rem;white-space:pre-wrap;word-break:break-all;max-height:320px;overflow-y:auto;line-height:1.8;color:var(--text);}
+    .credits-box .k{color:var(--cyan);}
+    .credits-box .v{color:var(--gold);}
+
+    /* ── MODEL OVERRIDE CARDS ── */
+    .mocard{display:flex;align-items:center;gap:.7rem;padding:.5rem .7rem;background:var(--panel2);border:1px solid var(--wire);margin-bottom:.4rem;}
+    .mo-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .mo-dot.degraded{background:var(--warn);}
+    .mo-dot.down{background:var(--red);}
+    .mo-id{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--cyan);flex:1;word-break:break-all;}
 
     /* ── LOG ── */
-    .log-panel{background:var(--void);border-top:1px solid var(--wire);padding:0.9rem 1.2rem;max-height:150px;overflow-y:auto;font-size:0.68rem;line-height:1.8;}
-    .log-line{color:var(--muted);}
-    .log-line.ok::before{content:'[OK] ';color:var(--green);}
-    .log-line.err::before{content:'[ERR] ';color:var(--red);}
-    .log-line.info::before{content:'[>>] ';color:var(--cyan);}
-    .log-line.warn::before{content:'[!!] ';color:var(--warn);}
-    .log-line.gold{color:var(--gold);}
-    ::-webkit-scrollbar{width:4px;height:4px;}
+    .log{background:var(--void);border-top:1px solid var(--wire);padding:.85rem 1.1rem;max-height:140px;overflow-y:auto;font-size:.65rem;line-height:1.9;}
+    .ll{color:var(--muted);}
+    .ll.ok::before{content:'[OK] ';color:var(--green);}
+    .ll.err::before{content:'[ERR] ';color:var(--red);}
+    .ll.info::before{content:'[>>] ';color:var(--cyan);}
+    .ll.warn::before{content:'[!!] ';color:var(--warn);}
+    .ll.gold{color:var(--gold);}
+
+    ::-webkit-scrollbar{width:3px;height:3px;}
     ::-webkit-scrollbar-track{background:var(--void);}
     ::-webkit-scrollbar-thumb{background:var(--wire);}
     ::-webkit-scrollbar-thumb:hover{background:var(--gold);}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .spinner{width:13px;height:13px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+    .sp{width:12px;height:12px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
   </style>
 </head>
 <body>
@@ -200,391 +222,370 @@
   <div class="auth-logo">ADO</div>
   <div class="auth-sub">Command Center · Restricted Access</div>
   <div class="auth-box">
-    <div class="auth-label">Admin Access Code</div>
-    <input class="auth-input" type="password" id="authInput" placeholder="Enter code..." autocomplete="off"/>
-    <button class="auth-btn" id="btnAuth">Authenticate →</button>
-    <div class="auth-err" id="authErr"></div>
+    <div class="a-label">Admin Access Code</div>
+    <input class="a-input" type="password" id="authInput" placeholder="Enter code..." autocomplete="off"/>
+    <button class="a-btn" id="btnAuth">Authenticate →</button>
+    <div class="a-err" id="authErr"></div>
   </div>
 </div>
 
 <!-- ── MAIN ── -->
 <div id="mainApp">
-
   <div class="topbar">
-    <span class="topbar-logo">ADO</span>
-    <span style="color:var(--muted2)">//</span>
-    <span class="topbar-title">Command Center v3</span>
-    <span class="topbar-spacer"></span>
-    <span class="status-badge"><span class="led"></span><span style="color:var(--green);font-size:0.65rem">NOMINAL</span></span>
-    <span class="topbar-time" id="topbarTime">—</span>
-    <a class="topbar-back" href="index.html">← Exit</a>
+    <span class="tb-logo">ADO</span><span class="tb-sep">//</span>
+    <span class="tb-title">Command Center v4</span>
+    <span class="tb-sp"></span>
+    <span class="tb-status"><span class="led"></span><span style="color:var(--green);font-size:.6rem">NOMINAL</span></span>
+    <span class="tb-time" id="tbTime">—</span>
+    <a class="tb-back" href="index.html">← Exit</a>
   </div>
 
-  <!-- TAB NAV -->
   <div class="tabnav">
     <button class="tab active" data-tab="overview">Overview</button>
     <button class="tab" data-tab="users">Users</button>
     <button class="tab" data-tab="trial">Trial Keys</button>
-    <button class="tab" data-tab="models">Model Status</button>
+    <button class="tab" data-tab="models">Models</button>
+    <button class="tab" data-tab="providers">Providers</button>
     <button class="tab" data-tab="system">System</button>
   </div>
 
   <div class="content">
 
-    <!-- ═══ OVERVIEW TAB ═══ -->
-    <div class="tab-panel active" id="tab-overview">
-      <div class="stat-grid" id="statGrid">
-        <div class="stat-cell"><div class="stat-label">Total Keys</div><div class="stat-val" id="sTotal">—</div><div class="stat-sub">all time</div></div>
-        <div class="stat-cell"><div class="stat-label">Active</div><div class="stat-val green" id="sActive">—</div><div class="stat-sub">not banned</div></div>
-        <div class="stat-cell"><div class="stat-label">Banned</div><div class="stat-val red" id="sBanned">—</div><div class="stat-sub">terminated</div></div>
-        <div class="stat-cell"><div class="stat-label">Requests Today</div><div class="stat-val cyan" id="sReqs">—</div><div class="stat-sub">total</div></div>
-        <div class="stat-cell"><div class="stat-label">Pool Used</div><div class="stat-val" id="sUtil">—</div><div class="stat-sub">% of capacity</div></div>
-        <div class="stat-cell"><div class="stat-label">Daily Limit</div><div class="stat-val warn" id="sLimit">—</div><div class="stat-sub">per user</div></div>
+    <!-- ══ OVERVIEW ══ -->
+    <div class="tp active" id="tab-overview">
+      <div class="stat-grid">
+        <div class="sc"><div class="sc-label">Total Keys</div><div class="sc-val" id="sTotal">—</div><div class="sc-sub">all time</div></div>
+        <div class="sc"><div class="sc-label">Active</div><div class="sc-val g" id="sActive">—</div><div class="sc-sub">not banned</div></div>
+        <div class="sc"><div class="sc-label">Banned</div><div class="sc-val r" id="sBanned">—</div><div class="sc-sub">terminated</div></div>
+        <div class="sc"><div class="sc-label">Requests Today</div><div class="sc-val c" id="sReqs">—</div><div class="sc-sub">total</div></div>
+        <div class="sc"><div class="sc-label">Pool Used</div><div class="sc-val" id="sUtil">—</div><div class="sc-sub">% of capacity</div></div>
+        <div class="sc"><div class="sc-label">Daily Limit</div><div class="sc-val w" id="sLimit">—</div><div class="sc-sub">per user</div></div>
       </div>
 
-      <!-- Announcement -->
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">📢 Announcement Banner</span>
-          <span style="font-size:0.62rem;color:var(--muted)">Shows on user dashboard status ticker</span>
-        </div>
-        <div class="block-body">
-          <div class="form-row">
-            <div class="field-group" style="flex:1">
-              <div class="field-label">Message (blank to clear)</div>
-              <input class="cmd-input gold" type="text" id="announcementInput" placeholder="e.g. Maintenance tonight 11pm UTC · Gemini 2.0 now available!"/>
+        <div class="bh"><span class="bt">📢 Announcement Broadcast</span><span style="font-size:.6rem;color:var(--muted)">Shows in user ticker immediately</span></div>
+        <div class="bb">
+          <div class="fr">
+            <div class="fg" style="flex:1">
+              <div class="fl">Message (leave blank to clear)</div>
+              <input class="fi gold" type="text" id="annoInput" placeholder="e.g. Maintenance 11pm UTC · New models available!"/>
             </div>
-            <button class="btn-cmd warn" id="btnAnnouncement">Broadcast →</button>
+            <button class="btn w" id="btnAnno">Broadcast →</button>
           </div>
-          <div class="status-line" id="announcementStatus"></div>
+          <div class="sl" id="annoSL"></div>
+          <div id="currentAnno" style="margin-top:.6rem;font-size:.65rem;color:var(--muted)"></div>
         </div>
       </div>
 
-      <!-- Activity Log -->
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">📋 Activity Log</span>
-          <button class="btn-cmd sm" onclick="clearLog()">Clear</button>
-        </div>
-        <div class="log-panel" id="logPanel">
-          <div class="log-line gold">ADO Command Center v3 initialized.</div>
-        </div>
+        <div class="bh"><span class="bt">📋 Activity Log</span><button class="btn sm" onclick="clearLog()">Clear</button></div>
+        <div class="log" id="logPanel"><div class="ll gold">ADO Command Center v4 initialized.</div></div>
       </div>
     </div>
 
-    <!-- ═══ USERS TAB ═══ -->
-    <div class="tab-panel" id="tab-users">
+    <!-- ══ USERS ══ -->
+    <div class="tp" id="tab-users">
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">👥 Registered Users</span>
-          <div class="btn-row">
-            <button class="btn-cmd cyan sm" id="btnRefreshKeys">Refresh ↻</button>
-          </div>
+        <div class="bh">
+          <span class="bt">👥 Registered Users</span>
+          <button class="btn c sm" id="btnRefKeys">Refresh ↻</button>
         </div>
-        <div class="block-body" style="padding-bottom:0.75rem">
-          <div class="btn-row" style="gap:0.6rem;flex-wrap:wrap;">
-            <div class="search-wrap">
-              <input class="search-input" type="text" id="searchInput" placeholder="Search key, name, email..."/>
-            </div>
-            <div class="filter-tabs" id="filterTabs">
-              <button class="filter-tab active" data-filter="all">All</button>
-              <button class="filter-tab" data-filter="active">Active</button>
-              <button class="filter-tab" data-filter="banned">Banned</button>
-              <button class="filter-tab" data-filter="heavy">High Usage</button>
-              <button class="filter-tab" data-filter="maxed">Maxed Out</button>
+        <div class="bb" style="padding-bottom:.6rem">
+          <div class="btn-row" style="gap:.5rem;flex-wrap:wrap">
+            <div class="sw"><input class="si" type="text" id="searchIn" placeholder="Search key, name, email..."/></div>
+            <div class="fts" id="fts">
+              <button class="ft active" data-f="all">All</button>
+              <button class="ft" data-f="active">Active</button>
+              <button class="ft" data-f="banned">Banned</button>
+              <button class="ft" data-f="heavy">≥60% Used</button>
+              <button class="ft" data-f="maxed">Maxed</button>
             </div>
           </div>
         </div>
-        <div class="table-wrap">
+        <div class="tw">
           <table>
-            <thead>
-              <tr>
-                <th data-sort="key">Pass ID</th>
-                <th data-sort="name">User</th>
-                <th data-sort="usedToday">Usage Today</th>
-                <th>Limit / Boost</th>
-                <th data-sort="created">Issued</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="keysBody">
-              <tr><td colspan="7" class="table-msg">Loading...</td></tr>
-            </tbody>
+            <thead><tr>
+              <th data-sort="key">Pass ID</th>
+              <th data-sort="name">User</th>
+              <th data-sort="usedToday">Usage Today</th>
+              <th>Boost / Reset</th>
+              <th data-sort="created">Issued</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody id="keysBody"><tr><td colspan="7" class="tm">Loading...</td></tr></tbody>
           </table>
         </div>
-        <div class="table-footer">
-          <span id="tableCount">—</span>
-          <span>Click column headers to sort</span>
-        </div>
+        <div class="tf"><span id="tableCount">—</span><span>Click headers to sort</span></div>
       </div>
     </div>
 
-    <!-- ═══ TRIAL KEYS TAB ═══ -->
-    <div class="tab-panel" id="tab-trial">
-      <!-- Generate form -->
+    <!-- ══ TRIAL KEYS ══ -->
+    <div class="tp" id="tab-trial">
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">🎟 Generate Trial Key</span>
-        </div>
-        <div class="block-body">
-          <p style="font-size:0.7rem;color:var(--muted);margin-bottom:1rem">Trial keys start with <span style="color:var(--warn)">ADOT-</span> and expire automatically. Give them to testers, Discord members, or anyone you want to try ADO without a Google account.</p>
-          <div class="form-row">
-            <div class="field-group">
-              <div class="field-label">Label / Note</div>
-              <input class="cmd-input" type="text" id="trialLabel" placeholder="e.g. Discord tester #1"/>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Request Quota</div>
-              <input class="cmd-input gold" type="number" id="trialQuota" value="10" min="1" max="200"/>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Duration (hours)</div>
-              <select class="cmd-select" id="trialDuration">
-                <option value="1">1 hour</option>
-                <option value="6">6 hours</option>
-                <option value="12">12 hours</option>
-                <option value="24" selected>24 hours</option>
-                <option value="48">48 hours</option>
-                <option value="72">72 hours (3 days)</option>
-                <option value="168">168 hours (1 week)</option>
+        <div class="bh"><span class="bt">🎟 Generate Trial Key</span></div>
+        <div class="bb">
+          <p style="font-size:.68rem;color:var(--muted);margin-bottom:.9rem">Trial keys start with <span style="color:var(--warn)">ADOT-</span> and expire automatically. Give to testers, community members, or anyone without a Google account.</p>
+          <div class="fr">
+            <div class="fg"><div class="fl">Label / Note</div><input class="fi" type="text" id="tLabel" placeholder="e.g. Discord tester #3"/></div>
+            <div class="fg"><div class="fl">Request Quota</div><input class="fi gold" type="number" id="tQuota" value="10" min="1" max="500"/></div>
+            <div class="fg"><div class="fl">Duration</div>
+              <select class="fi-sel" id="tDur">
+                <option value="1">1 hour</option><option value="6">6 hours</option>
+                <option value="12">12 hours</option><option value="24" selected>24 hours</option>
+                <option value="48">48 hours</option><option value="72">3 days</option>
+                <option value="168">1 week</option>
               </select>
             </div>
-            <button class="btn-cmd green" id="btnGenTrial">Generate →</button>
+            <button class="btn g" id="btnGenTrial">Generate →</button>
           </div>
-          <div class="status-line" id="trialGenStatus"></div>
+          <div class="sl" id="trialSL"></div>
         </div>
       </div>
 
-      <!-- Generated key display -->
       <div class="block" id="newTrialBlock" style="display:none">
-        <div class="block-header">
-          <span class="block-title" style="color:var(--warn)">⚡ New Trial Key Generated</span>
-          <button class="btn-cmd sm" onclick="document.getElementById('newTrialBlock').style.display='none'">Dismiss</button>
+        <div class="bh" style="border-color:rgba(255,149,0,.3)">
+          <span class="bt" style="color:var(--warn)">⚡ New Trial Key</span>
+          <button class="btn sm" onclick="this.closest('.block').style.display='none'">Dismiss</button>
         </div>
-        <div class="block-body">
-          <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.5rem">Copy and send this to your tester. It cannot be recovered.</div>
-          <div id="newTrialKeyDisplay" style="font-family:'Share Tech Mono',monospace;font-size:0.92rem;color:var(--warn);background:var(--panel2);border:1px solid rgba(255,149,0,0.3);padding:0.75rem 1rem;margin-bottom:0.75rem;word-break:break-all;"></div>
+        <div class="bb">
+          <div id="newTrialKey" style="font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--warn);background:var(--panel2);border:1px solid rgba(255,149,0,.3);padding:.7rem .9rem;margin-bottom:.7rem;word-break:break-all;"></div>
           <div class="btn-row">
-            <button class="btn-cmd warn sm" id="btnCopyTrial">Copy Key →</button>
-            <div id="copyTrialStatus" style="font-size:0.68rem;color:var(--green);"></div>
+            <button class="btn w sm" id="btnCopyTrial">Copy Key →</button>
+            <span id="trialCopySt" style="font-size:.65rem;color:var(--green)"></span>
           </div>
         </div>
       </div>
 
-      <!-- Active trial keys list -->
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">Active Trial Keys</span>
-          <button class="btn-cmd sm cyan" id="btnRefreshTrials">Refresh ↻</button>
-        </div>
-        <div class="block-body" id="trialKeysList">
-          <div class="table-msg">Loading trial keys...</div>
-        </div>
+        <div class="bh"><span class="bt">Active Trial Keys</span><button class="btn c sm" id="btnRefTrials">Refresh ↻</button></div>
+        <div class="bb" id="trialList"><div class="tm">Loading...</div></div>
       </div>
     </div>
 
-    <!-- ═══ MODELS TAB ═══ -->
-    <div class="tab-panel" id="tab-models">
+    <!-- ══ MODELS ══ -->
+    <div class="tp" id="tab-models">
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">🤖 Model Status Override</span>
-        </div>
-        <div class="block-body">
-          <p style="font-size:0.7rem;color:var(--muted);margin-bottom:1rem">Set a model's visible status for users. <span style="color:var(--green)">Available</span> = normal. <span style="color:var(--warn)">Degraded</span> = works but slow/unstable. <span style="color:var(--red)">Down</span> = unavailable. Users see this on the Models page.</p>
-          <div class="form-row">
-            <div class="field-group" style="flex:1">
-              <div class="field-label">Model ID</div>
-              <input class="cmd-input" type="text" id="modelIdInput" placeholder="e.g. gemini-pro, claude-3-haiku, gpt-4o"/>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Set Status</div>
-              <select class="cmd-select" id="modelStatusSelect">
-                <option value="available">✓ Available</option>
+        <div class="bh"><span class="bt">🤖 Set Model Status</span></div>
+        <div class="bb">
+          <p style="font-size:.68rem;color:var(--muted);margin-bottom:.9rem">Override the visible status of any model for your users. <span style="color:var(--green)">Available</span> removes any override. <span style="color:var(--warn)">Degraded</span> = slow/unstable. <span style="color:var(--red)">Down</span> = offline.</p>
+          <div class="fr">
+            <div class="fg" style="flex:1"><div class="fl">Model ID (exact)</div><input class="fi" type="text" id="mIdIn" placeholder="e.g. gemini-2.0-flash, claude-3-haiku-20240307"/></div>
+            <div class="fg"><div class="fl">Status</div>
+              <select class="fi-sel" id="mStatusSel">
+                <option value="available">✓ Available (remove override)</option>
                 <option value="degraded">⚡ Degraded</option>
                 <option value="down">✕ Down</option>
               </select>
             </div>
-            <button class="btn-cmd" id="btnSetModelStatus">Apply →</button>
+            <button class="btn" id="btnSetMS">Apply →</button>
           </div>
-          <div class="status-line" id="modelStatusLine"></div>
+          <div class="sl" id="msSL"></div>
         </div>
       </div>
 
-      <!-- Current overrides -->
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">Active Status Overrides</span>
-          <span style="font-size:0.62rem;color:var(--muted)">Models not listed here are shown as Available</span>
-        </div>
-        <div class="block-body" id="modelOverridesList">
-          <div class="table-msg">No overrides set. All models show as Available by default.</div>
+        <div class="bh"><span class="bt">Current Overrides</span><button class="btn c sm" id="btnRefMO">Refresh ↻</button></div>
+        <div class="bb" id="moList"><div class="tm">Loading overrides...</div></div>
+      </div>
+
+      <div class="block">
+        <div class="bh"><span class="bt">📡 Preview Model List</span><span style="font-size:.6rem;color:var(--muted)">As users see it</span></div>
+        <div class="bb">
+          <div class="fr" style="margin-bottom:.75rem">
+            <div class="fg" style="flex:1"><div class="fl">ADO Key (any valid key)</div><input class="fi" type="text" id="previewKeyIn" placeholder="ADO-XXXXXX-..."/></div>
+            <button class="btn c" id="btnPreviewModels">Load Live Models →</button>
+          </div>
+          <div id="modelPreviewArea"></div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ SYSTEM TAB ═══ -->
-    <div class="tab-panel" id="tab-system">
-
-      <!-- Master Key -->
+    <!-- ══ PROVIDERS ══ -->
+    <div class="tp" id="tab-providers">
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">⚡ Master Key Override</span>
-          <span style="font-size:0.62rem;color:var(--muted)">Instant · No redeploy</span>
-        </div>
-        <div class="block-body">
-          <div class="form-row">
-            <div class="field-group" style="flex:1">
-              <div class="field-label">New Upstream API Key</div>
-              <input class="cmd-input" type="text" id="masterKeyInput" placeholder="sk-bluesminds-..."/>
-            </div>
-            <button class="btn-cmd" id="btnUpdateMK">Update →</button>
+        <div class="bh"><span class="bt">➕ Add Provider</span></div>
+        <div class="bb">
+          <p style="font-size:.68rem;color:var(--muted);margin-bottom:.9rem">Add any OpenAI-compatible provider. Switching providers instantly updates the master key and base URL used by all requests — no Worker redeploy needed. Models auto-load from the active provider.</p>
+          <div class="fr">
+            <div class="fg"><div class="fl">Display Name</div><input class="fi gold" type="text" id="pName" placeholder="e.g. OpenRouter"/></div>
+            <div class="fg" style="flex:2"><div class="fl">Base URL (ends in /v1)</div><input class="fi" type="text" id="pUrl" placeholder="https://openrouter.ai/api/v1"/></div>
+            <div class="fg" style="flex:2"><div class="fl">API Key</div><input class="fi" type="text" id="pKey" placeholder="sk-or-..."/></div>
+            <button class="btn g" id="btnAddProvider">Add →</button>
           </div>
-          <div class="status-line" id="mkStatus"></div>
+          <div class="sl" id="pSL"></div>
         </div>
       </div>
 
-      <!-- Global Daily Limit -->
       <div class="block">
-        <div class="block-header">
-          <span class="block-title">🎯 Global Daily Limit</span>
-          <span style="font-size:0.62rem;color:var(--muted)">Applies to ALL users · Overrides hardcoded value</span>
-        </div>
-        <div class="block-body">
-          <div class="form-row">
-            <div class="field-group" style="flex:1">
-              <div class="field-label">Requests Per Day</div>
-              <input class="cmd-input gold" type="number" id="globalLimitInput" min="1" max="500" placeholder="5"/>
-            </div>
-            <button class="btn-cmd warn" id="btnSetGlobalLimit">Apply Globally →</button>
+        <div class="bh"><span class="bt">Registered Providers</span><button class="btn c sm" id="btnRefProviders">Refresh ↻</button></div>
+        <div class="bb" id="providerList"><div class="tm">Loading providers...</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SYSTEM ══ -->
+    <div class="tp" id="tab-system">
+
+      <div class="block">
+        <div class="bh"><span class="bt">⚡ Master Key Override</span><span style="font-size:.6rem;color:var(--muted)">Instant · No redeploy</span></div>
+        <div class="bb">
+          <div class="fr">
+            <div class="fg" style="flex:1"><div class="fl">New Upstream API Key</div><input class="fi" type="text" id="mkIn" placeholder="sk-bluesminds-..."/></div>
+            <button class="btn" id="btnMK">Update →</button>
           </div>
-          <div class="status-line" id="globalLimitStatus"></div>
-          <p style="font-size:0.65rem;color:var(--muted);margin-top:0.6rem">Currently: <span id="currentLimitDisplay" style="color:var(--gold)">loading...</span> requests/day. Use individual quota boost on the Users tab to give someone extra without affecting everyone.</p>
+          <div class="sl" id="mkSL"></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="bh"><span class="bt">🎯 Global Daily Limit</span><span style="font-size:.6rem;color:var(--muted)">Affects ALL users instantly</span></div>
+        <div class="bb">
+          <div class="fr">
+            <div class="fg" style="flex:1"><div class="fl">Requests Per Day</div><input class="fi gold" type="number" id="glIn" min="1" max="9999" placeholder="5"/></div>
+            <button class="btn w" id="btnGL">Apply Globally →</button>
+          </div>
+          <div class="sl" id="glSL"></div>
+          <p style="font-size:.62rem;color:var(--muted);margin-top:.5rem">Current: <span id="glCurrent" style="color:var(--gold)">loading...</span> · Individual boosts in Users tab override this.</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="bh"><span class="bt">💳 Provider Credits Check</span><span style="font-size:.6rem;color:var(--muted)">Probes billing endpoints</span></div>
+        <div class="bb">
+          <p style="font-size:.68rem;color:var(--muted);margin-bottom:.85rem">Attempts to fetch credit/billing info from the active provider. Works if the provider exposes an OpenAI-compatible billing endpoint. Results vary by provider.</p>
+          <button class="btn c" id="btnCheckCredits">Probe Credits →</button>
+          <div class="sl" id="creditsSL"></div>
+          <div id="creditsDisplay" style="margin-top:.75rem;display:none">
+            <div class="credits-box" id="creditsBox"></div>
+          </div>
         </div>
       </div>
 
     </div>
 
-  </div><!-- end .content -->
-</div>
+  </div><!-- .content -->
+</div><!-- #mainApp -->
 
 <script>
-// ══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 // PASTE YOUR WORKER URL HERE — NO TRAILING SLASH
-// ══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
 
 let ADMIN_KEY = null;
-let allKeys = [];
+let allKeys   = [];
 let sortField = "created", sortDir = "desc";
-let filterMode = "all", searchQuery = "";
+let filterMode = "all", searchQ = "";
 
-// ── LOG ──
-function log(msg, type = "info") {
+// ── LOG ──────────────────────────────────────────────────────
+function log(msg, type="info") {
   const p = document.getElementById("logPanel");
-  const line = document.createElement("div");
-  line.className = `log-line ${type}`;
-  const ts = new Date().toTimeString().slice(0, 8);
-  line.textContent = `[${ts}] ${msg}`;
-  p.appendChild(line);
-  p.scrollTop = p.scrollHeight;
+  const d = document.createElement("div");
+  d.className = `ll ${type}`;
+  d.textContent = `[${new Date().toTimeString().slice(0,8)}] ${msg}`;
+  p.appendChild(d); p.scrollTop = p.scrollHeight;
 }
-function clearLog() { document.getElementById("logPanel").innerHTML = '<div class="log-line gold">Log cleared.</div>'; }
+function clearLog() { document.getElementById("logPanel").innerHTML='<div class="ll gold">Log cleared.</div>'; }
 
-// ── CLOCK ──
-setInterval(() => {
-  const n = new Date();
-  document.getElementById("topbarTime").textContent = n.toUTCString().slice(0, 25) + " UTC";
-}, 1000);
+// ── CLOCK ─────────────────────────────────────────────────────
+setInterval(()=>{ document.getElementById("tbTime").textContent = new Date().toUTCString().slice(0,25)+" UTC"; },1000);
 
-// ── TABS ──
-document.querySelectorAll(".tab").forEach(t => {
-  t.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
-    document.querySelectorAll(".tab-panel").forEach(x => x.classList.remove("active"));
+// ── TABS ──────────────────────────────────────────────────────
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".tp").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById(`tab-${t.dataset.tab}`).classList.add("active");
-    if (t.dataset.tab === "users") loadKeys();
-    if (t.dataset.tab === "trial") loadTrialKeys();
+    if(t.dataset.tab==="users") loadKeys();
+    if(t.dataset.tab==="trial") loadTrialKeys();
+    if(t.dataset.tab==="models") { loadModelOverrides(); }
+    if(t.dataset.tab==="providers") loadProviders();
   });
 });
 
-// ── API ──
-async function api(path, opts = {}) {
-  return fetch(WORKER_URL + path, {
+// ── API HELPER ────────────────────────────────────────────────
+async function api(path, opts={}) {
+  return fetch(WORKER_URL+path, {
     ...opts,
-    headers: { "Content-Type": "application/json", "X-Admin-Key": ADMIN_KEY, ...(opts.headers||{}) }
+    headers:{ "Content-Type":"application/json", "X-Admin-Key":ADMIN_KEY, ...(opts.headers||{}) }
   });
 }
 
-// ── AUTH ──
+// ── AUTH ──────────────────────────────────────────────────────
 document.getElementById("btnAuth").addEventListener("click", doAuth);
-document.getElementById("authInput").addEventListener("keydown", e => { if(e.key==="Enter") doAuth(); });
+document.getElementById("authInput").addEventListener("keydown",e=>{ if(e.key==="Enter") doAuth(); });
 async function doAuth() {
   const code = document.getElementById("authInput").value.trim();
-  const errEl = document.getElementById("authErr");
-  if (!code) { errEl.textContent = "Enter your admin code."; return; }
-  errEl.textContent = "Authenticating...";
+  const err  = document.getElementById("authErr");
+  if (!code) { err.textContent="Enter your admin code."; return; }
+  err.textContent="Verifying...";
   try {
-    const r = await fetch(WORKER_URL + "/admin/keys", { headers: { "X-Admin-Key": code } });
-    if (r.status === 403) { errEl.textContent = "Access denied. Wrong code."; return; }
+    const r = await fetch(WORKER_URL+"/admin/keys", { headers:{"X-Admin-Key":code} });
+    if (r.status===403) { err.textContent="Access denied. Wrong code."; return; }
     ADMIN_KEY = code;
-    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("authScreen").style.display="none";
     document.getElementById("mainApp").classList.add("active");
     log("Authentication successful. Welcome, Administrator.", "ok");
-    loadKeys();
     loadStatus();
-  } catch(err) { errEl.textContent = "Connection error: " + err.message; }
+    loadKeys();
+  } catch(e) { err.textContent="Connection error: "+e.message; }
 }
 
-// ── STATUS / LIMIT ──
+// ── STATUS ────────────────────────────────────────────────────
 async function loadStatus() {
   try {
-    const r = await fetch(WORKER_URL + "/status");
+    const r = await fetch(WORKER_URL+"/status");
     const d = await r.json();
-    document.getElementById("sLimit").textContent = d.limit || 5;
-    document.getElementById("currentLimitDisplay").textContent = (d.limit || 5) + " req/day";
-    if (d.announcement) document.getElementById("announcementInput").value = d.announcement;
+    document.getElementById("sLimit").textContent = d.limit||5;
+    document.getElementById("glCurrent").textContent = (d.limit||5)+" req/day";
+    if (d.announcement) {
+      document.getElementById("glIn").placeholder = d.limit||5;
+      document.getElementById("currentAnno").textContent = "Current: \""+d.announcement+"\"";
+    }
   } catch {}
 }
 
-// ── LOAD KEYS ──
+// ── LOAD KEYS ─────────────────────────────────────────────────
 async function loadKeys() {
-  log("Fetching user registry...", "info");
+  log("Fetching user registry...","info");
   try {
     const r = await api("/admin/keys");
     const d = await r.json();
-    if (!r.ok) { log("Failed: " + d.error, "err"); return; }
-    allKeys = d.keys || [];
-    log(`Loaded ${allKeys.length} user keys.`, "ok");
-    updateStats();
-    renderTable();
-  } catch(err) { log("Error: " + err.message, "err"); }
+    if (!r.ok) { log("Failed: "+d.error,"err"); return; }
+    allKeys = d.keys||[];
+    if (d.globalLimit) {
+      document.getElementById("sLimit").textContent = d.globalLimit;
+      document.getElementById("glCurrent").textContent = d.globalLimit+" req/day";
+    }
+    log(`Loaded ${allKeys.length} user keys.`,"ok");
+    updateStats(); renderTable();
+  } catch(e) { log("Error: "+e.message,"err"); }
 }
 
 function updateStats() {
-  const total = allKeys.length, banned = allKeys.filter(k=>k.banned).length;
-  const reqs = allKeys.reduce((a,k)=>a+(k.usedToday||0),0);
-  const cap = total * (parseInt(document.getElementById("sLimit").textContent)||5);
-  const util = cap > 0 ? Math.round((reqs/cap)*100) : 0;
-  document.getElementById("sTotal").textContent = total;
-  document.getElementById("sActive").textContent = total - banned;
+  const lim    = parseInt(document.getElementById("sLimit").textContent)||5;
+  const total  = allKeys.length;
+  const banned = allKeys.filter(k=>k.banned).length;
+  const reqs   = allKeys.reduce((a,k)=>a+(k.usedToday||0),0);
+  const cap    = total*lim;
+  document.getElementById("sTotal").textContent  = total;
+  document.getElementById("sActive").textContent = total-banned;
   document.getElementById("sBanned").textContent = banned;
-  document.getElementById("sReqs").textContent = reqs;
-  document.getElementById("sUtil").textContent = util + "%";
+  document.getElementById("sReqs").textContent   = reqs;
+  document.getElementById("sUtil").textContent   = cap>0?Math.round((reqs/cap)*100)+"%":"—";
 }
 
-// ── RENDER TABLE ──
 function renderTable() {
-  let data = [...allKeys];
   const lim = parseInt(document.getElementById("sLimit").textContent)||5;
-  if (filterMode==="active") data = data.filter(k=>!k.banned);
-  else if (filterMode==="banned") data = data.filter(k=>k.banned);
-  else if (filterMode==="heavy") data = data.filter(k=>(k.usedToday||0)>=(lim*0.6));
-  else if (filterMode==="maxed") data = data.filter(k=>(k.usedToday||0)>=(k.dailyLimit||lim));
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    data = data.filter(k => k.key.toLowerCase().includes(q)||(k.email||"").toLowerCase().includes(q)||(k.name||"").toLowerCase().includes(q));
+  let data = [...allKeys];
+  if (filterMode==="active")  data=data.filter(k=>!k.banned);
+  else if(filterMode==="banned") data=data.filter(k=>k.banned);
+  else if(filterMode==="heavy")  data=data.filter(k=>(k.usedToday||0)>=(lim*.6));
+  else if(filterMode==="maxed")  data=data.filter(k=>(k.usedToday||0)>=(k.dailyLimit||lim));
+  if (searchQ) {
+    const q=searchQ.toLowerCase();
+    data=data.filter(k=>k.key.toLowerCase().includes(q)||(k.email||"").toLowerCase().includes(q)||(k.name||"").toLowerCase().includes(q));
   }
   data.sort((a,b)=>{
     let av=a[sortField]??0, bv=b[sortField]??0;
@@ -593,259 +594,387 @@ function renderTable() {
     if(av>bv) return sortDir==="asc"?1:-1;
     return 0;
   });
-  document.getElementById("tableCount").textContent = `${data.length} of ${allKeys.length} users`;
-  const tbody = document.getElementById("keysBody");
-  if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="table-msg">No users match filter.</td></tr>'; return; }
-  tbody.innerHTML="";
-  const lp = parseInt(document.getElementById("sLimit").textContent)||5;
+  document.getElementById("tableCount").textContent=`${data.length} of ${allKeys.length} users`;
+  const tb = document.getElementById("keysBody");
+  if (!data.length) { tb.innerHTML='<tr><td colspan="7" class="tm">No users match filter.</td></tr>'; return; }
+  tb.innerHTML="";
   for (const k of data) {
-    const used = k.usedToday||0;
-    const limit = k.dailyLimit || lp;
-    const pct = Math.min(100,(used/limit)*100);
-    const barClass = pct>=100?"danger":pct>=60?"warn":"";
-    const d = k.created ? new Date(k.created).toLocaleDateString() : "—";
-    const isNew = k.created && (Date.now()-k.created)<86400000;
+    const used  = k.usedToday||0;
+    const limit = k.dailyLimit||lim;
+    const pct   = Math.min(100,(used/limit)*100);
+    const bc    = pct>=100?"d":pct>=60?"w":"";
+    const ds    = k.created?new Date(k.created).toLocaleDateString():"—";
+    const isNew = k.created&&(Date.now()-k.created)<86400000;
     const tr = document.createElement("tr");
-    if (k.banned) tr.className="banned";
-    tr.innerHTML = `
-      <td><div class="td-key">${k.key}</div></td>
-      <td><div class="td-name">${k.name||"—"}</div><div class="td-email">${k.email||"—"}</div></td>
+    if(k.banned) tr.className="banned";
+    tr.innerHTML=`
+      <td><div class="tk">${k.key}</div></td>
+      <td><div class="tn">${k.name||"—"}</div><div class="te">${k.email||"—"}</div></td>
       <td>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem">${used} / ${limit}</div>
-        <div class="mini-bar-bg"><div class="mini-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem">${used}/${limit}</div>
+        <div class="mb"><div class="mbf ${bc}" style="width:${pct}%"></div></div>
       </td>
       <td>
-        <div class="quota-inline">
-          <span style="font-size:0.65rem;color:var(--muted)">+</span>
-          <input class="quota-input" type="number" min="1" max="100" value="5" id="qi_${k.key.replace(/-/g,'_')}"/>
-          <button class="btn-cmd green sm" onclick="boostQuota('${k.key}')">Go</button>
-          <button class="btn-cmd cyan sm" onclick="resetUsage('${k.key}')">Reset</button>
+        <div class="qi-row">
+          <span style="font-size:.6rem;color:var(--muted)">+</span>
+          <input class="qi" type="number" min="1" max="200" value="5" id="qi_${k.key.replace(/-/g,'_')}"/>
+          <button class="btn g sm" onclick="boostQuota('${k.key}')">Boost</button>
+          <button class="btn c sm" onclick="resetUsage('${k.key}')">Reset</button>
         </div>
       </td>
-      <td style="font-size:0.65rem;color:var(--muted)">${d}${isNew?` <span class="badge badge-new">NEW</span>`:""}</td>
-      <td>${k.banned?'<span class="badge badge-banned">Banned</span>':'<span class="badge badge-active">Active</span>'}</td>
-      <td>
-        <div class="action-cell">
-          <button class="btn-cmd sm ${k.banned?"cyan":"red"}" onclick="toggleBan('${k.key}',${k.banned})">${k.banned?"Unban":"Ban"}</button>
-        </div>
-      </td>
+      <td style="font-size:.62rem;color:var(--muted)">${ds}${isNew?` <span class="badge bn">NEW</span>`:""}</td>
+      <td>${k.banned?'<span class="badge bb2">Banned</span>':'<span class="badge ba">Active</span>'}</td>
+      <td><div class="ac"><button class="btn sm ${k.banned?"c":"r"}" onclick="toggleBan('${k.key}',${k.banned})">${k.banned?"Unban":"Ban"}</button></div></td>
     `;
-    tbody.appendChild(tr);
+    tb.appendChild(tr);
   }
 }
 
-// ── SORT ──
-document.querySelectorAll("th[data-sort]").forEach(th => {
-  th.addEventListener("click", () => {
-    const f = th.dataset.sort;
-    if (sortField===f) sortDir=sortDir==="asc"?"desc":"asc";
-    else { sortField=f; sortDir="desc"; }
-    document.querySelectorAll("th").forEach(t=>t.classList.remove("sort-asc","sort-desc"));
-    th.classList.add(sortDir==="asc"?"sort-asc":"sort-desc");
+// Sort headers
+document.querySelectorAll("th[data-sort]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const f=th.dataset.sort;
+    if(sortField===f) sortDir=sortDir==="asc"?"desc":"asc"; else{sortField=f;sortDir="desc";}
+    document.querySelectorAll("th").forEach(t=>t.classList.remove("sa","sd"));
+    th.classList.add(sortDir==="asc"?"sa":"sd");
     renderTable();
   });
 });
 
-// ── FILTER / SEARCH ──
-document.getElementById("filterTabs").addEventListener("click", e => {
-  const tab = e.target.closest(".filter-tab"); if(!tab) return;
-  document.querySelectorAll(".filter-tab").forEach(t=>t.classList.remove("active"));
-  tab.classList.add("active"); filterMode=tab.dataset.filter; renderTable();
+// Filter
+document.getElementById("fts").addEventListener("click",e=>{
+  const t=e.target.closest(".ft"); if(!t) return;
+  document.querySelectorAll(".ft").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active"); filterMode=t.dataset.f; renderTable();
 });
-document.getElementById("searchInput").addEventListener("input", e => { searchQuery=e.target.value.trim(); renderTable(); });
-document.getElementById("btnRefreshKeys").addEventListener("click", loadKeys);
+document.getElementById("searchIn").addEventListener("input",e=>{searchQ=e.target.value.trim();renderTable();});
+document.getElementById("btnRefKeys").addEventListener("click",loadKeys);
 
-// ── BAN ──
+// User actions
 async function toggleBan(key, banned) {
-  log(`${banned?"Unbanning":"Banning"}: ${key.slice(0,18)}...`, "warn");
+  log(`${banned?"Unbanning":"Banning"}: ${key.slice(0,18)}...`,"warn");
   try {
-    const r = await api("/admin/ban", { method:"POST", body:JSON.stringify({key,banned:!banned}) });
-    const d = await r.json();
-    if (d.ok) { log(`${banned?"Unbanned":"Banned"}: ${key.slice(0,18)}`, "ok"); const k=allKeys.find(x=>x.key===key); if(k) k.banned=!banned; updateStats(); renderTable(); }
-    else log("Failed: " + d.error, "err");
-  } catch(err) { log("Error: "+err.message,"err"); }
+    const r=await api("/admin/ban",{method:"POST",body:JSON.stringify({key,banned:!banned})});
+    const d=await r.json();
+    if(d.ok){log(`${banned?"Unbanned":"Banned"}: ${key.slice(0,16)}...`,"ok");const k=allKeys.find(x=>x.key===key);if(k)k.banned=!banned;updateStats();renderTable();}
+    else log("Failed: "+d.error,"err");
+  } catch(e){log("Error: "+e.message,"err");}
 }
-
-// ── QUOTA BOOST ──
 async function boostQuota(key) {
-  const id = "qi_"+key.replace(/-/g,"_");
-  const bonus = parseInt(document.getElementById(id)?.value)||5;
-  log(`Boosting ${key.slice(0,18)}... +${bonus}`, "info");
+  const bonus=parseInt(document.getElementById("qi_"+key.replace(/-/g,"_"))?.value)||5;
+  log(`Boosting ${key.slice(0,16)}... +${bonus}`,"info");
   try {
-    const r = await api("/admin/quota",{method:"POST",body:JSON.stringify({key,bonus})});
-    const d = await r.json();
-    if (d.ok) { log(`Boosted. New daily limit: ${d.newDailyLimit}`, "ok"); const k=allKeys.find(x=>x.key===key); if(k) k.dailyLimit=d.newDailyLimit; renderTable(); }
+    const r=await api("/admin/quota",{method:"POST",body:JSON.stringify({key,bonus})});
+    const d=await r.json();
+    if(d.ok){log(`Boosted. New limit: ${d.newDailyLimit}`,"ok");const k=allKeys.find(x=>x.key===key);if(k)k.dailyLimit=d.newDailyLimit;renderTable();}
     else log("Failed: "+d.error,"err");
-  } catch(err) { log("Error: "+err.message,"err"); }
+  } catch(e){log("Error: "+e.message,"err");}
 }
-
-// ── RESET USAGE ──
 async function resetUsage(key) {
-  if (!confirm(`Reset today's usage for ${key.slice(0,20)}...?`)) return;
-  log(`Resetting usage: ${key.slice(0,18)}...`, "warn");
+  if(!confirm(`Reset today's usage for ${key.slice(0,20)}...?`)) return;
+  log(`Resetting usage: ${key.slice(0,16)}...`,"warn");
   try {
-    const r = await api("/admin/resetusage",{method:"POST",body:JSON.stringify({key})});
-    const d = await r.json();
-    if (d.ok) { log("Reset complete.", "ok"); const k=allKeys.find(x=>x.key===key); if(k) k.usedToday=0; updateStats(); renderTable(); }
+    const r=await api("/admin/resetusage",{method:"POST",body:JSON.stringify({key})});
+    const d=await r.json();
+    if(d.ok){log("Reset complete.","ok");const k=allKeys.find(x=>x.key===key);if(k)k.usedToday=0;updateStats();renderTable();}
     else log("Failed: "+d.error,"err");
-  } catch(err) { log("Error: "+err.message,"err"); }
+  } catch(e){log("Error: "+e.message,"err");}
 }
 
-// ── MASTER KEY ──
-document.getElementById("btnUpdateMK").addEventListener("click", async () => {
-  const key = document.getElementById("masterKeyInput").value.trim();
-  const sl = document.getElementById("mkStatus");
-  if (!key||key.length<8){sl.textContent="Key too short.";sl.className="status-line err";return;}
-  sl.textContent="Sending...";sl.className="status-line";
-  log("Updating master key...","warn");
+// ── TRIAL KEYS ────────────────────────────────────────────────
+document.getElementById("btnGenTrial").addEventListener("click", async()=>{
+  const label=document.getElementById("tLabel").value.trim();
+  const quota=parseInt(document.getElementById("tQuota").value)||10;
+  const dur=parseInt(document.getElementById("tDur").value)||24;
+  const sl=document.getElementById("trialSL");
+  sl.textContent="Generating..."; sl.className="sl";
+  log(`Generating trial: "${label||"unlabeled"}" ${quota}req ${dur}h`,"info");
   try {
-    const r = await api("/admin/masterkey",{method:"POST",body:JSON.stringify({masterKey:key})});
-    const d = await r.json();
-    if(d.ok){sl.textContent="Master key updated in KV. Active immediately.";sl.className="status-line ok";document.getElementById("masterKeyInput").value="";log("Master key updated.","ok");}
-    else{sl.textContent=d.error;sl.className="status-line err";}
-  } catch(err){sl.textContent=err.message;sl.className="status-line err";}
-});
-
-// ── GLOBAL LIMIT ──
-document.getElementById("btnSetGlobalLimit").addEventListener("click", async () => {
-  const limit = parseInt(document.getElementById("globalLimitInput").value);
-  const sl = document.getElementById("globalLimitStatus");
-  if(!limit||limit<1||limit>500){sl.textContent="Must be 1–500.";sl.className="status-line err";return;}
-  sl.textContent="Applying...";sl.className="status-line";
-  log(`Setting global limit to ${limit}...`,"warn");
-  try {
-    const r = await api("/admin/globallimit",{method:"POST",body:JSON.stringify({limit})});
-    const d = await r.json();
+    const r=await api("/admin/tempkey",{method:"POST",body:JSON.stringify({label,quota,durationHours:dur})});
+    const d=await r.json();
     if(d.ok){
-      sl.textContent=`Global limit set to ${limit} req/day. All users affected immediately.`;sl.className="status-line ok";
-      document.getElementById("sLimit").textContent=limit;
-      document.getElementById("currentLimitDisplay").textContent=limit+" req/day";
-      log(`Global limit set: ${limit}/day`,"ok");
-    } else {sl.textContent=d.error;sl.className="status-line err";}
-  } catch(err){sl.textContent=err.message;sl.className="status-line err";}
-});
-
-// ── ANNOUNCEMENT ──
-document.getElementById("btnAnnouncement").addEventListener("click", async () => {
-  const msg = document.getElementById("announcementInput").value.trim();
-  const sl = document.getElementById("announcementStatus");
-  sl.textContent="Broadcasting...";sl.className="status-line";
-  try {
-    const r = await api("/admin/announcement",{method:"POST",body:JSON.stringify({message:msg})});
-    const d = await r.json();
-    if(d.ok){
-      sl.textContent = msg ? `Announcement live: "${msg.slice(0,40)}..."` : "Announcement cleared.";
-      sl.className="status-line ok";
-      log(msg?"Announcement set.":"Announcement cleared.","ok");
-    } else {sl.textContent=d.error;sl.className="status-line err";}
-  } catch(err){sl.textContent=err.message;sl.className="status-line err";}
-});
-
-// ── TRIAL KEYS ──
-document.getElementById("btnGenTrial").addEventListener("click", async () => {
-  const label = document.getElementById("trialLabel").value.trim();
-  const quota = parseInt(document.getElementById("trialQuota").value)||10;
-  const durationHours = parseInt(document.getElementById("trialDuration").value)||24;
-  const sl = document.getElementById("trialGenStatus");
-  sl.textContent="Generating...";sl.className="status-line";
-  log(`Generating trial key: "${label||"unlabeled"}" ${quota}req ${durationHours}h`,"info");
-  try {
-    const r = await api("/admin/tempkey",{method:"POST",body:JSON.stringify({label,quota,durationHours})});
-    const d = await r.json();
-    if(d.ok){
-      sl.textContent=`Trial key generated. Expires in ${durationHours}h.`;sl.className="status-line ok";
-      document.getElementById("newTrialKeyDisplay").textContent = d.key;
+      sl.textContent=`Trial key generated — ${dur}h expiry, ${quota} requests.`; sl.className="sl ok";
+      document.getElementById("newTrialKey").textContent=d.key;
       document.getElementById("newTrialBlock").style.display="";
-      document.getElementById("btnCopyTrial").onclick = () => {
+      document.getElementById("btnCopyTrial").onclick=()=>{
         navigator.clipboard.writeText(d.key).then(()=>{
-          document.getElementById("copyTrialStatus").textContent="Copied!";
-          setTimeout(()=>document.getElementById("copyTrialStatus").textContent="",2000);
+          document.getElementById("trialCopySt").textContent="Copied!";
+          setTimeout(()=>document.getElementById("trialCopySt").textContent="",2000);
         });
       };
-      log(`Trial key: ${d.key.slice(0,20)}... (${quota}req, ${durationHours}h)`,"ok");
+      log("Trial key: "+d.key.slice(0,22)+"...","ok");
       loadTrialKeys();
-    } else {sl.textContent=d.error;sl.className="status-line err";}
-  } catch(err){sl.textContent=err.message;sl.className="status-line err";}
+    } else {sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
 });
 
-document.getElementById("btnRefreshTrials").addEventListener("click", loadTrialKeys);
-
+document.getElementById("btnRefTrials").addEventListener("click", loadTrialKeys);
 async function loadTrialKeys() {
-  const container = document.getElementById("trialKeysList");
-  container.innerHTML='<div class="table-msg">Loading...</div>';
+  const c=document.getElementById("trialList"); c.innerHTML='<div class="tm">Loading...</div>';
   try {
-    const r = await api("/admin/tempkeys");
-    const d = await r.json();
-    if(!r.ok){container.innerHTML=`<div class="table-msg" style="color:var(--red)">${d.error}</div>`;return;}
-    const keys = d.keys||[];
-    if(!keys.length){container.innerHTML='<div class="table-msg">No active trial keys.</div>';return;}
-    container.innerHTML="";
+    const r=await api("/admin/tempkeys"); const d=await r.json();
+    if(!r.ok){c.innerHTML=`<div class="tm" style="color:var(--red)">${d.error}</div>`;return;}
+    const keys=d.keys||[];
+    if(!keys.length){c.innerHTML='<div class="tm">No active trial keys.</div>';return;}
+    c.innerHTML="";
     for(const k of keys){
-      const now=Date.now();
-      const total=k.expiresAt-k.created;
-      const elapsed=now-k.created;
+      const now=Date.now(),total=k.expiresAt-k.created,elapsed=now-k.created;
       const pct=Math.min(100,Math.max(0,(elapsed/total)*100));
+      const rem=Math.max(0,k.expiresAt-now);
+      const remH=Math.floor(rem/3600000),remM=Math.floor((rem%3600000)/60000);
       const expired=now>k.expiresAt;
-      const remMs=Math.max(0,k.expiresAt-now);
-      const remH=Math.floor(remMs/3600000);const remM=Math.floor((remMs%3600000)/60000);
-      const card=document.createElement("div"); card.className="temp-key-card";
+      const card=document.createElement("div"); card.className="tkc";
       card.innerHTML=`
-        <div class="temp-key-val">${k.key}</div>
-        <div class="temp-key-meta">
-          Label: <span>${k.label||"—"}</span> · 
-          Quota: <span>${k.usedToday||0} / ${k.quota} used today</span> · 
-          ${expired?'<span style="color:var(--red)">EXPIRED</span>':`Expires in: <span>${remH}h ${remM}m</span>`}
-        </div>
-        <div class="expiry-bar-bg"><div class="expiry-bar-fill" style="width:${pct}%;background:${pct>80?'var(--red)':'var(--warn)'}"></div></div>
-        <div class="btn-row" style="margin-top:0.6rem">
-          <button class="btn-cmd red sm" onclick="revokeTrialKey('${k.key}',this)">Revoke</button>
-          <button class="btn-cmd sm" onclick="navigator.clipboard.writeText('${k.key}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
+        <div class="tkv">${k.key}</div>
+        <div class="tkm">Label: <span>${k.label||"—"}</span> · Used today: <span>${k.usedToday||0}/${k.quota}</span> · ${expired?'<span style="color:var(--red)">EXPIRED</span>':`Expires: <span>${remH}h ${remM}m</span>`}</div>
+        <div class="ebar"><div class="ebf" style="width:${pct}%;background:${pct>80?'var(--red)':'var(--warn)'}"></div></div>
+        <div class="btn-row" style="margin-top:.5rem">
+          <button class="btn r sm" onclick="revokeKey('${k.key}',this)">Revoke</button>
+          <button class="btn sm" onclick="navigator.clipboard.writeText('${k.key}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
         </div>
       `;
-      container.appendChild(card);
+      c.appendChild(card);
     }
-  } catch(err){container.innerHTML=`<div class="table-msg" style="color:var(--red)">${err.message}</div>`;}
+  } catch(e){c.innerHTML=`<div class="tm" style="color:var(--red)">${e.message}</div>`;}
 }
-
-async function revokeTrialKey(key, btn) {
-  if (!confirm(`Revoke trial key ${key.slice(0,20)}...?`)) return;
+async function revokeKey(key, btn) {
+  if(!confirm(`Revoke ${key.slice(0,22)}...?`)) return;
   btn.disabled=true; btn.textContent="...";
-  log(`Revoking trial key: ${key.slice(0,20)}...`,"warn");
   try {
-    const r = await api("/admin/tempkey",{method:"DELETE",body:JSON.stringify({key})});
-    const d = await r.json();
+    const r=await api("/admin/tempkey",{method:"DELETE",body:JSON.stringify({key})});
+    const d=await r.json();
     if(d.ok){log("Trial key revoked.","ok");loadTrialKeys();}
-    else{btn.disabled=false;btn.textContent="Revoke";log("Failed: "+d.error,"err");}
-  } catch(err){btn.disabled=false;btn.textContent="Revoke";log("Error: "+err.message,"err");}
+    else{btn.disabled=false;btn.textContent="Revoke";}
+  } catch(e){btn.disabled=false;btn.textContent="Revoke";}
 }
 
-// ── MODEL STATUS ──
-document.getElementById("btnSetModelStatus").addEventListener("click", async () => {
-  const modelId = document.getElementById("modelIdInput").value.trim();
-  const status = document.getElementById("modelStatusSelect").value;
-  const sl = document.getElementById("modelStatusLine");
-  if (!modelId){sl.textContent="Enter a model ID.";sl.className="status-line err";return;}
-  sl.textContent="Applying...";sl.className="status-line";
+// ── MODEL STATUS ──────────────────────────────────────────────
+document.getElementById("btnSetMS").addEventListener("click", async()=>{
+  const modelId=document.getElementById("mIdIn").value.trim();
+  const status=document.getElementById("mStatusSel").value;
+  const sl=document.getElementById("msSL");
+  if(!modelId){sl.textContent="Enter a model ID.";sl.className="sl err";return;}
+  sl.textContent="Applying..."; sl.className="sl";
   try {
-    const r = await api("/admin/modelstatus",{method:"POST",body:JSON.stringify({modelId,status})});
-    const d = await r.json();
-    if(d.ok){sl.textContent=`${modelId} set to "${status}".`;sl.className="status-line ok";log(`Model ${modelId} → ${status}`,"ok");document.getElementById("modelIdInput").value="";loadModelOverrides();}
-    else{sl.textContent=d.error;sl.className="status-line err";}
-  } catch(err){sl.textContent=err.message;sl.className="status-line err";}
+    const r=await api("/admin/modelstatus",{method:"POST",body:JSON.stringify({modelId,status})});
+    const d=await r.json();
+    if(d.ok){sl.textContent=`${modelId} → "${status}"`;sl.className="sl ok";log(`Model status: ${modelId} = ${status}`,"ok");document.getElementById("mIdIn").value="";loadModelOverrides();}
+    else{sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
 });
 
+document.getElementById("btnRefMO").addEventListener("click", loadModelOverrides);
 async function loadModelOverrides() {
-  // We can't directly list KV by prefix from frontend alone, but we piggyback on the models list
-  // shown via /v1/models with a dummy approach: fetch the model list and show non-available ones
-  const container = document.getElementById("modelOverridesList");
-  container.innerHTML='<div class="table-msg">Checking for overrides...</div>';
+  const c=document.getElementById("moList"); c.innerHTML='<div class="tm">Loading...</div>';
   try {
-    // Use master key check via status
-    const r = await fetch(WORKER_URL+"/status");
-    const d = await r.json();
-    // We can't list KV prefixes from the frontend, but the admin can see what they've set in the log
-    container.innerHTML='<div class="table-msg">Overrides are stored in KV. Set or update above. Use the Models page to verify how users see each model.</div>';
-  } catch { container.innerHTML='<div class="table-msg">Could not fetch overrides.</div>'; }
+    const r=await api("/admin/modeloverrides"); const d=await r.json();
+    if(!r.ok){c.innerHTML=`<div class="tm" style="color:var(--red)">${d.error}</div>`;return;}
+    const ov=d.overrides||[];
+    if(!ov.length){c.innerHTML='<div class="tm">No overrides set. All models show as Available.</div>';return;}
+    c.innerHTML="";
+    for(const o of ov){
+      const card=document.createElement("div"); card.className="mocard";
+      card.innerHTML=`
+        <div class="mo-dot ${o.status}"></div>
+        <div class="mo-id">${o.modelId}</div>
+        <span class="badge ${o.status==="degraded"?"bw":"bb2"}">${o.status==="degraded"?"⚡ DEGRADED":"✕ DOWN"}</span>
+        <button class="btn sm c" onclick="clearModelOverride('${o.modelId}',this)">Clear →</button>
+      `;
+      c.appendChild(card);
+    }
+  } catch(e){c.innerHTML=`<div class="tm" style="color:var(--red)">${e.message}</div>`;}
+}
+async function clearModelOverride(modelId, btn) {
+  btn.disabled=true;
+  try {
+    const r=await api("/admin/modelstatus",{method:"POST",body:JSON.stringify({modelId,status:"available"})});
+    const d=await r.json();
+    if(d.ok){log(`Cleared override: ${modelId}`,"ok");loadModelOverrides();}
+    else btn.disabled=false;
+  } catch{btn.disabled=false;}
+}
+
+// Model preview
+document.getElementById("btnPreviewModels").addEventListener("click", async()=>{
+  const key=document.getElementById("previewKeyIn").value.trim();
+  const area=document.getElementById("modelPreviewArea");
+  if(!key){area.innerHTML='<div class="tm">Enter an ADO key to preview.</div>';return;}
+  area.innerHTML='<div class="tm">Loading...</div>';
+  try {
+    const r=await fetch(WORKER_URL+"/v1/models",{headers:{"Authorization":"Bearer "+key}});
+    const d=await r.json();
+    if(!r.ok){area.innerHTML=`<div class="tm" style="color:var(--red)">${d.error||"Error"}</div>`;return;}
+    const models=d.data||[];
+    if(!models.length){area.innerHTML='<div class="tm">No models returned.</div>';return;}
+    const avail=models.filter(m=>!m.ado_status||m.ado_status==="available").length;
+    const down=models.filter(m=>m.ado_status==="down").length;
+    const deg=models.filter(m=>m.ado_status==="degraded").length;
+    area.innerHTML=`
+      <div style="font-size:.68rem;color:var(--muted);margin-bottom:.75rem">${models.length} models · <span style="color:var(--green)">${avail} available</span> · <span style="color:var(--warn)">${deg} degraded</span> · <span style="color:var(--red)">${down} down</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem">
+        ${models.map(m=>`<div style="background:var(--panel2);border:1px solid var(--wire);padding:.4rem .6rem;font-size:.62rem;color:var(--cyan);font-family:'Share Tech Mono',monospace;word-break:break-all">${m.id}${m.ado_status&&m.ado_status!=="available"?` <span style="color:${m.ado_status==="down"?"var(--red)":"var(--warn)"}">·${m.ado_status}</span>`:""}</div>`).join("")}
+      </div>
+    `;
+  } catch(e){area.innerHTML=`<div class="tm" style="color:var(--red)">${e.message}</div>`;}
+});
+
+// ── PROVIDERS ─────────────────────────────────────────────────
+document.getElementById("btnAddProvider").addEventListener("click", async()=>{
+  const name=document.getElementById("pName").value.trim();
+  const url=document.getElementById("pUrl").value.trim();
+  const key=document.getElementById("pKey").value.trim();
+  const sl=document.getElementById("pSL");
+  if(!name||!url||!key){sl.textContent="All three fields required.";sl.className="sl err";return;}
+  sl.textContent="Adding..."; sl.className="sl";
+  try {
+    const r=await api("/admin/providers",{method:"POST",body:JSON.stringify({name,baseUrl:url,apiKey:key})});
+    const d=await r.json();
+    if(d.ok){sl.textContent=`Added: ${name}`;sl.className="sl ok";log("Provider added: "+name,"ok");
+      document.getElementById("pName").value="";document.getElementById("pUrl").value="";document.getElementById("pKey").value="";
+      loadProviders();}
+    else{sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
+});
+
+document.getElementById("btnRefProviders").addEventListener("click",loadProviders);
+async function loadProviders() {
+  const c=document.getElementById("providerList"); c.innerHTML='<div class="tm">Loading...</div>';
+  try {
+    const r=await api("/admin/providers"); const d=await r.json();
+    if(!r.ok){c.innerHTML=`<div class="tm" style="color:var(--red)">${d.error}</div>`;return;}
+    const providers=d.providers||[];
+    if(!providers.length){
+      c.innerHTML='<div class="tm">No providers saved yet. The default Bluesminds env var is used until you add and switch to a saved provider.</div>';return;
+    }
+    c.innerHTML="";
+    for(const p of providers){
+      const card=document.createElement("div");
+      card.className="pcard"+(p.isActive?" active-p":"");
+      card.innerHTML=`
+        <div class="pc-led ${p.isActive?"on":"off"}"></div>
+        <div class="pc-info">
+          <div class="pc-name">${p.name}${p.isActive?' <span class="badge ba" style="font-size:.54rem">ACTIVE</span>':""}</div>
+          <div class="pc-url">${p.baseUrl}</div>
+          <div class="pc-key">Key: ${p.apiKey}</div>
+        </div>
+        <div class="btn-row">
+          ${!p.isActive?`<button class="btn g sm" onclick="switchProvider('${p.id}',this)">Switch →</button>`:""}
+          <button class="btn r sm" onclick="removeProvider('${p.id}',this)">Remove</button>
+        </div>
+      `;
+      c.appendChild(card);
+    }
+  } catch(e){c.innerHTML=`<div class="tm" style="color:var(--red)">${e.message}</div>`;}
+}
+
+async function switchProvider(id, btn) {
+  if(!confirm("Switch active provider? This instantly routes all traffic to the new provider.")) return;
+  btn.disabled=true; btn.textContent="Switching...";
+  log("Switching active provider: "+id,"warn");
+  try {
+    const r=await api("/admin/providers/switch",{method:"POST",body:JSON.stringify({id})});
+    const d=await r.json();
+    if(d.ok){log(`Switched to: ${d.switched} (${d.baseUrl})`,"ok");loadProviders();}
+    else{log("Failed: "+d.error,"err");btn.disabled=false;btn.textContent="Switch →";}
+  } catch(e){log("Error: "+e.message,"err");btn.disabled=false;btn.textContent="Switch →";}
+}
+
+async function removeProvider(id, btn) {
+  if(!confirm("Remove this provider?")) return;
+  btn.disabled=true;
+  try {
+    const r=await api("/admin/providers",{method:"DELETE",body:JSON.stringify({id})});
+    const d=await r.json();
+    if(d.ok){log("Provider removed.","ok");loadProviders();}
+    else btn.disabled=false;
+  } catch{btn.disabled=false;}
+}
+
+// ── SYSTEM ────────────────────────────────────────────────────
+document.getElementById("btnMK").addEventListener("click", async()=>{
+  const key=document.getElementById("mkIn").value.trim();
+  const sl=document.getElementById("mkSL");
+  if(!key||key.length<8){sl.textContent="Key too short.";sl.className="sl err";return;}
+  sl.textContent="Updating..."; sl.className="sl";
+  log("Updating master key...","warn");
+  try {
+    const r=await api("/admin/masterkey",{method:"POST",body:JSON.stringify({masterKey:key})});
+    const d=await r.json();
+    if(d.ok){sl.textContent="Master key updated. Active immediately.";sl.className="sl ok";document.getElementById("mkIn").value="";log("Master key updated.","ok");}
+    else{sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
+});
+
+document.getElementById("btnGL").addEventListener("click", async()=>{
+  const limit=parseInt(document.getElementById("glIn").value);
+  const sl=document.getElementById("glSL");
+  if(!limit||limit<1||limit>9999){sl.textContent="Must be 1–9999.";sl.className="sl err";return;}
+  sl.textContent="Applying..."; sl.className="sl";
+  log(`Setting global limit to ${limit}...`,"warn");
+  try {
+    const r=await api("/admin/globallimit",{method:"POST",body:JSON.stringify({limit})});
+    const d=await r.json();
+    if(d.ok){
+      sl.textContent=`Global limit: ${limit} req/day. Affects all users immediately.`;sl.className="sl ok";
+      document.getElementById("sLimit").textContent=limit;
+      document.getElementById("glCurrent").textContent=limit+" req/day";
+      log("Global limit set: "+limit+"/day","ok");
+    } else{sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
+});
+
+document.getElementById("btnAnno").addEventListener("click", async()=>{
+  const msg=document.getElementById("annoInput").value.trim();
+  const sl=document.getElementById("annoSL");
+  sl.textContent="Broadcasting..."; sl.className="sl";
+  try {
+    const r=await api("/admin/announcement",{method:"POST",body:JSON.stringify({message:msg})});
+    const d=await r.json();
+    if(d.ok){
+      sl.textContent=msg?`Live: "${msg.slice(0,50)}..."`: "Announcement cleared.";sl.className="sl ok";
+      document.getElementById("currentAnno").textContent=msg?`Current: "${msg}"`:"(No announcement)";
+      log(msg?"Announcement set.":"Announcement cleared.","ok");
+    } else{sl.textContent=d.error;sl.className="sl err";}
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
+});
+
+document.getElementById("btnCheckCredits").addEventListener("click", async()=>{
+  const sl=document.getElementById("creditsSL");
+  const box=document.getElementById("creditsBox");
+  const display=document.getElementById("creditsDisplay");
+  sl.textContent="Probing endpoints..."; sl.className="sl";
+  display.style.display="none"; box.innerHTML="";
+  log("Probing provider credit endpoints...","info");
+  try {
+    const r=await api("/admin/credits");
+    const d=await r.json();
+    display.style.display="";
+    if(d.ok){
+      sl.textContent=`Found at: ${d.endpoint}`;sl.className="sl ok";
+      log("Credits data found at: "+d.endpoint,"ok");
+      box.innerHTML=formatJSON(d.data);
+    } else {
+      sl.textContent="No billing endpoint found — provider likely doesn't expose credit info.";sl.className="sl w";
+      log("No credit endpoint found.","warn");
+      box.innerHTML=`<span style="color:var(--muted)">${d.message||"No data available."}\n\nEndpoints probed:\n${(d.probed||[]).map(p=>typeof p==="string"?p:`${p.endpoint} → HTTP ${p.status||"ERR"}`).join("\n")}</span>`;
+    }
+  } catch(e){sl.textContent=e.message;sl.className="sl err";}
+});
+
+function formatJSON(obj, indent=0) {
+  if (typeof obj !== "object" || obj===null) {
+    const s=JSON.stringify(obj);
+    return `<span class="v">${s}</span>`;
+  }
+  const isArr=Array.isArray(obj);
+  const entries=isArr?obj.map((_,i)=>[i,obj[i]]):Object.entries(obj);
+  if(!entries.length) return isArr?"[]":"{}";
+  const pad="  ".repeat(indent+1);
+  const inner=entries.map(([k,v])=>
+    isArr?`${pad}${formatJSON(v,indent+1)}`:
+    `${pad}<span class="k">"${k}"</span>: ${formatJSON(v,indent+1)}`
+  ).join(",\n");
+  return (isArr?`[\n${inner}\n`:`{\n${inner}\n`)+"  ".repeat(indent)+(isArr?"]":"}");
 }
 </script>
 </body>
