@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ADO Models — Available AI Models</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <title>ADO Models — What's Available</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
@@ -14,209 +14,224 @@
     }
     html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;}
     #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
-    .topnav{position:relative;z-index:10;display:flex;align-items:center;gap:1rem;padding:0.75rem 1.5rem;background:rgba(7,7,15,0.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);flex-wrap:wrap;}
-    .topnav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:0.2em;color:var(--accent);}
-    .topnav-title{font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;}
-    .topnav-spacer{flex:1;}
-    .nav-link{font-size:0.78rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:0.3rem 0.8rem;border-radius:6px;transition:all 0.15s;}
+    .topnav{position:relative;z-index:10;display:flex;align-items:center;gap:.75rem;padding:.7rem 1.4rem;background:rgba(7,7,15,.96);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);flex-wrap:wrap;}
+    .tnl{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.2em;color:var(--accent);}
+    .tnt{font-size:.72rem;color:var(--muted);letter-spacing:.06em;}
+    .tnsp{flex:1;}
+    .beta-pill{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);border-radius:99px;padding:1px 8px;font-size:.62rem;font-weight:800;color:var(--accent4);letter-spacing:.1em;}
+    .nav-link{font-size:.75rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:.28rem .75rem;border-radius:6px;transition:all .15s;}
     .nav-link:hover{border-color:var(--accent);color:var(--accent);}
-    .beta-pill{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.35);border-radius:99px;padding:1px 8px;font-size:0.65rem;font-weight:800;color:var(--accent4);letter-spacing:0.1em;}
-    .page{position:relative;z-index:1;padding:2rem 1rem 4rem;max-width:920px;margin:0 auto;}
-    .page-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:0.15em;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-    .page-sub{color:var(--muted);font-size:0.85rem;margin-top:0.3rem;margin-bottom:1.75rem;}
-    .key-bar{display:flex;gap:0.6rem;margin-bottom:1.5rem;flex-wrap:wrap;}
-    .key-input{flex:1;min-width:200px;padding:0.7rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
-    .key-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,132,252,0.1);}
-    .key-input::placeholder{color:var(--muted);}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.7rem 1.4rem;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.15s;}
-    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07070f;}
-    .btn-primary:hover:not(:disabled){box-shadow:0 4px 24px rgba(192,132,252,0.4);transform:translateY(-1px);}
-    .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-    .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
-    .btn-ghost:hover{border-color:var(--accent3);color:var(--accent3);}
-    .error-box{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:12px;padding:1rem 1.25rem;color:var(--error);font-size:0.85rem;line-height:1.6;margin-bottom:1.5rem;display:none;}
-    .error-box.visible{display:block;}
-    .error-box::before{content:'⚠ ';}
-    .status-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem;}
-    .status-cell{background:var(--surface);padding:1rem 1.2rem;}
-    .status-cell-label{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
-    .status-cell-val{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;}
-    .status-cell-val.green{color:var(--success);}
-    .status-cell-val.yellow{color:var(--warn);}
-    .status-cell-val.red{color:var(--error);}
-    .filter-row{display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
-    .filter-pill{padding:0.35rem 0.9rem;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
-    .filter-pill.active{background:var(--accent);border-color:var(--accent);color:#07070f;}
-    .filter-pill:hover:not(.active){border-color:var(--accent);color:var(--accent);}
-    .filter-spacer{flex:1;}
-    .model-count{font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace;}
-    .models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;}
-    .model-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;position:relative;overflow:hidden;transition:all 0.2s;}
-    .model-card:hover{border-color:var(--accent);box-shadow:0 4px 24px rgba(192,132,252,0.1);}
-    .model-card.degraded{border-color:rgba(251,146,60,0.3);}
-    .model-card.down{border-color:rgba(248,113,113,0.3);opacity:0.6;}
-    .model-card::before{content:'';position:absolute;top:-40px;right:-40px;width:100px;height:100px;background:radial-gradient(circle,rgba(192,132,252,0.06),transparent 70%);pointer-events:none;}
-    .model-top{display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.75rem;}
-    .model-name{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent3);word-break:break-all;line-height:1.5;flex:1;}
-    .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-    .status-dot.available{background:var(--success);box-shadow:0 0 8px var(--success);}
-    .status-dot.degraded{background:var(--warn);box-shadow:0 0 8px var(--warn);}
-    .status-dot.down{background:var(--error);box-shadow:0 0 8px var(--error);}
-    .model-badges{display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.75rem;}
-    .mbadge{font-size:0.62rem;padding:2px 7px;border-radius:99px;font-weight:700;}
-    .mbadge-available{background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:var(--success);}
-    .mbadge-degraded{background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:var(--warn);}
-    .mbadge-down{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--error);}
-    .mbadge-type{background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.2);color:var(--accent);}
-    .mbadge-ctx{background:rgba(103,232,249,0.07);border:1px solid rgba(103,232,249,0.18);color:var(--accent3);}
-    .model-meta{font-size:0.72rem;color:var(--muted);line-height:1.7;}
-    .model-meta strong{color:var(--text);}
-    .copy-btn{margin-top:0.9rem;width:100%;padding:0.45rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
-    .copy-btn:hover{border-color:var(--accent3);color:var(--accent3);}
-    .copy-btn.copied{border-color:var(--success);color:var(--success);}
-    .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:1rem;color:var(--muted);text-align:center;}
-    .state-icon{font-size:3rem;opacity:0.4;}
-    .state-title{font-size:1rem;font-weight:700;}
-    .state-sub{font-size:0.82rem;line-height:1.6;}
-    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+    .page{position:relative;z-index:1;padding:1.75rem 1rem 4rem;max-width:940px;margin:0 auto;}
+    .ph{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.15em;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .ps{color:var(--muted);font-size:.83rem;margin-top:.25rem;margin-bottom:1.6rem;line-height:1.6;}
+    .key-bar{display:flex;gap:.55rem;margin-bottom:1.4rem;flex-wrap:wrap;}
+    .ki{flex:1;min-width:180px;padding:.65rem .9rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:.8rem;outline:none;transition:border-color .2s;}
+    .ki:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(192,132,252,.1);}
+    .ki::placeholder{color:var(--muted);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.65rem 1.3rem;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.83rem;cursor:pointer;transition:all .15s;}
+    .btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07070f;}
+    .btn-p:hover:not(:disabled){box-shadow:0 4px 22px rgba(192,132,252,.4);transform:translateY(-1px);}
+    .btn-p:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-g{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+    .btn-g:hover{border-color:var(--accent3);color:var(--accent3);}
+    .err-box{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.22);border-radius:12px;padding:.9rem 1.1rem;color:var(--error);font-size:.83rem;line-height:1.6;margin-bottom:1.4rem;display:none;}
+    .err-box.vis{display:block;}
+    .err-box::before{content:'⚠ ';}
+    .info-box{background:rgba(103,232,249,.06);border:1px solid rgba(103,232,249,.18);border-radius:12px;padding:.8rem 1rem;font-size:.78rem;color:var(--accent3);margin-bottom:1.4rem;display:none;line-height:1.65;}
+    .info-box.vis{display:block;}
+    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.4rem;}
+    .sc{background:var(--surface);padding:.85rem 1.1rem;}
+    .sc-label{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.28rem;}
+    .sc-val{font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;}
+    .g{color:var(--success);} .y{color:var(--warn);} .r{color:var(--error);}
+    .filter-row{display:flex;gap:.45rem;margin-bottom:1.1rem;flex-wrap:wrap;align-items:center;}
+    .fp{padding:.3rem .85rem;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;}
+    .fp.active{background:var(--accent);border-color:var(--accent);color:#07070f;}
+    .fp:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+    .fsp{flex:1;} .mc{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.9rem;}
+    .mcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem;position:relative;overflow:hidden;transition:all .2s;}
+    .mcard:hover{border-color:var(--accent);box-shadow:0 4px 22px rgba(192,132,252,.09);}
+    .mcard.degraded{border-color:rgba(251,146,60,.3);}
+    .mcard.down{border-color:rgba(248,113,113,.3);opacity:.55;}
+    .mcard::before{content:'';position:absolute;top:-35px;right:-35px;width:90px;height:90px;background:radial-gradient(circle,rgba(192,132,252,.05),transparent 70%);pointer-events:none;}
+    .mt{display:flex;align-items:flex-start;justify-content:space-between;gap:.4rem;margin-bottom:.6rem;}
+    .mn{font-family:'Space Mono',monospace;font-size:.77rem;color:var(--accent3);word-break:break-all;line-height:1.5;flex:1;}
+    .sd{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+    .sd.available{background:var(--success);box-shadow:0 0 7px var(--success);}
+    .sd.degraded{background:var(--warn);box-shadow:0 0 7px var(--warn);}
+    .sd.down{background:var(--error);box-shadow:0 0 7px var(--error);}
+    .badges{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.6rem;}
+    .bdg{font-size:.6rem;padding:1px 6px;border-radius:99px;font-weight:700;}
+    .bdg-a{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.28);color:var(--success);}
+    .bdg-d{background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.28);color:var(--warn);}
+    .bdg-x{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);color:var(--error);}
+    .bdg-t{background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.2);color:var(--accent);}
+    .bdg-c{background:rgba(103,232,249,.07);border:1px solid rgba(103,232,249,.18);color:var(--accent3);}
+    .mm{font-size:.7rem;color:var(--muted);line-height:1.65;} .mm strong{color:var(--text);}
+    .cbtn{margin-top:.8rem;width:100%;padding:.4rem;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;}
+    .cbtn:hover{border-color:var(--accent3);color:var(--accent3);}
+    .cbtn.copied{border-color:var(--success);color:var(--success);}
+    .state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 2rem;gap:.85rem;color:var(--muted);text-align:center;}
+    .si{font-size:2.8rem;opacity:.35;} .st{font-size:.95rem;font-weight:700;} .ss{font-size:.8rem;line-height:1.6;}
+    .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
-    footer{color:var(--muted);font-size:0.75rem;text-align:center;margin-top:3rem;}
+    footer{color:var(--muted);font-size:.72rem;text-align:center;margin-top:2.5rem;}
     footer a{color:var(--accent);text-decoration:none;}
   </style>
 </head>
 <body>
 <canvas id="stars"></canvas>
 <div class="topnav">
-  <span class="topnav-logo">ADO</span>
+  <span class="tnl">ADO</span>
   <span style="color:var(--border)">//</span>
-  <span class="topnav-title">Model Lineup</span>
+  <span class="tnt">Model Lineup</span>
   <span class="beta-pill">BETA</span>
-  <span class="topnav-spacer"></span>
+  <span class="tnsp"></span>
   <a class="nav-link" href="index.html">← Dashboard</a>
 </div>
 <div class="page">
-  <div class="page-title">Available Models</div>
-  <p class="page-sub">Enter your ADO key to see the full roster. Model names copy directly into SillyTavern or JanitorAI.</p>
+  <div class="ph">Available Models</div>
+  <p class="ps">Enter your ADO key to see every model available from the current provider. Status dots show real-time admin overrides. Copy model names directly into SillyTavern or JanitorAI.<br>In SillyTavern, the model list loads <strong>automatically</strong> when you paste your ADO endpoint URL.</p>
+
   <div class="key-bar">
-    <input class="key-input" type="text" id="keyInput" placeholder="ADO-XXXXXX-XXXXXX-XXXXXX-XXXXXX" spellcheck="false"/>
-    <button class="btn btn-primary" id="btnLoad">Load Models</button>
-    <button class="btn btn-ghost" id="btnRefresh" style="display:none" title="Refresh">↻</button>
+    <input class="ki" type="text" id="keyIn" placeholder="ADO-XXXXXX-XXXXXX-XXXXXX-XXXXXX" spellcheck="false"/>
+    <button class="btn btn-p" id="btnLoad">Load Models</button>
+    <button class="btn btn-g" id="btnRef" style="display:none">↻ Refresh</button>
   </div>
-  <div class="error-box" id="errorBox"></div>
-  <div class="status-row" id="statusRow" style="display:none">
-    <div class="status-cell"><div class="status-cell-label">Total Models</div><div class="status-cell-val" id="sTotal">—</div></div>
-    <div class="status-cell"><div class="status-cell-label">Available</div><div class="status-cell-val green" id="sAvail">—</div></div>
-    <div class="status-cell"><div class="status-cell-label">Degraded</div><div class="status-cell-val yellow" id="sDeg">—</div></div>
-    <div class="status-cell"><div class="status-cell-label">Down</div><div class="status-cell-val red" id="sDown">—</div></div>
+
+  <div class="err-box" id="errBox"></div>
+  <div class="info-box" id="infoBox"></div>
+
+  <div class="stat-row" id="statRow" style="display:none">
+    <div class="sc"><div class="sc-label">Total</div><div class="sc-val" id="sTotal">—</div></div>
+    <div class="sc"><div class="sc-label">Available</div><div class="sc-val g" id="sAvail">—</div></div>
+    <div class="sc"><div class="sc-label">Degraded</div><div class="sc-val y" id="sDeg">—</div></div>
+    <div class="sc"><div class="sc-label">Down</div><div class="sc-val r" id="sDown">—</div></div>
   </div>
+
   <div class="filter-row" id="filterRow" style="display:none">
-    <button class="filter-pill active" data-f="all">All</button>
-    <button class="filter-pill" data-f="available">Available</button>
-    <button class="filter-pill" data-f="degraded">Degraded</button>
-    <button class="filter-pill" data-f="down">Down</button>
-    <span class="filter-spacer"></span>
-    <span class="model-count" id="mCount"></span>
+    <button class="fp active" data-f="all">All</button>
+    <button class="fp" data-f="available">Available</button>
+    <button class="fp" data-f="degraded">Degraded</button>
+    <button class="fp" data-f="down">Down</button>
+    <span class="fsp"></span>
+    <span class="mc" id="mCount"></span>
   </div>
-  <div id="modelsArea">
-    <div class="state-box">
-      <div class="state-icon">🎙</div>
-      <div class="state-title">Enter your ADO key above</div>
-      <div class="state-sub">The full model roster will appear here.<br>Copy model IDs directly into your app.</div>
+
+  <div id="area">
+    <div class="state">
+      <div class="si">🎙</div>
+      <div class="st">Enter your ADO key above</div>
+      <div class="ss">The full model roster appears here.<br>SillyTavern loads this list automatically when you paste your ADO endpoint.</div>
     </div>
   </div>
-  <footer>ADO LIVE Beta · <a href="index.html">Dashboard</a></footer>
+
+  <footer>ADO LIVE Beta · <a href="index.html">Dashboard</a> · Model data fetched live from active provider</footer>
 </div>
+
 <script>
+// ═══════════════════════════════════════════
+// PASTE YOUR WORKER URL HERE
+// ═══════════════════════════════════════════
 const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
-let allModels = [], activeFilter = "all";
+
+let allModels=[], activeFilter="all";
 
 (function(){
   const c=document.getElementById("stars"),ctx=c.getContext("2d");let s=[];
-  function resize(){c.width=innerWidth;c.height=innerHeight;}
-  function init(){s=[];const n=Math.floor(c.width*c.height/9000);for(let i=0;i<n;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+0.2,sp:Math.random()*0.003+0.001,ph:Math.random()*Math.PI*2});}
-  function draw(t){ctx.clearRect(0,0,c.width,c.height);for(const p of s){const a=0.15+0.6*(0.5+0.5*Math.sin(t*p.sp+p.ph));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,170,255,${a})`;ctx.fill();}requestAnimationFrame(draw);}
-  window.addEventListener("resize",()=>{resize();init();});resize();init();requestAnimationFrame(draw);
+  function r(){c.width=innerWidth;c.height=innerHeight;}
+  function init(){s=[];const n=Math.floor(c.width*c.height/9000);for(let i=0;i<n;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+.2,sp:Math.random()*.003+.001,ph:Math.random()*Math.PI*2});}
+  function d(t){ctx.clearRect(0,0,c.width,c.height);for(const p of s){const a=.15+.6*(.5+.5*Math.sin(t*p.sp+p.ph));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,170,255,${a})`;ctx.fill();}requestAnimationFrame(d);}
+  window.addEventListener("resize",()=>{r();init();});r();init();requestAnimationFrame(d);
 })();
 
-const saved = localStorage.getItem("ado_key_cache");
-if (saved) document.getElementById("keyInput").value = saved;
+// Pre-fill saved key
+const saved=localStorage.getItem("ado_key_cache");
+if(saved) document.getElementById("keyIn").value=saved;
 
-document.getElementById("btnLoad").addEventListener("click", load);
-document.getElementById("btnRefresh").addEventListener("click", load);
-document.getElementById("keyInput").addEventListener("keydown", e => { if(e.key==="Enter") load(); });
+document.getElementById("btnLoad").addEventListener("click",load);
+document.getElementById("btnRef").addEventListener("click",load);
+document.getElementById("keyIn").addEventListener("keydown",e=>{if(e.key==="Enter")load();});
 
-async function load() {
-  const key = document.getElementById("keyInput").value.trim();
-  const errBox = document.getElementById("errorBox");
-  errBox.className = "error-box";
-  if (!key) { errBox.textContent = "Please enter your ADO key."; errBox.className = "error-box visible"; return; }
-  localStorage.setItem("ado_key_cache", key);
-  const btn = document.getElementById("btnLoad");
-  btn.disabled = true; btn.textContent = "Loading...";
-  document.getElementById("modelsArea").innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title" style="margin-top:0.5rem">Fetching roster...</div></div>';
-  document.getElementById("statusRow").style.display = "none";
-  document.getElementById("filterRow").style.display = "none";
-  document.getElementById("btnRefresh").style.display = "none";
+async function load(){
+  const key=document.getElementById("keyIn").value.trim();
+  const err=document.getElementById("errBox"), info=document.getElementById("infoBox");
+  err.className="err-box"; info.className="info-box";
+  if(!key){err.textContent="Please enter your ADO key.";err.className="err-box vis";return;}
+  localStorage.setItem("ado_key_cache",key);
+  const btn=document.getElementById("btnLoad");
+  btn.disabled=true;btn.textContent="Loading...";
+  document.getElementById("area").innerHTML='<div class="state"><div class="spinner"></div><div class="st" style="margin-top:.6rem">Fetching from provider...</div></div>';
+  document.getElementById("statRow").style.display="none";
+  document.getElementById("filterRow").style.display="none";
+  document.getElementById("btnRef").style.display="none";
   try {
-    const r = await fetch(`${WORKER_URL}/v1/models`, { headers: { "Authorization": `Bearer ${key}` } });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
-    if (!d.data || !Array.isArray(d.data)) throw new Error("Unexpected response — models endpoint may not be configured.");
-    allModels = d.data;
-    renderModels();
-    document.getElementById("statusRow").style.display = "";
-    document.getElementById("filterRow").style.display = "";
-    document.getElementById("btnRefresh").style.display = "";
-  } catch(err) {
-    errBox.textContent = err.message; errBox.className = "error-box visible";
-    document.getElementById("modelsArea").innerHTML = '<div class="state-box"><div class="state-icon">⚠️</div><div class="state-title">Could not load models</div><div class="state-sub">Check your key and try again.</div></div>';
-  } finally { btn.disabled = false; btn.textContent = "Load Models"; }
+    const r=await fetch(WORKER_URL+"/v1/models",{headers:{"Authorization":"Bearer "+key}});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||"HTTP "+r.status);
+    if(!d.data||!Array.isArray(d.data)) throw new Error("Provider returned no model list. The /v1/models endpoint may not be supported by the current provider.");
+    allModels=d.data;
+    // Show provider info if available
+    const pInfo=r.headers.get("x-provider")||(d.provider?`From: ${d.provider}`:"");
+    if(d.data.length===0){
+      info.textContent="Provider returned 0 models. They may require a specific model to be set manually.";
+      info.className="info-box vis";
+    }
+    render();
+    document.getElementById("statRow").style.display="";
+    document.getElementById("filterRow").style.display="";
+    document.getElementById("btnRef").style.display="";
+  } catch(e){
+    err.textContent=e.message; err.className="err-box vis";
+    document.getElementById("area").innerHTML='<div class="state"><div class="si">⚠️</div><div class="st">Could not load models</div><div class="ss">Check your key and try again.</div></div>';
+  } finally{btn.disabled=false;btn.textContent="Load Models";}
 }
 
-function renderModels() {
-  let data = [...allModels];
-  if (activeFilter !== "all") data = data.filter(m => (m.ado_status||"available") === activeFilter);
-  const avail = allModels.filter(m=>!m.ado_status||m.ado_status==="available").length;
-  const deg = allModels.filter(m=>m.ado_status==="degraded").length;
-  const down = allModels.filter(m=>m.ado_status==="down").length;
-  document.getElementById("sTotal").textContent = allModels.length;
-  document.getElementById("sAvail").textContent = avail;
-  document.getElementById("sDeg").textContent = deg;
-  document.getElementById("sDown").textContent = down;
-  document.getElementById("mCount").textContent = `${data.length} model${data.length!==1?"s":""}`;
-  if (!data.length) { document.getElementById("modelsArea").innerHTML='<div class="state-box"><div class="state-icon">🔍</div><div class="state-title">No models match this filter</div></div>'; return; }
-  const grid = document.createElement("div"); grid.className="models-grid";
-  for (const m of data) {
-    const status = m.ado_status||"available";
-    const ctx = m.context_length||m.context_window||null;
-    const card = document.createElement("div");
-    card.className = `model-card ${status!=="available"?status:""}`;
-    card.innerHTML = `
-      <div class="model-top">
-        <div class="model-name">${m.id}</div>
-        <div class="status-dot ${status}" title="${status}"></div>
+function render(){
+  let data=[...allModels];
+  if(activeFilter!=="all") data=data.filter(m=>(m.ado_status||"available")===activeFilter);
+  const avail=allModels.filter(m=>!m.ado_status||m.ado_status==="available").length;
+  const deg=allModels.filter(m=>m.ado_status==="degraded").length;
+  const down=allModels.filter(m=>m.ado_status==="down").length;
+  document.getElementById("sTotal").textContent=allModels.length;
+  document.getElementById("sAvail").textContent=avail;
+  document.getElementById("sDeg").textContent=deg;
+  document.getElementById("sDown").textContent=down;
+  document.getElementById("mCount").textContent=data.length+" model"+(data.length!==1?"s":"");
+  if(!data.length){document.getElementById("area").innerHTML='<div class="state"><div class="si">🔍</div><div class="st">No models match filter</div></div>';return;}
+  const g=document.createElement("div"); g.className="grid";
+  for(const m of data){
+    const st=m.ado_status||"available";
+    const ctx=m.context_length||m.context_window||null;
+    const el=document.createElement("div");
+    el.className=`mcard ${st!=="available"?st:""}`;
+    el.innerHTML=`
+      <div class="mt">
+        <div class="mn">${m.id}</div>
+        <div class="sd ${st}" title="${st}"></div>
       </div>
-      <div class="model-badges">
-        <span class="mbadge mbadge-${status}">${status==="available"?"✓ Online":status==="degraded"?"⚡ Degraded":"✕ Offline"}</span>
-        ${m.type?`<span class="mbadge mbadge-type">${m.type}</span>`:""}
-        ${ctx?`<span class="mbadge mbadge-ctx">${fmt(ctx)} ctx</span>`:""}
+      <div class="badges">
+        <span class="bdg ${st==="available"?"bdg-a":st==="degraded"?"bdg-d":"bdg-x"}">${st==="available"?"✓ Online":st==="degraded"?"⚡ Degraded":"✕ Offline"}</span>
+        ${m.type?`<span class="bdg bdg-t">${m.type}</span>`:""}
+        ${ctx?`<span class="bdg bdg-c">${fmt(ctx)}</span>`:""}
       </div>
-      <div class="model-meta">
+      <div class="mm">
         ${m.owned_by?`Provider: <strong>${m.owned_by}</strong><br>`:""}
-        ${status==="degraded"?'<span style="color:var(--warn)">⚡ May be slow or unstable</span>':""}
-        ${status==="down"?'<span style="color:var(--error)">✕ Currently unavailable</span>':""}
+        ${st==="degraded"?'<span style="color:var(--warn)">⚡ May respond slowly or produce errors</span>':""}
+        ${st==="down"?'<span style="color:var(--error)">✕ Currently unavailable — try another model</span>':""}
       </div>
-      <button class="copy-btn" onclick="copyModel('${m.id}',this)">Copy Model Name</button>
+      <button class="cbtn" onclick="cpyM('${m.id}',this)">Copy Model Name</button>
     `;
-    grid.appendChild(card);
+    g.appendChild(el);
   }
-  document.getElementById("modelsArea").innerHTML="";
-  document.getElementById("modelsArea").appendChild(grid);
+  document.getElementById("area").innerHTML="";
+  document.getElementById("area").appendChild(g);
 }
 
-function fmt(n){return n>=1000000?(n/1000000).toFixed(0)+"M":n>=1000?(n/1000).toFixed(0)+"K":String(n);}
-function copyModel(id,btn){navigator.clipboard.writeText(id).then(()=>{btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="Copy Model Name";btn.classList.remove("copied");},2000);});}
-document.querySelectorAll(".filter-pill").forEach(p=>{p.addEventListener("click",()=>{document.querySelectorAll(".filter-pill").forEach(x=>x.classList.remove("active"));p.classList.add("active");activeFilter=p.dataset.f;renderModels();});});
+function fmt(n){return n>=1e6?(n/1e6).toFixed(0)+"M":n>=1000?(n/1000).toFixed(0)+"K":String(n);}
+function cpyM(id,btn){navigator.clipboard.writeText(id).then(()=>{btn.textContent="✓ Copied!";btn.classList.add("copied");setTimeout(()=>{btn.textContent="Copy Model Name";btn.classList.remove("copied");},2000);});}
+document.querySelectorAll(".fp").forEach(p=>{p.addEventListener("click",()=>{document.querySelectorAll(".fp").forEach(x=>x.classList.remove("active"));p.classList.add("active");activeFilter=p.dataset.f;render();});});
 </script>
 </body>
 </html>
