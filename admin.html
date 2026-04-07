@@ -234,6 +234,7 @@
     <button class="tab" data-tab="models">Models</button>
     <button class="tab" data-tab="providers">Providers</button>
     <button class="tab" data-tab="system">System</button>
+    <button class="tab" data-tab="analytics">Analytics</button>
   </div>
 
   <div class="content">
@@ -293,8 +294,10 @@
               <th data-sort="created">Issued</th>
               <th>Status</th>
               <th>Action</th>
-            </tr></thead>
-            <tbody id="keysBody"><tr><td colspan="7" class="tm">Loading...</td></tr></tbody>
+            </tr>
+            </thead>
+            <tbody id="keysBody"><tr><td colspan="7" class="tm">Loading...</td></tr>
+            </tbody>
           </table>
         </div>
         <div class="tf_"><span id="tableCount">—</span><span>Click headers to sort</span></div>
@@ -440,6 +443,27 @@
       </div>
     </div>
 
+    <!-- ANALYTICS TAB -->
+    <div class="tp" id="tab-analytics">
+      <div class="sg">
+        <div class="sc"><div class="sl_">Requests Today</div><div class="sv c" id="anReqs">—</div></div>
+        <div class="sc"><div class="sl_">Active Users Today</div><div class="sv g" id="anUsers">—</div></div>
+        <div class="sc"><div class="sl_">Total Keys</div><div class="sv" id="anKeys">—</div></div>
+      </div>
+      <div class="block">
+        <div class="bh"><span class="bt_">🏆 Top Models Today</span><button class="btn c sm" id="btnRefAn">Refresh ↻</button></div>
+        <div class="bb" id="anModels"><div class="tm">Loading analytics...</div></div>
+      </div>
+      <div class="block">
+        <div class="bh"><span class="bt_">📈 Hourly Today (24h)</span></div>
+        <div class="bb" id="anHourly"><div class="tm">Loading...</div></div>
+      </div>
+      <div class="block">
+        <div class="bh"><span class="bt_">📅 7-Day Trend</span></div>
+        <div class="bb" id="anTrend"><div class="tm">Loading...</div></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -472,6 +496,7 @@ document.querySelectorAll(".tab").forEach(t=>{
     if(t.dataset.tab==="trial") loadTrialKeys();
     if(t.dataset.tab==="models") loadModelOverrides();
     if(t.dataset.tab==="providers") loadProviders();
+    if(t.dataset.tab==="analytics") loadAnalytics();
   });
 });
 
@@ -846,6 +871,51 @@ function fmtJSON(obj,i=0){
   const inner=ent.map(([k,v])=>isA?`${pad}${fmtJSON(v,i+1)}`:`${pad}<span class="ck">"${k}"</span>: ${fmtJSON(v,i+1)}`).join(",\n");
   return(isA?`[\n${inner}\n`:`{\n${inner}\n`)+"  ".repeat(i)+(isA?"]":"}");
 }
+
+// ── ANALYTICS ─────────────────────────────────────────
+async function loadAnalytics() {
+  try {
+    const r = await api("/admin/analytics"); const d = await r.json();
+    if (!r.ok) return;
+    document.getElementById("anReqs").textContent  = d.totalRequestsToday;
+    document.getElementById("anUsers").textContent = d.activeUsersToday;
+    document.getElementById("anKeys").textContent  = d.totalKeys;
+
+    // Top models
+    const mc = document.getElementById("anModels");
+    if (!d.topModels?.length) { mc.innerHTML = '<div class="tm">No model data yet — send some requests first.</div>'; }
+    else {
+      const max = d.topModels[0].requests;
+      mc.innerHTML = d.topModels.map(m => `
+        <div style="display:flex;align-items:center;gap:.7rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.03)">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--cyan);flex:1;word-break:break-all">${m.model}</div>
+          <div style="flex:2;height:6px;background:var(--wire);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--gold);width:${Math.round((m.requests/max)*100)}%"></div></div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--gold);width:30px;text-align:right">${m.requests}</div>
+        </div>`).join("");
+    }
+
+    // Hourly
+    const hc = document.getElementById("anHourly");
+    const maxH = Math.max(...(d.hourlyToday||[]).map(h=>h.requests), 1);
+    hc.innerHTML = (d.hourlyToday||[]).map(h => `
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.3rem 0">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--muted);width:35px">${String(h.hour).padStart(2,"0")}:00</div>
+        <div style="flex:1;height:5px;background:var(--wire);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--cyan);width:${Math.round((h.requests/maxH)*100)}%"></div></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text);width:22px;text-align:right">${h.requests}</div>
+      </div>`).join("");
+
+    // 7-day
+    const tc = document.getElementById("anTrend");
+    const maxD = Math.max(...(d.sevenDayTrend||[]).map(d=>d.requests), 1);
+    tc.innerHTML = (d.sevenDayTrend||[]).map(day => `
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.3rem 0">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--muted);width:55px">${day.date.slice(5)}</div>
+        <div style="flex:1;height:6px;background:var(--wire);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--green);width:${Math.round((day.requests/maxD)*100)}%"></div></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text);width:35px;text-align:right">${day.requests} req</div>
+      </div>`).join("");
+  } catch(e) { log("Analytics error: "+e.message,"err"); }
+}
+document.getElementById("btnRefAn")?.addEventListener("click", loadAnalytics);
 </script>
 </body>
 </html>
