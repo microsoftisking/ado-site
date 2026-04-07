@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ADO Status</title>
+  <meta http-equiv="refresh" content="60">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#07070f;--surface:#0f0f1c;--surface2:#15152a;--border:#252545;--accent:#c084fc;--accent2:#f472b6;--accent3:#67e8f9;--accent4:#fbbf24;--text:#ede8ff;--muted:#6060a0;--success:#4ade80;--error:#f87171;--warn:#fb923c;}
+    html,body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+    #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .page{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:2rem 1rem 4rem;}
+    header{text-align:center;padding:2rem 0 1.5rem;}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.2em;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .logo-sub{font-size:.75rem;color:var(--muted);letter-spacing:.1em;margin-top:2px;}
+    .hero-status{margin:1.5rem 0;text-align:center;padding:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:20px;}
+    .hero-dot{width:18px;height:18px;border-radius:50%;margin:0 auto .75rem;transition:all .3s;}
+    .hero-dot.ok{background:var(--success);box-shadow:0 0 20px var(--success),0 0 40px rgba(74,222,128,.3);animation:hpulse 2s ease-in-out infinite;}
+    .hero-dot.down{background:var(--error);box-shadow:0 0 20px var(--error);}
+    .hero-dot.checking{background:var(--accent4);box-shadow:0 0 16px var(--accent4);animation:spin2 1s linear infinite;}
+    @keyframes hpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+    @keyframes spin2{to{transform:rotate(360deg)}}
+    .hero-label{font-size:1.4rem;font-weight:800;}
+    .hero-label.ok{color:var(--success);}
+    .hero-label.down{color:var(--error);}
+    .hero-label.checking{color:var(--accent4);}
+    .hero-sub{font-size:.82rem;color:var(--muted);margin-top:.3rem;}
+    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:1.25rem 0;}
+    .mc{background:var(--surface);padding:1rem 1.1rem;}
+    .mc-label{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;}
+    .mc-val{font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;}
+    .mc-val.g{color:var(--success);} .mc-val.c{color:var(--accent3);} .mc-val.w{color:var(--accent4);}
+    .section{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:1rem;overflow:hidden;}
+    .section-title{padding:.85rem 1.2rem;border-bottom:1px solid var(--border);font-weight:800;font-size:.88rem;color:var(--accent);display:flex;align-items:center;gap:.5rem;}
+    .bar-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.04);}
+    .bar-row:last-child{border-bottom:none;}
+    .bar-label{font-size:.72rem;color:var(--muted);width:80px;flex-shrink:0;font-family:'Space Mono',monospace;}
+    .bar-track{flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent3),var(--accent));transition:width .8s cubic-bezier(.4,0,.2,1);}
+    .bar-num{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);width:30px;text-align:right;flex-shrink:0;}
+    .model-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.04);}
+    .model-row:last-child{border-bottom:none;}
+    .model-name{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--accent3);}
+    .model-count{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+    .pill{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;border-radius:99px;font-size:.68rem;font-weight:700;}
+    .pill-ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:var(--success);}
+    .pill-down{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:var(--error);}
+    .pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+    footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:1.5rem;}
+    footer a{color:var(--accent);text-decoration:none;}
+    .announce-box{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem;font-size:.84rem;color:var(--accent4);line-height:1.6;display:none;}
+    .announce-box.vis{display:block;}
+    .last-updated{font-size:.68rem;color:var(--muted);text-align:center;margin-bottom:1rem;}
+    .spinner{width:18px;height:18px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin2 .8s linear infinite;margin:0 auto;}
+  </style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="page">
+  <header>
+    <div class="logo">ADO STATUS</div>
+    <div class="logo-sub">Live · Refreshes every 60 seconds</div>
+  </header>
+
+  <div class="hero-status">
+    <div class="hero-dot checking" id="heroDot"></div>
+    <div class="hero-label checking" id="heroLabel">Checking...</div>
+    <div class="hero-sub" id="heroSub">Connecting to ADO gateway</div>
+  </div>
+
+  <div class="announce-box" id="announceBox"></div>
+  <div class="last-updated" id="lastUpdated">Fetching live data...</div>
+
+  <div class="metrics" id="metrics" style="display:none">
+    <div class="mc"><div class="mc-label">Requests Today</div><div class="mc-val c" id="mReqs">—</div></div>
+    <div class="mc"><div class="mc-label">Active Users</div><div class="mc-val g" id="mUsers">—</div></div>
+    <div class="mc"><div class="mc-label">Daily Limit</div><div class="mc-val w" id="mLimit">—</div></div>
+    <div class="mc"><div class="mc-label">Providers</div><div class="mc-val" id="mProviders">—</div></div>
+  </div>
+
+  <div class="section" id="hourlySection" style="display:none">
+    <div class="section-title">📈 Requests — Last 24h</div>
+    <div id="hourlyBars"></div>
+  </div>
+
+  <div class="section" id="trendSection" style="display:none">
+    <div class="section-title">📅 7-Day Trend</div>
+    <div id="trendBars"></div>
+  </div>
+
+  <div class="section" id="modelsSection" style="display:none">
+    <div class="section-title">🎙 Top Models Today</div>
+    <div id="modelsList"></div>
+  </div>
+
+  <footer>ADO LIVE Beta · <a href="index.html">← Dashboard</a> · Auto-refreshes every 60 seconds</footer>
+</div>
+
+<script>
+const WORKER_URL = "https://apiado.burgerboixs.workers.dev";
+
+(function(){
+  const c=document.getElementById("stars"),ctx=c.getContext("2d");let s=[];
+  function r(){c.width=innerWidth;c.height=innerHeight;}
+  function init(){s=[];const n=Math.floor(c.width*c.height/10000);for(let i=0;i<n;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.1+.2,sp:Math.random()*.003+.001,ph:Math.random()*Math.PI*2});}
+  function d(t){ctx.clearRect(0,0,c.width,c.height);for(const p of s){const a=.12+.5*(.5+.5*Math.sin(t*p.sp+p.ph));ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,170,255,${a})`;ctx.fill();}requestAnimationFrame(d);}
+  window.addEventListener("resize",()=>{r();init();});r();init();requestAnimationFrame(d);
+})();
+
+async function load() {
+  try {
+    const r = await fetch(`${WORKER_URL}/analytics/public`);
+    const d = await r.json();
+
+    // Hero
+    const dot   = document.getElementById("heroDot");
+    const label = document.getElementById("heroLabel");
+    const sub   = document.getElementById("heroSub");
+    dot.className   = "hero-dot ok";
+    label.className = "hero-label ok";
+    label.textContent = "All Systems Operational";
+    sub.textContent   = "ADO gateway is online and accepting requests.";
+
+    // Announcement
+    const ab = document.getElementById("announceBox");
+    if (d.announcement) { ab.textContent = "📢 " + d.announcement; ab.className = "announce-box vis"; }
+    else ab.className = "announce-box";
+
+    // Metrics
+    document.getElementById("mReqs").textContent     = d.requestsToday.toLocaleString();
+    document.getElementById("mUsers").textContent    = d.activeUsersToday;
+    document.getElementById("mLimit").textContent    = d.dailyLimit + "/day";
+    document.getElementById("mProviders").textContent= d.providers;
+    document.getElementById("metrics").style.display = "";
+
+    // Hourly bars (last 24h, skip zeros at start)
+    const hours = d.hourlyToday || [];
+    const maxH = Math.max(...hours.map(h=>h.requests), 1);
+    if (hours.some(h=>h.requests>0)) {
+      const hc = document.getElementById("hourlyBars");
+      hc.innerHTML = "";
+      for (const h of hours) {
+        const pct = Math.round((h.requests/maxH)*100);
+        const row = document.createElement("div"); row.className="bar-row";
+        row.innerHTML=`<div class="bar-label">${String(h.hour).padStart(2,"0")}:00</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-num">${h.requests}</div>`;
+        hc.appendChild(row);
+      }
+      document.getElementById("hourlySection").style.display="";
+    }
+
+    // 7-day trend
+    const days = d.sevenDayTrend || [];
+    const maxD = Math.max(...days.map(d=>d.requests), 1);
+    if (days.some(d=>d.requests>0)) {
+      const dc = document.getElementById("trendBars");
+      dc.innerHTML="";
+      for (const day of days) {
+        const pct = Math.round((day.requests/maxD)*100);
+        const row = document.createElement("div"); row.className="bar-row";
+        row.innerHTML=`<div class="bar-label">${day.date.slice(5)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-num">${day.requests}</div>`;
+        dc.appendChild(row);
+      }
+      document.getElementById("trendSection").style.display="";
+    }
+
+    document.getElementById("lastUpdated").textContent = "Last updated: " + new Date().toUTCString().slice(0,25) + " UTC";
+
+  } catch(e) {
+    const dot   = document.getElementById("heroDot");
+    const label = document.getElementById("heroLabel");
+    const sub   = document.getElementById("heroSub");
+    dot.className   = "hero-dot down";
+    label.className = "hero-label down";
+    label.textContent = "Service Disruption";
+    sub.textContent   = "ADO gateway is not responding. Check back shortly.";
+    document.getElementById("lastUpdated").textContent = "Failed to load: " + e.message;
+  }
+}
+
+load();
+</script>
+</body>
+</html>
