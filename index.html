@@ -368,6 +368,26 @@
       <div class="endpoint-url" id="endpointDisplay">loading...</div>
     </div>
 
+    <!-- LOREBOOK CARD -->
+    <div class="info-card" id="lorebookCard" style="display:none">
+      <div class="howto-title">
+        📖 Global Lorebook
+        <span style="font-size:0.72rem;color:var(--muted);font-weight:400">injected into every message</span>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.9rem;line-height:1.6">
+        Type your world rules, character notes, or universe lore here. ADO automatically prepends this to every request you send — no more pasting it into every new chat.
+      </p>
+      <textarea id="lorebookText" placeholder="e.g. Setting: feudal Japan. Main character Hana is a 19-year-old shrine maiden with the ability to see spirits..." style="width:100%;min-height:120px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.82rem;padding:0.75rem;outline:none;resize:vertical;line-height:1.6;transition:border-color 0.2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;flex-wrap:wrap;gap:0.5rem">
+        <span id="lbCharCount" style="font-size:0.7rem;color:var(--muted)">0 / 6000 chars</span>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn-icon" id="btnLbClear" style="color:var(--error);border-color:rgba(248,113,113,0.3)">🗑 Clear</button>
+          <button class="btn-icon" id="btnLbSave" style="border-color:var(--accent);color:var(--accent)">💾 Save Lorebook</button>
+        </div>
+      </div>
+      <div id="lbStatus" style="font-size:0.72rem;margin-top:0.4rem;min-height:1em;color:var(--muted)"></div>
+    </div>
+
     <div class="info-card">
       <div class="howto-title">
         🛠 Quick Setup Guide
@@ -381,7 +401,12 @@
       </div>
     </div>
 
-    <footer>ADO LIVE Beta · Free for the community · <a href="admin.html">Admin ⚙</a></footer>
+    <footer>
+      ADO LIVE Beta · Free for the community ·
+      <a href="models.html">🎙 Models</a> ·
+      <a href="status.html">📡 Status</a> ·
+      <a href="admin.html">Admin ⚙</a><br>
+    </footer>
   </div>
 </div><!-- end .page -->
 
@@ -801,6 +826,7 @@ async function onUserSignedIn(user) {
     if (d.isNew) setTimeout(() => showGacha(d.key), 400);
 
     await fetchUsage(d.key);
+    loadLorebook(d.key);
   } catch (err) {
     document.getElementById("keyDisplay").textContent = "Error: " + err.message;
     showScreen("dashboard");
@@ -876,11 +902,11 @@ async function checkStatus() {
     document.getElementById("tickerDot").className = "ticker-dot" + (d.ok ? "" : " offline");
     if (d.announcement) {
       document.getElementById("tickerText").textContent =
-        `📢 ${d.announcement}   ✦   ADO LIVE BETA · ${d.limit || 5} REQ/DAY   ✦   FREE FOR THE COMMUNITY   ✦   RESETS MIDNIGHT UTC`;
+        `📢 ${d.announcement}   ✦   ADO LIVE BETA · ${d.limit||5} REQ/DAY   ✦   RESETS MIDNIGHT UTC`;
     } else {
       document.getElementById("tickerText").textContent = d.ok
-        ? `✦ ADO LIVE BETA — All systems operational · ${d.limit || 5} req/day · Free forever`
-        : "⚠ SERVICE DISRUPTION · Global pool issue · Check back soon";
+        ? `✦ ADO LIVE BETA — All systems operational · ${d.limit||5} req/day · ${d.providerCount||1} provider(s) active · Free forever`
+        : "⚠ SERVICE DISRUPTION · Check back soon";
     }
   } catch {
     document.getElementById("tickerDot").className = "ticker-dot offline";
@@ -908,6 +934,53 @@ document.getElementById("btnCopyST").addEventListener("click", () => {
   if (!currentKey) return;
   navigator.clipboard.writeText(`Custom API\nAPI Url: ${WORKER_URL}\nAPI Key: ${currentKey}`);
   tempLabel(document.getElementById("btnCopyST"), "🧠 SillyTavern", "✓ Copied!");
+});
+
+// ── LOREBOOK ─────────────────────────────────────────────────
+async function loadLorebook(key) {
+  try {
+    const r = await fetch(`${WORKER_URL}/lorebook`, { headers: { "Authorization": `Bearer ${key}` } });
+    const d = await r.json();
+    if (d.lorebook) {
+      document.getElementById("lorebookText").value = d.lorebook;
+      updateLbCount();
+    }
+    document.getElementById("lorebookCard").style.display = "";
+  } catch {}
+}
+
+function updateLbCount() {
+  const len = document.getElementById("lorebookText").value.length;
+  document.getElementById("lbCharCount").textContent = `${len} / 6000 chars`;
+}
+document.getElementById("lorebookText")?.addEventListener("input", updateLbCount);
+
+document.getElementById("btnLbSave")?.addEventListener("click", async () => {
+  if (!currentKey) return;
+  const text = document.getElementById("lorebookText").value.trim();
+  const st   = document.getElementById("lbStatus");
+  const btn  = document.getElementById("btnLbSave");
+  btn.textContent = "Saving...";
+  try {
+    const r = await fetch(`${WORKER_URL}/lorebook`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${currentKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ lorebook: text }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      st.textContent = text ? `✓ Saved (${d.length} chars) — injected into every request` : "✓ Lorebook cleared";
+      st.style.color = "var(--success)";
+    } else { st.textContent = "Save failed: " + (d.error || "unknown"); st.style.color = "var(--error)"; }
+  } catch(e) { st.textContent = "Error: " + e.message; st.style.color = "var(--error)"; }
+  btn.textContent = "💾 Save Lorebook";
+  setTimeout(() => { st.textContent = ""; }, 4000);
+});
+
+document.getElementById("btnLbClear")?.addEventListener("click", async () => {
+  if (!currentKey || !confirm("Clear your lorebook? It will no longer be injected.")) return;
+  document.getElementById("lorebookText").value = "";
+  document.getElementById("btnLbSave")?.click();
 });
 
 // ── GACHA ──
